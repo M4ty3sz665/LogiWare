@@ -1,0 +1,18 @@
+const express = require("express")
+const server = express()
+server.use(express.static("public"))
+const dbHandler = require("./dbHandler")
+server.use(express.json())
+require("dotenv").config()
+const PORT = process.env.PORT
+//server.use('./UserRoutes')
+/*dbHandler.Users.sync({ alter: true })
+dbHandler.Products.sync({ alter: true })
+dbHandler.OrderItems.sync({ alter: true })
+dbHandler.Orders.sync({ alter: true })
+dbHandler.ClientCompanies.sync({ alter: true })
+dbHandler.Suppliers.sync({ alter: true })
+dbHandler.stockMovements.sync({ alter: true })
+dbHandler.Stock.sync({ alter: true })
+dbHandler.Receipts.sync({ alter: true })*/
+server.listen(PORT,()=>{console.log( "server is running on port " + PORT)})
