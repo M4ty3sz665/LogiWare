@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raktárkészlet - Pro Inventory</title>
+    <!-- Authentication Check Script (Ez fusson le legelőször) -->
+    <script>
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            // Ha nincs bejelentkezve, visszadobjuk a loginra
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* --- A TE EREDETI CSS KÓDOD (Változtatás nélkül + kiegészítések) --- */
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.85)),
+                        url('https://images.unsplash.com/photo-1553413077-190dd305871c?q=80&w=1935&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            overflow-x: hidden; /* Gördítősáv fix */
+        }
+
+        /* Input mezők stílusa (Login/Registerből átemelve) */
+        input, select.form-select {
+            background-color: #2a2a2a !important;
+            color: #fff !important;
+            border: 1px solid #555 !important;
+            transition: all 0.25s ease;
+        }
+        input::placeholder { color: #c5c5c5 !important; }
+        
+        input:focus, select.form-select:focus {
+            background-color: #333 !important;
+            border-color: #ffffff !important;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            transform: scale(1.01);
+            outline: none;
+        }
+
+        /* Gombok stílusa (Login/Registerből átemelve) */
+        .btn-dark {
+            background-color: transparent;
+            color: #fff;
+            border: 1px solid #fff;
+            font-family: monospace;
+            font-weight: 700;
+            transition: all 0.3s ease-in-out;
+        }
+        .btn-dark:hover {
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 0 10px #fff; 
+            border: 1px solid #fff !important;
+        }
+        
+        /* Piros gomb a törléshez/kijelentkezéshez */
+        .btn-danger-custom {
+            background: transparent;
+            border: 1px solid #ff4d4d;
+            color: #ff4d4d;
+            font-family: monospace;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+        .btn-danger-custom:hover {
+            background: #ff4d4d;
+            color: #fff;
+            box-shadow: 0 0 10px #ff4d4d;
+        }
+
+        /* --- DASHBOARD SPECIFIKUS STÍLUSOK --- */
+        
+        /* A fő doboz, ami követi a .custom-box dizájnt, de szélesebb */
+        .dashboard-container {
+            background: linear-gradient(10deg, #000000, #3a3a3a);
+            border-radius: 12px;
+            box-shadow: 0 0 20px #000;
+            padding: 25px;
+            margin: 20px auto;
+            min-height: 85vh;
+        }
+
+        /* Sidebar stílus */
+        .sidebar {
+            border-right: 1px solid rgba(255,255,255,0.1);
+            padding-right: 20px;
+        }
+        .nav-link {
+            color: #ccc;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        /* Táblázat stílus */
+        .table-dark-custom {
+            --bs-table-bg: #2a2a2a;
+            --bs-table-color: #fff;
+            border-color: rgba(255,255,255,0.1);
+        }
+        .table-dark-custom th {
+            background-color: #333;
+            color: #fff;
+            border-bottom: 2px solid #555;
+        }
+        .table-dark-custom td {
+            vertical-align: middle;
+            background-color: #2a2a2a; /* Fix a csíkozáshoz */
+        }
+        .table-hover tbody tr:hover td {
+            background-color: #3a3a3a;
+            color: #fff;
+        }
+
+        /* Modal stílus (hogy illeszkedjen a sötét témához) */
+        .modal-content {
+            background: linear-gradient(10deg, #1a1a1a, #2a2a2a);
+            color: white;
+            border: 1px solid #555;
+            box-shadow: 0 0 20px #000;
+        }
+        .modal-header { border-bottom: 1px solid #444; }
+        .modal-footer { border-top: 1px solid #444; }
+        .btn-close { filter: invert(1); } /* Fehér X gomb */
+        .btn-close { filter: invert(1); }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid p-4">
+    <div class="dashboard-container">
+        <div class="row h-100">
+            
+            <!-- SIDEBAR -->
+            <div class="col-md-3 col-lg-2 sidebar d-none d-md-block">
+                <h3 class="text-white mb-4 ps-2">📦 ProInv.</h3>
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#">📊 Készlet</a>
+                    <a class="nav-link" href="#">📥 Bevételezés</a>
+                    <a class="nav-link" href="#">📤 Kiadás</a>
+                </nav>
+                
+                <div class="mt-5 pt-5">
+                    <div class="small text-secondary mb-2 ps-2">Belépve mint:</div>
+                    <div class="d-flex align-items-center mb-4 ps-2">
+                        <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center text-white" style="width:35px;height:35px;font-weight:bold" id="userAvatar">
+                            <!-- Initials here -->
+                        </div>
+                        <div>
+                            <strong id="displayUserName">Betöltés...</strong><br>
+                            <small id="displayUserRole" class="text-info">...</small>
+                        </div>
+                    </div>
+                    <button onclick="logout()" class="btn btn-danger-custom w-100">Kijelentkezés</button>
+                </div>
+            </div>
+
+            <!-- FŐ TARTALOM -->
+            <div class="col-md-9 col-lg-10 ps-md-4">
+                <div class="d-md-none mb-3 d-flex justify-content-between align-items-center">
+                    <h3>ProInv.</h3>
+                    <button onclick="logout()" class="btn btn-sm btn-danger-custom">Kilépés</button>
+                </div>
+
+                <!-- KERESŐ & TÁBLÁZAT -->
+                <div class="row mb-4 align-items-end g-3">
+                    <div class="col-md-5">
+                        <label class="mb-1 text-secondary">Keresés</label>
+                        <input type="text" id="searchInput" class="form-control" placeholder="SKU vagy terméknév...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="mb-1 text-secondary">Raktár szűrés</label>
+                        <select id="filterSelect" class="form-select">
+                            <option value="">Összes raktár</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <button class="btn btn-dark" onclick="openModal(true)">+ Új termék</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive rounded-3 border border-secondary">
+                    <table class="table table-dark-custom table-hover mb-0">
+                        <thead>
+                            <tr><th>Termék név</th><th>SKU</th><th>Mennyiség</th><th>Hely</th><th class="text-end">Műveletek</th></tr>
+                        </thead>
+                        <tbody id="inventoryTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL (ugyanaz mint volt) -->
+<div class="modal fade" id="productModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title" id="modalTitle">Termék adatok</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <input type="hidden" id="productId">
+        <div class="mb-3"><label>Név</label><input type="text" id="inpName" class="form-control"></div>
+        <div class="mb-3"><label>SKU</label><input type="text" id="inpSku" class="form-control"></div>
+        <div class="row"><div class="col-6"><label>Mennyiség</label><input type="number" id="inpQty" class="form-control"></div><div class="col-6"><label>Hely</label><input type="text" id="inpLoc" class="form-control"></div></div>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Mégse</button><button type="button" class="btn btn-light" onclick="saveProduct()">Mentés</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // --- 1. USER MEGJELENÍTÉS (ÚJ RÉSZ) ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const userJson = localStorage.getItem('currentUser');
+        if(userJson) {
+            const user = JSON.parse(userJson);
+            // Név és Beosztás kiírása
+            document.getElementById('displayUserName').textContent = `${user.lName} ${user.fName}`;
+            document.getElementById('displayUserRole').textContent = user.role;
+            // Avatar monogram
+            document.getElementById('userAvatar').textContent = user.lName.charAt(0) + user.fName.charAt(0);
+        }
+        
+        renderTable();
+        myModal = new bootstrap.Modal(document.getElementById('productModal'));
+    });
+
+    // --- 2. KIJELENTKEZÉS FÜGGVÉNY ---
+    function logout() {
+        if(confirm("Biztosan ki szeretnél lépni?")) {
+            localStorage.removeItem('currentUser'); // Session törlése
+            window.location.href = 'login.html';
+        }
+    }
+
+    // --- 3. RAKTÁR LOGIKA (EZ A RÉGI KÓDOD) ---
+    let products = [
+        { id: 1, name: "EUR Raklap", sku: "PLT-EU", qty: 45, loc: "B-01" },
+        { id: 2, name: "Stretch Fólia", sku: "FL-TR-500", qty: 120, loc: "A-12" },
+        { id: 3, name: "Pántolószalag", sku: "STR-PP", qty: 8, loc: "C-05" },
+    ];
+    let myModal;
+    const tableBody = document.getElementById('inventoryTableBody');
+    const searchInput = document.getElementById('searchInput');
+    const filterSelect = document.getElementById('filterSelect');
+
+    function renderTable() {
+        const query = searchInput.value.toLowerCase();
+        const locFilter = filterSelect.value;
+        const filtered = products.filter(p => (p.name.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query)) && (!locFilter || p.loc === locFilter));
+        
+        tableBody.innerHTML = filtered.length ? '' : '<tr><td colspan="5" class="text-center p-3 text-secondary">Nincs találat</td></tr>';
+        
+        filtered.forEach(p => {
+            tableBody.innerHTML += `<tr>
+                <td><strong>${p.name}</strong></td>
+                <td class="text-secondary">${p.sku}</td>
+                <td><span class="badge ${p.qty<10?'bg-danger':'bg-success'}">${p.qty} db</span></td>
+                <td>${p.loc}</td>
+                <td class="text-end">
+                    <button class="btn btn-sm btn-outline-light" onclick="editProduct(${p.id})">✏️</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(${p.id})">🗑️</button>
+                </td></tr>`;
+        });
+        updateFilterOptions();
+    }
+
+    function updateFilterOptions() {
+        const locations = [...new Set(products.map(p => p.loc))].sort();
+        if (filterSelect.options.length - 1 !== locations.length) {
+            const currentVal = filterSelect.value;
+            filterSelect.innerHTML = '<option value="">Összes raktár</option>' + locations.map(l => `<option value="${l}">${l}</option>`).join('');
+            filterSelect.value = currentVal;
+        }
+    }
+
+    window.openModal = function(isNew) {
+        if(isNew) {
+            document.getElementById('modalTitle').innerText = "Új termék";
+            document.getElementById('productId').value = ''; document.getElementById('inpName').value = '';
+            document.getElementById('inpSku').value = ''; document.getElementById('inpQty').value = ''; document.getElementById('inpLoc').value = '';
+        }
+        myModal.show();
+    }
+    window.editProduct = function(id) {
+        const p = products.find(x => x.id === id);
+        if(!p) return;
+        document.getElementById('modalTitle').innerText = "Szerkesztés";
+        document.getElementById('productId').value = p.id; document.getElementById('inpName').value = p.name;
+        document.getElementById('inpSku').value = p.sku; document.getElementById('inpQty').value = p.qty; document.getElementById('inpLoc').value = p.loc;
+        myModal.show();
+    };
+    window.saveProduct = function() {
+        const idVal = document.getElementById('productId').value;
+        const name = document.getElementById('inpName').value, sku = document.getElementById('inpSku').value;
+        const qty = parseInt(document.getElementById('inpQty').value), loc = document.getElementById('inpLoc').value;
+        if(!name || !sku) return alert("Név és SKU kötelező!");
+        if(idVal) { const idx = products.findIndex(p=>p.id==idVal); if(idx>-1) products[idx] = {id:parseInt(idVal), name, sku, qty, loc}; }
+        else { products.push({id: Date.now(), name, sku, qty, loc}); }
+        myModal.hide(); renderTable();
+    };
+    window.deleteProduct = function(id) { if(confirm("Törlöd?")) { products = products.filter(p=>p.id!==id); renderTable(); } };
+    
+    searchInput.addEventListener('input', renderTable);
+    filterSelect.addEventListener('change', renderTable);
+</script>
+</body>
+</html>
