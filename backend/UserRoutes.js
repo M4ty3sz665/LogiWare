@@ -35,7 +35,8 @@ Server.server.post("/register", async (req, res) => {
             password: req.body.password,
             phone:req.body.phone,
             role:req.body.role,
-            email:req.body.email
+            email:req.body.email,
+            admin:req.body.admin
         })
         res.json({"message":"Successful registration"})
         res.status(201).end()

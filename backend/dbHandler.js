@@ -34,7 +34,11 @@ const user = sequelize.define('user', {
     joined_at:{
         type:DataTypes.DATE,
         defaultValue:DataTypes.NOW
-    }
+    },
+	admin:{
+		type:DataTypes.BOOLEAN,
+		defaultValue:false
+	}
 })
 
 const product = sequelize.define('product', {
@@ -87,9 +91,6 @@ const orderItem = sequelize.define('order_item', {
 		type: DataTypes.INTEGER,
         default:1
 	},
-	image_name: {
-		type: DataTypes.STRING
-	},
     unit_price_net:{
         type:DataTypes.INTEGER,
         allowNull:false
@@ -105,11 +106,7 @@ const orderItem = sequelize.define('order_item', {
 })
 
 const order = sequelize.define('order', {
-	id: {
-		type: DataTypes.INTEGER,
-		primaryKey: true,
-		autoIncrement: true
-	},
+
 	item_id: {
 		type: DataTypes.INTEGER,
 		allowNull: false
@@ -118,18 +115,15 @@ const order = sequelize.define('order', {
 		type: DataTypes.INTEGER,
 		allowNull: false
 	},
-	suppllier_id: {
-		type: DataTypes.INTEGER,
-        default:1
-	},
 	created_at: {
 		type: DataTypes.DATE,
         defaultValue:DataTypes.NOW
 	},
     order_number:{
         type:DataTypes.INTEGER,
-        allowNull:false
-    },
+		primaryKey:true,
+		autoIncrement:tr
+	},
     status:{
         type:DataTypes.STRING,
         defaultValue:"TBD"
@@ -145,7 +139,10 @@ const order = sequelize.define('order', {
     due_date:{
         type:DataTypes.DATEONLY,
         allowNull:false
-    }
+    },
+	due_time:{
+		type:DataTypes.TIME
+	}
 })
 
 const client_company = sequelize.define('client_company', {
@@ -155,7 +152,7 @@ const client_company = sequelize.define('client_company', {
 		autoIncrement: true
 	},
 	admitted_at: {
-		type: DataTypes.DATE,
+		type: DataTypes.DATEONLY,
 		defaultValue: DataTypes.NOW
 	},
 	company_name: {
@@ -173,41 +170,6 @@ const client_company = sequelize.define('client_company', {
         allowNull:false
     },
     billing_address:{
-        type:DataTypes.STRING
-    },
-    email:{
-        type:DataTypes.STRING,
-        allowNull:false
-    },
-    phone:{
-        type:DataTypes.STRING,
-        allowNull:false
-    }
-})
-
-const supplier = sequelize.define('client_company', {
-	id: {
-		type: DataTypes.INTEGER,
-		primaryKey: true,
-		autoIncrement: true
-	},
-	title: {
-		type: DataTypes.STRING
-	},
-	status: {
-		type: DataTypes.STRING,
-	},
-	tax_number: {
-		type: DataTypes.STRING
-	},
-	registration_number: {
-		type: DataTypes.STRING
-	},
-    address:{
-        type:DataTypes.STRING,
-        allowNull:false
-    },
-    contact_name:{
         type:DataTypes.STRING
     },
     email:{
@@ -238,17 +200,13 @@ const stock_movement = sequelize.define('stock_movement', {
 		type: DataTypes.INTEGER,
         allowNull:false
 	},
-	time_of_movement: {
-		type: DataTypes.DATE,
-        defaultValue:DataTypes.NOW
-	},
     movement_type:{
         type:DataTypes.STRING,
         allowNull:false
     }
 })
 
-const stock = sequelize.define('stock_movement', {
+const stock = sequelize.define('stock', {
 	id: {
 		type: DataTypes.INTEGER,
 		primaryKey: true,
@@ -263,13 +221,13 @@ const stock = sequelize.define('stock_movement', {
 		defaultValue: 1
 	},
 	created_at:{
-    type:DataTypes.DATE,
+    type:DataTypes.DATEONLY,
     defaultValue:DataTypes.NOW
     }
 	
 })
 
-const receipt = sequelize.define('client_company', {
+const receipt = sequelize.define('receipt', {
 	id: {
 		type: DataTypes.INTEGER,
 		primaryKey: true,
@@ -293,7 +251,7 @@ const receipt = sequelize.define('client_company', {
         allowNull:false
     },
     created_at:{
-        type:DataTypes.DATE,
+        type:DataTypes.DATEONLY,
         defaultValue:DataTypes.NOW
     },
     total_net:{
