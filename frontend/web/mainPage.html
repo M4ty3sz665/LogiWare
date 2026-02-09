@@ -3,222 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raktárkészlet - Pro Inventory</title>
-    <!-- Authentication Check Script (Ez fusson le legelőször) -->
+    <title>LogiWare - Raktárkezelő</title>
     <script>
-        const currentUser = localStorage.getItem('currentUser');
-        if (!currentUser) {
-            // Ha nincs bejelentkezve, visszadobjuk a loginra
+        // Belépés ellenőrzése azonnal
+        if (!localStorage.getItem('token')) {
             window.location.href = 'login.html';
         }
     </script>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css">
     <style>
-        /* --- A TE EREDETI CSS KÓDOD (Változtatás nélkül + kiegészítések) --- */
+        /* DASHBOARD SPECIFIKUS STÍLUSOK (Inline, hogy biztosan látványos legyen) */
         body {
             background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.85)),
                         url('https://images.unsplash.com/photo-1553413077-190dd305871c?q=80&w=1935&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #fff;
-            overflow-x: hidden; /* Gördítősáv fix */
+            background-size: cover; background-position: center; background-attachment: fixed;
+            min-height: 100vh; font-family: 'Segoe UI', sans-serif; color: #fff;
         }
-
-        /* Input mezők stílusa (Login/Registerből átemelve) */
-        input, select.form-select {
-            background-color: #2a2a2a !important;
-            color: #fff !important;
-            border: 1px solid #555 !important;
-            transition: all 0.25s ease;
-        }
-        input::placeholder { color: #c5c5c5 !important; }
-        
-        input:focus, select.form-select:focus {
-            background-color: #333 !important;
-            border-color: #ffffff !important;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
-            transform: scale(1.01);
-            outline: none;
-        }
-
-        /* Gombok stílusa (Login/Registerből átemelve) */
-        .btn-dark {
-            background-color: transparent;
-            color: #fff;
-            border: 1px solid #fff;
-            font-family: monospace;
-            font-weight: 700;
-            transition: all 0.3s ease-in-out;
-        }
-        .btn-dark:hover {
-            background-color: #fff;
-            color: #000;
-            box-shadow: 0 0 10px #fff; 
-            border: 1px solid #fff !important;
-        }
-        
-        /* Piros gomb a törléshez/kijelentkezéshez */
-        .btn-danger-custom {
-            background: transparent;
-            border: 1px solid #ff4d4d;
-            color: #ff4d4d;
-            font-family: monospace;
-            font-weight: 700;
-            transition: 0.3s;
-        }
-        .btn-danger-custom:hover {
-            background: #ff4d4d;
-            color: #fff;
-            box-shadow: 0 0 10px #ff4d4d;
-        }
-
-        /* --- DASHBOARD SPECIFIKUS STÍLUSOK --- */
-        
-        /* A fő doboz, ami követi a .custom-box dizájnt, de szélesebb */
         .dashboard-container {
             background: linear-gradient(10deg, #000000, #3a3a3a);
-            border-radius: 12px;
-            box-shadow: 0 0 20px #000;
-            padding: 25px;
-            margin: 20px auto;
-            min-height: 85vh;
+            border-radius: 12px; box-shadow: 0 0 20px #000;
+            padding: 25px; margin: 20px auto; min-height: 85vh;
         }
-
-        /* Sidebar stílus */
-        .sidebar {
-            border-right: 1px solid rgba(255,255,255,0.1);
-            padding-right: 20px;
-        }
-        .nav-link {
-            color: #ccc;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            transition: 0.2s;
-        }
-        .nav-link:hover, .nav-link.active {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-        }
-
-        /* Táblázat stílus */
-        .table-dark-custom {
-            --bs-table-bg: #2a2a2a;
-            --bs-table-color: #fff;
-            border-color: rgba(255,255,255,0.1);
-        }
-        .table-dark-custom th {
-            background-color: #333;
-            color: #fff;
-            border-bottom: 2px solid #555;
-        }
-        .table-dark-custom td {
-            vertical-align: middle;
-            background-color: #2a2a2a; /* Fix a csíkozáshoz */
-        }
-        .table-hover tbody tr:hover td {
-            background-color: #3a3a3a;
-            color: #fff;
-        }
-
-        /* Modal stílus (hogy illeszkedjen a sötét témához) */
-        .modal-content {
-            background: linear-gradient(10deg, #1a1a1a, #2a2a2a);
-            color: white;
-            border: 1px solid #555;
-            box-shadow: 0 0 20px #000;
-        }
-        .modal-header { border-bottom: 1px solid #444; }
-        .modal-footer { border-top: 1px solid #444; }
-        .btn-close { filter: invert(1); } /* Fehér X gomb */
-        .btn-close { filter: invert(1); }
+        .sidebar { border-right: 1px solid rgba(255,255,255,0.1); }
+        .nav-link { color: #ccc; cursor: pointer; transition: 0.3s; margin-bottom: 5px; border-radius: 8px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: #fff; }
+        .table-dark-custom { --bs-table-bg: #2a2a2a; color: #fff; border-color: #444; }
+        .modal-content { background: #1a1a1a; color: white; border: 1px solid #555; }
+        .form-control, .form-select { background-color: #2a2a2a !important; color: #fff !important; border: 1px solid #555 !important; }
     </style>
 </head>
 <body>
 
 <div class="container-fluid p-4">
     <div class="dashboard-container">
-        <div class="row h-100">
+        <div class="row">
             
-            <!-- SIDEBAR -->
-            <div class="col-md-3 col-lg-2 sidebar d-none d-md-block">
-                <h3 class="text-white mb-4 ps-2">📦 ProInv.</h3>
+            <!-- OLDALSÁV (NAVBAR) -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <h3 class="text-white mb-4">📦 LogiWare</h3>
                 <nav class="nav flex-column">
-                    <a class="nav-link active" href="#">📊 Készlet</a>
-                    <a class="nav-link" href="#">📥 Bevételezés</a>
-                    <a class="nav-link" href="#">📤 Kiadás</a>
+                    <a class="nav-link active" id="btn-inventory" onclick="showSection('inventory')">📊 Készlet</a>
+                    <a class="nav-link" id="btn-orders" onclick="showSection('orders')">📜 Rendelések</a>
                 </nav>
                 
-                <div class="mt-5 pt-5">
-                    <div class="small text-secondary mb-2 ps-2">Belépve mint:</div>
-                    <div class="d-flex align-items-center mb-4 ps-2">
-                        <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center text-white" style="width:35px;height:35px;font-weight:bold" id="userAvatar">
-                            <!-- Initials here -->
-                        </div>
-                        <div>
-                            <strong id="displayUserName">Betöltés...</strong><br>
-                            <small id="displayUserRole" class="text-info">...</small>
-                        </div>
-                    </div>
-                    <button onclick="logout()" class="btn btn-danger-custom w-100">Kijelentkezés</button>
+                <div class="mt-5">
+                    <small class="text-secondary">Bejelentkezve:</small>
+                    <div class="mb-3"><strong id="userName">...</strong><br><small id="userRole" class="text-info">...</small></div>
+                    <button onclick="logout()" class="btn btn-sm btn-outline-danger w-100">Kijelentkezés</button>
                 </div>
             </div>
 
             <!-- FŐ TARTALOM -->
-            <div class="col-md-9 col-lg-10 ps-md-4">
-                <div class="d-md-none mb-3 d-flex justify-content-between align-items-center">
-                    <h3>ProInv.</h3>
-                    <button onclick="logout()" class="btn btn-sm btn-danger-custom">Kilépés</button>
+            <div class="col-md-9 col-lg-10 ps-4">
+                
+                <!-- KÉSZLET SZEKCIÓ -->
+                <div id="section-inventory">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Raktárkészlet</h2>
+                        <div>
+                            <button class="btn btn-outline-light me-2" onclick="openOrderModal()">📦 Új rendelés</button>
+                            <button class="btn btn-primary" onclick="openProductModal()">+ Új termék</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-dark-custom table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Termék</th><th>Kód (SKU)</th><th>Ár (Nettó)</th><th>Készlet</th><th>Hely</th><th>Műveletek</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTable"></tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <!-- KERESŐ & TÁBLÁZAT -->
-                <div class="row mb-4 align-items-end g-3">
-                    <div class="col-md-5">
-                        <label class="mb-1 text-secondary">Keresés</label>
-                        <input type="text" id="searchInput" class="form-control" placeholder="SKU vagy terméknév...">
+                <!-- RENDELÉSEK SZEKCIÓ (Alapból rejtve) -->
+                <div id="section-orders" style="display:none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Leadott rendelések</h2>
                     </div>
-                    <div class="col-md-3">
-                        <label class="mb-1 text-secondary">Raktár szűrés</label>
-                        <select id="filterSelect" class="form-select">
-                            <option value="">Összes raktár</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 text-md-end">
-                        <button class="btn btn-dark" onclick="openModal(true)">+ Új termék</button>
+                    <div class="table-responsive">
+                        <table class="table table-dark-custom">
+                            <thead>
+                                <tr>
+                                    <th>ID</th><th>Ügyfél</th><th>Határidő</th><th>Fizetés</th><th>Állapot</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTable"></tbody>
+                        </table>
                     </div>
                 </div>
 
-                <div class="table-responsive rounded-3 border border-secondary">
-                    <table class="table table-dark-custom table-hover mb-0">
-                        <thead>
-                            <tr><th>Termék név</th><th>SKU</th><th>Mennyiség</th><th>Hely</th><th class="text-end">Műveletek</th></tr>
-                        </thead>
-                        <tbody id="inventoryTableBody"></tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- MODAL (ugyanaz mint volt) -->
+<!-- TERMÉK MODAL (Új/Szerkesztés) -->
 <div class="modal fade" id="productModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title" id="modalTitle">Termék adatok</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <input type="hidden" id="productId">
-        <div class="mb-3"><label>Név</label><input type="text" id="inpName" class="form-control"></div>
-        <div class="mb-3"><label>SKU</label><input type="text" id="inpSku" class="form-control"></div>
-        <div class="row"><div class="col-6"><label>Mennyiség</label><input type="number" id="inpQty" class="form-control"></div><div class="col-6"><label>Hely</label><input type="text" id="inpLoc" class="form-control"></div></div>
-      </div>
-      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Mégse</button><button type="button" class="btn btn-light" onclick="saveProduct()">Mentés</button></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5>Termék kezelése</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="mb-3"><label>Termék neve</label><input type="text" id="pName" class="form-control"></div>
+                <div class="mb-3"><label>Termék kód (SKU)</label><input type="text" id="pCode" class="form-control"></div>
+                <div class="row">
+                    <div class="col-6 mb-3"><label>Nettó ár (Ft)</label><input type="number" id="pPrice" class="form-control"></div>
+                    <div class="col-6 mb-3"><label>Kezdő készlet</label><input type="number" id="pQty" class="form-control"></div>
+                </div>
+                <div class="mb-3"><label>Raktári hely (pl. A-10)</label><input type="text" id="pLoc" class="form-control"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Mégse</button>
+                <button class="btn btn-primary" onclick="saveProduct()">Mentés</button>
+            </div>
+        </div>
     </div>
-  </div>
+</div>
+
+<!-- RENDELÉS MODAL -->
+<div class="modal fade" id="orderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5>Új rendelés leadása</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label>Ügyfél (Client Company)</label>
+                    <select id="oClient" class="form-select"></select>
+                </div>
+                <div class="mb-3">
+                    <label>Termék kiválasztása</label>
+                    <select id="oProduct" class="form-select"></select>
+                </div>
+                <div class="row">
+                    <div class="col-6"><label>Mennyiség</label><input type="number" id="oAmount" class="form-control" value="1" min="1"></div>
+                    <div class="col-6"><label>Határidő</label><input type="date" id="oDeadline" class="form-control"></div>
+                </div>
+                <div class="mt-3">
+                    <label>Fizetési mód</label>
+                    <select id="oPayment" class="form-select">
+                        <option value="Átutalás">Átutalás</option>
+                        <option value="Készpénz">Készpénz</option>
+                        <option value="Bankkártya">Bankkártya</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary w-100" onclick="submitOrder()">Rendelés rögzítése (Készletlevonással)</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
