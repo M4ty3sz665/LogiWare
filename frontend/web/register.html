@@ -71,31 +71,6 @@
         </div>
     </div>
 
-    <script>
-        function handleRegister() {
-            // Adatok kinyerése
-            const user = {
-                lName: document.getElementById('regLName').value,
-                fName: document.getElementById('regFName').value,
-                email: document.getElementById('regEmail').value,
-                username: document.getElementById('regUser').value,
-                pass: document.getElementById('regPass').value,
-                role: document.getElementById('regRole').value
-            };
-
-            // Validáció
-            if(!user.username || !user.pass || !user.role || !user.lName) {
-                alert("Kérlek tölts ki minden mezőt!");
-                return;
-            }
-
-            // Mentés localStorage-ba (szimulált adatbázis)
-            // 'usersDB' kulcs alá mentjük az adatot JSON formátumban
-            localStorage.setItem('registeredUser', JSON.stringify(user));
-
-            alert("Sikeres regisztráció! Most kérlek jelentkezz be.");
-            window.location.href = 'login.html';
-        }
-    </script>
+    <script src="register_script.js"></script>
 </body>
 </html>

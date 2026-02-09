@@ -49,32 +49,6 @@
         </div>
     </div>
 
-    <script>
-        function handleLogin() {
-            const inputUser = document.getElementById('loginUser').value;
-            const inputPass = document.getElementById('loginPass').value;
-
-            // Adatok lekérése a "memóriából"
-            const storedData = localStorage.getItem('registeredUser');
-            
-            if(!storedData) {
-                alert("Nincs regisztrált felhasználó! Kérlek regisztrálj először.");
-                return;
-            }
-
-            const validUser = JSON.parse(storedData);
-
-            // Ellenőrzés
-            if(inputUser === validUser.username && inputPass === validUser.pass) {
-                // Sikeres belépés -> Létrehozunk egy "aktív sessiont"
-                localStorage.setItem('currentUser', JSON.stringify(validUser));
-                
-                // Átirányítás a főoldalra (index.html vagy inventory.html)
-                window.location.href = 'mainPage.html'; 
-            } else {
-                alert("Hibás felhasználónév vagy jelszó!");
-            }
-        }
-    </script>
+    <script src="login.script.js"></script>
 </body>
 </html>

@@ -17,7 +17,7 @@ Server.server.post("/product",middlewares.Auth(), async (req, res) => {
         res.status(400).end()
     }
     else{
-        await dbHandler.Users.create({
+        await dbHandler.Products.create({
             name: req.body.name,
             price_net: req.body.price_net,
             price_gross:req.body.price_gross,
