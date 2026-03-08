@@ -70,6 +70,10 @@ const product = sequelize.define('product', {
     recieved_at:{
         type:DataTypes.DATE,
         defaultValue:DataTypes.NOW
+    },
+    supplier_id:{
+        type:DataTypes.INTEGER,
+        allowNull:false
     }
 })
 
@@ -122,7 +126,7 @@ const order = sequelize.define('order', {
     order_number:{
         type:DataTypes.INTEGER,
 		primaryKey:true,
-		autoIncrement:tr
+		autoIncrement:true
 	},
     status:{
         type:DataTypes.STRING,
@@ -265,8 +269,67 @@ const receipt = sequelize.define('receipt', {
     }
 })
 
-product.belongsTo(orderItem,{foreignKey:'product_id',sourceKey:'id'})
-orderItem.hasMany(product,{foreignKey:'product_id',targetKey:'id'})
+const supplier = sequelize.define('supplier', {
+	id: {
+		type: DataTypes.INTEGER,
+		primaryKey: true,
+		autoIncrement: true
+	},
+	admitted_at: {
+		type: DataTypes.DATEONLY,
+		defaultValue: DataTypes.NOW
+	},
+	company_name: {
+		type: DataTypes.STRING,
+		allowNull: false
+	},
+	tax_number: {
+		type: DataTypes.STRING
+	},
+	registration_number: {
+		type: DataTypes.STRING
+	},
+    address:{
+        type:DataTypes.STRING,
+        allowNull:false
+    },
+    billing_address:{
+        type:DataTypes.STRING
+    },
+    email:{
+        type:DataTypes.STRING,
+        allowNull:false
+    },
+    phone:{
+        type:DataTypes.STRING,
+        allowNull:false
+    }
+})
+
+// Kapcsolatok definiálása
+orderItem.belongsTo(product, { foreignKey: 'product_id' })
+product.hasMany(orderItem, { foreignKey: 'product_id' })
+
+order.hasMany(orderItem, { foreignKey: 'order_id' })
+orderItem.belongsTo(order, { foreignKey: 'order_id' })
+
+client_company.hasMany(order, { foreignKey: 'company_id' })
+order.belongsTo(client_company, { foreignKey: 'company_id' })
+
+stock_movement.belongsTo(stock, { foreignKey: 'stock_id' })
+stock.hasMany(stock_movement, { foreignKey: 'stock_id' })
+
+stock.belongsTo(product, { foreignKey: 'item_id' })
+product.hasMany(stock, { foreignKey: 'item_id' })
+
+receipt.belongsTo(client_company, { foreignKey: 'company_id' })
+client_company.hasMany(receipt, { foreignKey: 'company_id' })
+
+receipt.belongsTo(order, { foreignKey: 'order_id' })
+order.hasMany(receipt, { foreignKey: 'order_id' })
+
+supplier.hasMany(product, { foreignKey: 'supplier_id' })
+product.belongsTo(supplier, { foreignKey: 'supplier_id' })
 
 exports.Users = user
 exports.Products = product

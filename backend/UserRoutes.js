@@ -1,11 +1,11 @@
-const Server = require("./server")
 const middlewares = require("./middlewares")
 const dbHandler = require('./dbHandler')
 
-Server.server.post("/login", async (req, res) => {
+module.exports = function(server) {
+    server.post("/login", async (req, res) => {
         const user = await dbHandler.Users.findOne({
             where:{
-                name: req.body.name,
+                email: req.body.email,
                 password: req.body.password
             }
         })
@@ -19,18 +19,17 @@ Server.server.post("/login", async (req, res) => {
         }
     })
 
-Server.server.post("/register", async (req, res) => {
+    server.post("/register", async (req, res) => {
     const user = await dbHandler.Users.findOne({
         where:{
             name: req.body.name
         }
     })
     if(user){
-        res.json({"message":"A user with this username already exists"})
-        res.status(400).end()
+        res.status(400).json({"message":"A user with this username already exists"}).end()
     }
     else{
-        await dbHandler.Users.create({
+        const newUser = await dbHandler.Users.create({
             name: req.body.name,
             password: req.body.password,
             phone:req.body.phone,
@@ -38,17 +37,17 @@ Server.server.post("/register", async (req, res) => {
             email:req.body.email,
             admin:req.body.admin
         })
-        res.json({"message":"Successful registration"})
-        res.status(201).end()
+        const token = middlewares.JWT.sign({"uid":newUser.id , "admin":newUser.admin}, process.env.SECRETKEY, {expiresIn: "6h"})
+        res.status(201).json({"message":"Successful registration", "token": token}).end()
     }
     res.end()
 })
 
-Server.server.get('/oneuser', middlewares.Auth(), async (req,res)=>{
+    server.get('/oneuser', middlewares.Auth(), async (req,res)=>{
     console.log(req.uid)
     res.status(200).json(await dbHandler.Users.findByPk(req.uid)).end()
 })
-Server.server.delete('/oneuser',Auth(), async (req,res)=> {
+    server.delete('/oneuser',middlewares.Auth(), async (req,res)=> {
     if(req.admin){
         try{
             await dbHandler.Users.destroy({where:{id:req.uid}})
@@ -56,12 +55,12 @@ Server.server.delete('/oneuser',Auth(), async (req,res)=> {
         }
         catch(err){
             console.log(err)
-            des.status(404).json({message:err}).end()
+            res.status(404).json({message:err}).end()
         }
     }
  })
 
-Server.server.put('/oneuser', middlewares.Auth(), async (req, res) => {
+    server.put('/oneuser', middlewares.Auth(), async (req, res) => {
     if(req.admin){
     try {
         const updated = await dbHandler.Users.update(req.body, {where:{id:req.uid }})
@@ -78,4 +77,4 @@ Server.server.put('/oneuser', middlewares.Auth(), async (req, res) => {
     }
 })
 
-module.exports = {Server}
+}

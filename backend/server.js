@@ -5,7 +5,8 @@ const dbHandler = require("./dbHandler")
 server.use(express.json())
 require("dotenv").config()
 const PORT = process.env.PORT
-//server.use('./UserRoutes')
+const userRoutes = require('./UserRoutes')
+userRoutes(server)
 /*dbHandler.Users.sync({ alter: true })
 dbHandler.Products.sync({ alter: true })
 dbHandler.OrderItems.sync({ alter: true })
@@ -16,3 +17,5 @@ dbHandler.stockMovements.sync({ alter: true })
 dbHandler.Stock.sync({ alter: true })
 dbHandler.Receipts.sync({ alter: true })*/
 server.listen(PORT,()=>{console.log( "server is running on port " + PORT)})
+
+module.exports = {server}
