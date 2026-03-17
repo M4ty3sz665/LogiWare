@@ -68,7 +68,13 @@ function HomePage({ onLogout }) {
       case 'products':
         return <Products />
       case 'profile':
-        return <Profile userInfo={userInfo} onUpdated={fetchUserInfo} />
+        return (
+          <Profile
+            userInfo={userInfo}
+            onUpdated={fetchUserInfo}
+            onLogout={handleLogout}
+          />
+        )
       default:
         return null
     }

@@ -4,7 +4,7 @@ function Dashboard({ userInfo, onNavigate }) {
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -22,16 +22,6 @@ function Dashboard({ userInfo, onNavigate }) {
               <p className="text-4xl font-bold text-gray-800 mt-2">0</p>
             </div>
             <div className="text-4xl">📦</div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-500 text-sm font-medium">Ügyfelek</p>
-              <p className="text-4xl font-bold text-gray-800 mt-2">0</p>
-            </div>
-            <div className="text-4xl">👥</div>
           </div>
         </div>
 
@@ -90,14 +80,14 @@ function Dashboard({ userInfo, onNavigate }) {
           </button>
           <button
             className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-medium"
-            onClick={() => alert('Jelszó módosítás: hamarosan')}
+            onClick={() => onNavigate?.('profile')}
             type="button"
           >
             Jelszó Módosítása
           </button>
           <button
             className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
-            onClick={() => alert('Fiók törlés: hamarosan')}
+            onClick={() => onNavigate?.('profile')}
             type="button"
           >
             Fiók Törlése

@@ -3,7 +3,12 @@ const dbHandler = require('./dbHandler')
 
 module.exports = function (server) {
   server.get('/product', async (req, res) => {
-    res.json(await dbHandler.Products.findAll()).end()
+    try {
+      res.json(await dbHandler.Products.findAll()).end()
+    } catch (err) {
+      console.log('GET /product failed:', err?.parent?.sqlMessage || err?.message || err)
+      res.status(500).json({ message: err?.parent?.sqlMessage || err?.message || 'Server error' }).end()
+    }
   })
 
   server.post('/product', middlewares.Auth(), async (req, res) => {

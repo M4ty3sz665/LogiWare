@@ -73,7 +73,7 @@ const product = sequelize.define('product', {
     },
     supplier_id:{
         type:DataTypes.INTEGER,
-        allowNull:false
+        allowNull:true
     }
 })
 
@@ -339,4 +339,5 @@ exports.ClientCompanies = client_company
 exports.Suppliers = supplier
 exports.stockMovements = stock_movement
 exports.Stock = stock
+exports.sequelize = sequelize
 exports.Receipts = receipt

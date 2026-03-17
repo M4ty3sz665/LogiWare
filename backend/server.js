@@ -11,15 +11,33 @@ const productRoutes = require('./ProductRoutes')
 productRoutes(server)
 const stockRoutes = require('./StockRoutes')
 stockRoutes(server)
-/*dbHandler.Users.sync({ alter: true })
-dbHandler.Products.sync({ alter: true })
-dbHandler.OrderItems.sync({ alter: true })
-dbHandler.Orders.sync({ alter: true })
-dbHandler.ClientCompanies.sync({ alter: true })
-dbHandler.Suppliers.sync({ alter: true })
-dbHandler.stockMovements.sync({ alter: true })
-dbHandler.Stock.sync({ alter: true })
-dbHandler.Receipts.sync({ alter: true })*/
-server.listen(PORT,()=>{console.log( "server is running on port " + PORT)})
+
+const { DataTypes } = require('sequelize')
+
+async function ensureSchema() {
+  const qi = dbHandler.sequelize.getQueryInterface()
+
+  // Keep this lightweight: only add missing columns we rely on.
+  const products = await qi.describeTable('products')
+  if (!products.supplier_id) {
+    await qi.addColumn('products', 'supplier_id', {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    })
+  }
+}
+
+async function start() {
+  try {
+    await ensureSchema()
+  } catch (e) {
+    console.log('Schema ensure failed:', e?.parent?.sqlMessage || e?.message || e)
+  }
+  server.listen(PORT, () => {
+    console.log('server is running on port ' + PORT)
+  })
+}
+
+start()
 
 module.exports = {server}
