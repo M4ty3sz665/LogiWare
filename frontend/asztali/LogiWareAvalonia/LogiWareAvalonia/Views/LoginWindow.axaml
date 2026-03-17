@@ -1,0 +1,80 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="LogiWareAvalonia.Window1"
+        Title="Login">
+
+    <Grid>
+        <!-- LOGIN GRID -->
+        <Grid Name="LoginGrid"
+              Background="#2B2B30">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Column="1"
+                    Grid.Row="1"
+                    Background="#1E1E22"
+                    Padding="30"
+                    CornerRadius="12">
+
+                <StackPanel>
+
+                    <TextBlock Text="LogiWare"
+                               FontSize="36"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Username" FontSize="16" Margin="0,0,0,6"/>
+                        <TextBox Name="UsernameBox"
+                                 MinHeight="34"
+                                 Padding="8"
+                                 Background="#2B2B30"
+                                 Foreground="White"
+                                 BorderBrush="#555"
+                                 BorderThickness="1"
+                                 Text="{Binding Username}"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,18">
+                        <TextBlock Text="Password" FontSize="16" Margin="0,0,0,6"/>
+                        <TextBox Name="PasswordBox"
+                                     MinHeight="34"
+                                     Padding="8"
+                                     Background="#2B2B30"
+                                     Foreground="White"
+                                     BorderBrush="#555"
+                                     BorderThickness="1"
+                                     Text="{Binding Password}"/>
+                    </StackPanel>
+                    <Border  CornerRadius="10"
+                             Background="#7A3CFF">
+                        <Button Name="LoginButton"
+                                Padding="150,8,0,0"
+                                Content="Login"
+                                MinHeight="38"
+                                Foreground="White"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                FontWeight="SemiBold"
+                                Cursor="Hand"
+                                Command="{Binding Login}"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
