@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogiWareAvalonia", "LogiWareAvalonia\LogiWareAvalonia.csproj", "{5E219157-F2BD-2E34-FC9F-CE72994348C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogiWareAvalonia.Android", "LogiWareAvalonia.Android\LogiWareAvalonia.Android.csproj", "{5CF4252D-0795-7CB6-C48C-039F720E2888}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogiWareAvalonia.Desktop", "LogiWareAvalonia.Desktop\LogiWareAvalonia.Desktop.csproj", "{73546223-EBC6-1288-77CD-4A688F5B161E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5E219157-F2BD-2E34-FC9F-CE72994348C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E219157-F2BD-2E34-FC9F-CE72994348C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E219157-F2BD-2E34-FC9F-CE72994348C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E219157-F2BD-2E34-FC9F-CE72994348C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CF4252D-0795-7CB6-C48C-039F720E2888}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CF4252D-0795-7CB6-C48C-039F720E2888}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CF4252D-0795-7CB6-C48C-039F720E2888}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{5CF4252D-0795-7CB6-C48C-039F720E2888}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CF4252D-0795-7CB6-C48C-039F720E2888}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CF4252D-0795-7CB6-C48C-039F720E2888}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{73546223-EBC6-1288-77CD-4A688F5B161E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73546223-EBC6-1288-77CD-4A688F5B161E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73546223-EBC6-1288-77CD-4A688F5B161E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73546223-EBC6-1288-77CD-4A688F5B161E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3FF8F9AE-0744-4C00-A879-475C5972D941}
+	EndGlobalSection
+EndGlobal
