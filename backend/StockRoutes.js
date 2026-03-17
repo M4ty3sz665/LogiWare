@@ -37,6 +37,73 @@ module.exports = function (server) {
     }
   })
 
+  // Inventory operation: IN/OUT/ADJUST for a product.
+  // Body: { product_id, type: 'IN'|'OUT'|'ADJUST', amount, note?, time_of_movement? }
+  server.post('/inventory/move', middlewares.Auth(), async (req, res) => {
+    try {
+      const productId = Number(req.body.product_id)
+      const type = String(req.body.type || '').toUpperCase()
+      const amount = Number(req.body.amount)
+      const note = req.body.note
+      const time = req.body.time_of_movement
+
+      if (!productId || Number.isNaN(productId)) {
+        res.status(400).json({ message: 'Missing product_id' }).end()
+        return
+      }
+      if (!['IN', 'OUT', 'ADJUST'].includes(type)) {
+        res.status(400).json({ message: 'Invalid type' }).end()
+        return
+      }
+      if (!Number.isFinite(amount) || amount < 0) {
+        res.status(400).json({ message: 'Invalid amount' }).end()
+        return
+      }
+
+      const product = await dbHandler.Products.findByPk(productId)
+      if (!product) {
+        res.status(404).json({ message: 'No such product' }).end()
+        return
+      }
+
+      // Ensure a stock row exists for this product.
+      let stockRow = await dbHandler.Stock.findOne({ where: { item_id: productId } })
+      if (!stockRow) {
+        stockRow = await dbHandler.Stock.create({ item_id: productId, amount: 0 })
+      }
+
+      const current = Number(stockRow.amount || 0)
+      let newAmount = current
+      let movementAmount = amount
+
+      if (type === 'IN') {
+        newAmount = current + amount
+        movementAmount = amount
+      } else if (type === 'OUT') {
+        newAmount = current - amount
+        movementAmount = -amount
+      } else if (type === 'ADJUST') {
+        newAmount = amount
+        movementAmount = amount - current
+      }
+
+      await stockRow.update({ amount: newAmount })
+
+      const movement = await dbHandler.stockMovements.create({
+        stock_id: stockRow.id,
+        amount: movementAmount,
+        order_id: 0,
+        movement_type: type,
+        time_of_movement: time,
+        note,
+      })
+
+      res.status(201).json({ message: 'inventory updated', stock: stockRow, movement }).end()
+    } catch (err) {
+      res.status(500).json({ message: err?.parent?.sqlMessage || err?.message || 'Server error' }).end()
+    }
+  })
+
   server.post('/stock', middlewares.Auth(), async (req, res) => {
     const created = await dbHandler.Stock.create({
       item_id: req.body.item_id,

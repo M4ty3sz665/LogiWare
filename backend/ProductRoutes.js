@@ -29,7 +29,8 @@ module.exports = function (server) {
       price_gross: req.body.price_gross,
       vat_rate: req.body.vat_rate,
       product_code: req.body.product_code,
-      supplier_id: req.body.supplier_id,
+      supplier_id: req.body.supplier_id ?? null,
+      low_stock_threshold: req.body.low_stock_threshold ?? 0,
     })
 
     res.status(201).json({ message: 'Product successfully added' }).end()
@@ -49,6 +50,7 @@ module.exports = function (server) {
       vat_rate: req.body.vat_rate,
       product_code: req.body.product_code,
       supplier_id: req.body.supplier_id ?? oneProduct.supplier_id,
+      low_stock_threshold: req.body.low_stock_threshold ?? oneProduct.low_stock_threshold,
     })
 
     res.status(200).json({ message: 'Product successfully updated' }).end()

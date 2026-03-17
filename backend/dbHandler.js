@@ -74,6 +74,11 @@ const product = sequelize.define('product', {
     supplier_id:{
         type:DataTypes.INTEGER,
         allowNull:true
+    },
+    low_stock_threshold: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
     }
 })
 
@@ -202,11 +207,19 @@ const stock_movement = sequelize.define('stock_movement', {
 	},
 	order_id: {
 		type: DataTypes.INTEGER,
-        allowNull:false
+        allowNull:false,
+        defaultValue: 0
 	},
     movement_type:{
         type:DataTypes.STRING,
         allowNull:false
+    },
+    time_of_movement: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
+    },
+    note: {
+        type: DataTypes.STRING
     }
 })
 

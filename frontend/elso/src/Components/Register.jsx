@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { register as apiRegister, validateEmail } from '../utils/auth'
+import { useToast } from './ToastProvider.jsx'
 
 function Register({ onRegister, onShowLogin }) {
+  const toast = useToast()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -43,7 +45,7 @@ function Register({ onRegister, onShowLogin }) {
 
     try {
       const data = await apiRegister({ name, email, phone, password, role })
-      alert('Sikeres regisztráció!')
+      toast.success('Sikeres regisztráció!')
       if (onRegister) {
         onRegister({ name, email })
       }

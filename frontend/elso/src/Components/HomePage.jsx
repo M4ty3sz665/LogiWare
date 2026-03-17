@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import Dashboard from './home/Dashboard.jsx'
 import CreateOrder from './home/CreateOrder.jsx'
 import Stock from './home/Stock.jsx'
 import Products from './home/Products.jsx'
 import Profile from './home/Profile.jsx'
+import Orders from './home/Orders.jsx'
+import { apiFetch } from '../utils/api'
 
 function HomePage({ onLogout }) {
   const [userInfo, setUserInfo] = useState(null)
@@ -11,46 +13,43 @@ function HomePage({ onLogout }) {
   const [error, setError] = useState('')
   const [activeMenu, setActiveMenu] = useState('dashboard')
 
-  useEffect(() => {
-    fetchUserInfo()
-  }, [])
-
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch('/api/oneuser', {
-        method: 'GET',
-        headers: {
-          'Authorization': token,
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch user info')
-      }
-
-      const data = await response.json()
+      const data = await apiFetch('/oneuser')
       setUserInfo(data)
       setLoading(false)
     } catch {
       setError('Hiba az adatok betöltésénél')
       setLoading(false)
     }
-  }
+  }, [])
 
-  const handleLogout = () => {
+  useEffect(() => {
+    queueMicrotask(() => {
+      fetchUserInfo()
+    })
+  }, [fetchUserInfo])
+
+  const handleLogout = useCallback(() => {
     localStorage.removeItem('token')
     if (onLogout) {
       onLogout()
     }
-  }
+  }, [onLogout])
+
+  useEffect(() => {
+    const handler = () => handleLogout()
+    window.addEventListener('auth:logout', handler)
+    return () => window.removeEventListener('auth:logout', handler)
+  }, [handleLogout])
 
   const headerTitle =
     activeMenu === 'dashboard'
       ? '📊 Dashboard'
       : activeMenu === 'create-order'
         ? '➕ Rendelés Létrehozása'
+        : activeMenu === 'orders'
+          ? '🧾 Rendelések'
         : activeMenu === 'stock'
           ? '📦 Raktárkezelés'
           : activeMenu === 'products'
@@ -63,6 +62,8 @@ function HomePage({ onLogout }) {
         return <Dashboard userInfo={userInfo} onNavigate={setActiveMenu} />
       case 'create-order':
         return <CreateOrder />
+      case 'orders':
+        return <Orders />
       case 'stock':
         return <Stock />
       case 'products':
@@ -122,6 +123,16 @@ function HomePage({ onLogout }) {
             }`}
           >
             ➕ Rendelés Lét.
+          </button>
+          <button
+            onClick={() => setActiveMenu('orders')}
+            className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
+              activeMenu === 'orders'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'text-gray-300 hover:bg-slate-700'
+            }`}
+          >
+            🧾 Rendelések
           </button>
           <button
             onClick={() => setActiveMenu('stock')}

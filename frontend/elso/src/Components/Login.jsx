@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { login as apiLogin, validateEmail } from '../utils/auth'
+import { useToast } from './ToastProvider.jsx'
 
 function Login({ onLogin, onShowRegister }) {
+  const toast = useToast()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
@@ -9,7 +11,7 @@ function Login({ onLogin, onShowRegister }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    if (error) setError('')
+    setError('')
   }, [email, password])
 
   const handleSubmit = async (e) => {
@@ -31,7 +33,7 @@ function Login({ onLogin, onShowRegister }) {
     try {
       const data = await apiLogin({ email, password })
       localStorage.setItem('token', data.token)
-      alert('Sikeres bejelentkezés!')
+      toast.success('Sikeres bejelentkezés!')
       if (onLogin) {
         onLogin({ email, rememberMe })
       }
@@ -116,7 +118,7 @@ function Login({ onLogin, onShowRegister }) {
 
               <button
                 type="button"
-                onClick={() => alert('Jelszó visszaállítás funkció - hamarosan')}
+                onClick={() => toast.info('Jelszó visszaállítás funkció - hamarosan')}
                 className="text-sm text-blue-600 hover:text-blue-800 font-medium transition"
               >
                 Elfelejtett jelszó?

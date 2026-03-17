@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
+import { apiFetch } from '../../utils/api'
+import { useToast } from '../ToastProvider.jsx'
 
 function Profile({ userInfo, onUpdated, onLogout }) {
+  const toast = useToast()
   const [name, setName] = useState(userInfo?.name || '')
   const [email, setEmail] = useState(userInfo?.email || '')
   const [phone, setPhone] = useState(userInfo?.phone || '')
@@ -43,22 +46,9 @@ function Profile({ userInfo, onUpdated, onLogout }) {
 
     setIsSubmitting(true)
     try {
-      const token = localStorage.getItem('token')
-      const res = await fetch('/api/oneuser', {
-        method: 'PUT',
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, phone, role }),
-      })
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null)
-        throw new Error(data?.message || `HTTP ${res.status}`)
-      }
-
+      await apiFetch('/oneuser', { method: 'PUT', body: { name, email, phone, role } })
       setSuccess('Mentve.')
+      toast.success('Profil mentve.')
       if (onUpdated) onUpdated()
     } catch (err) {
       setError(err?.message || 'Nem sikerült menteni.')
@@ -87,22 +77,12 @@ function Profile({ userInfo, onUpdated, onLogout }) {
 
     setPwSubmitting(true)
     try {
-      const token = localStorage.getItem('token')
-      const res = await fetch('/api/oneuser/password', {
+      await apiFetch('/oneuser/password', {
         method: 'PUT',
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ currentPassword: pwCurrent, newPassword: pwNew }),
+        body: { currentPassword: pwCurrent, newPassword: pwNew },
       })
-
-      const data = await res.json().catch(() => null)
-      if (!res.ok) {
-        throw new Error(data?.message || `HTTP ${res.status}`)
-      }
-
       setPwSuccess('Jelszó frissítve.')
+      toast.success('Jelszó frissítve.')
       setPwCurrent('')
       setPwNew('')
       setPwConfirm('')
@@ -118,17 +98,7 @@ function Profile({ userInfo, onUpdated, onLogout }) {
     setDeleteError('')
     setDeleteSubmitting(true)
     try {
-      const token = localStorage.getItem('token')
-      const res = await fetch('/api/oneuser', {
-        method: 'DELETE',
-        headers: {
-          Authorization: token,
-        },
-      })
-      const data = await res.json().catch(() => null)
-      if (!res.ok) {
-        throw new Error(data?.message || `HTTP ${res.status}`)
-      }
+      await apiFetch('/oneuser', { method: 'DELETE' })
       localStorage.removeItem('token')
       if (onLogout) onLogout()
       else window.location.reload()

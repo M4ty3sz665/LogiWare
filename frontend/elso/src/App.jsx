@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Login from './Components/Login.jsx'
 import Register from './Components/Register.jsx'
 import HomePage from './Components/HomePage.jsx'
+import { ToastProvider } from './Components/ToastProvider.jsx'
 
 function App() {
   const [view, setView] = useState('login') // 'login', 'register', or 'home'
@@ -33,25 +34,15 @@ function App() {
   }
 
   return (
-    <>
-      {isLoggedIn && view === 'home' && (
-        <HomePage
-          onLogout={handleLogout}
-        />
-      )}
+    <ToastProvider>
+      {isLoggedIn && view === 'home' && <HomePage onLogout={handleLogout} />}
       {!isLoggedIn && view === 'login' && (
-        <Login
-          onLogin={handleLogin}
-          onShowRegister={() => setView('register')}
-        />
+        <Login onLogin={handleLogin} onShowRegister={() => setView('register')} />
       )}
       {!isLoggedIn && view === 'register' && (
-        <Register
-          onRegister={handleRegister}
-          onShowLogin={() => setView('login')}
-        />
+        <Register onRegister={handleRegister} onShowLogin={() => setView('login')} />
       )}
-    </>
+    </ToastProvider>
   )
 }
 
