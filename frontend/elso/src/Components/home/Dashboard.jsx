@@ -1,4 +1,4 @@
-function Dashboard({ userInfo }) {
+function Dashboard({ userInfo, onNavigate }) {
   if (!userInfo) return null
 
   return (
@@ -81,13 +81,25 @@ function Dashboard({ userInfo }) {
       <div className="bg-white rounded-xl shadow-lg p-6">
         <h3 className="text-xl font-bold text-gray-800 mb-4">⚡ Gyors Műveletek</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium"
+            onClick={() => onNavigate?.('profile')}
+            type="button"
+          >
             Profil Szerkesztése
           </button>
-          <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-medium">
+          <button
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-medium"
+            onClick={() => alert('Jelszó módosítás: hamarosan')}
+            type="button"
+          >
             Jelszó Módosítása
           </button>
-          <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium">
+          <button
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
+            onClick={() => alert('Fiók törlés: hamarosan')}
+            type="button"
+          >
             Fiók Törlése
           </button>
         </div>

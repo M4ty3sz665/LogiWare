@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import Dashboard from './home/Dashboard.jsx'
 import CreateOrder from './home/CreateOrder.jsx'
 import Stock from './home/Stock.jsx'
-import Clients from './home/Clients.jsx'
 import Products from './home/Products.jsx'
+import Profile from './home/Profile.jsx'
 
 function HomePage({ onLogout }) {
   const [userInfo, setUserInfo] = useState(null)
@@ -53,22 +53,22 @@ function HomePage({ onLogout }) {
         ? '➕ Rendelés Létrehozása'
         : activeMenu === 'stock'
           ? '📦 Raktárkezelés'
-          : activeMenu === 'clients'
-            ? '👥 Ügyfelekezelés'
-            : '🛍️ Termékkezelés'
+          : activeMenu === 'products'
+            ? '🛍️ Termékkezelés'
+            : '👤 Profil'
 
   const renderContent = () => {
     switch (activeMenu) {
       case 'dashboard':
-        return <Dashboard userInfo={userInfo} />
+        return <Dashboard userInfo={userInfo} onNavigate={setActiveMenu} />
       case 'create-order':
         return <CreateOrder />
       case 'stock':
         return <Stock />
-      case 'clients':
-        return <Clients />
       case 'products':
         return <Products />
+      case 'profile':
+        return <Profile userInfo={userInfo} onUpdated={fetchUserInfo} />
       default:
         return null
     }
@@ -128,16 +128,6 @@ function HomePage({ onLogout }) {
             📦 Raktár
           </button>
           <button
-            onClick={() => setActiveMenu('clients')}
-            className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
-              activeMenu === 'clients'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-300 hover:bg-slate-700'
-            }`}
-          >
-            👥 Ügyfelek
-          </button>
-          <button
             onClick={() => setActiveMenu('products')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'products'
@@ -146,6 +136,16 @@ function HomePage({ onLogout }) {
             }`}
           >
             🛍️ Termékek
+          </button>
+          <button
+            onClick={() => setActiveMenu('profile')}
+            className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
+              activeMenu === 'profile'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'text-gray-300 hover:bg-slate-700'
+            }`}
+          >
+            👤 Profil
           </button>
         </nav>
 

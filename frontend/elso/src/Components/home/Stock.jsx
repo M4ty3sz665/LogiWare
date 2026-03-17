@@ -17,8 +17,8 @@ function Stock() {
     const q = query.trim().toLowerCase()
     if (!q) return rows
     return rows.filter((r) => {
-      const name = r.product?.name || ''
-      const code = r.product?.product_code || ''
+      const name = r.product_name || r.product?.name || ''
+      const code = r.product_code || r.product?.product_code || ''
       return (
         String(r.id).includes(q) ||
         String(r.item_id).includes(q) ||
@@ -133,10 +133,15 @@ function Stock() {
                     {r.id}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-800">
-                    {r.product?.name || `Item #${r.item_id}`}
+                    {r.product_name || r.product?.name || `Item #${r.item_id}`}
+                    {r.missing_product && (
+                      <span className="ml-2 inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 ring-1 ring-amber-200">
+                        nincs hozzá product
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700">
-                    {r.product?.product_code || '-'}
+                    {r.product_code || r.product?.product_code || '-'}
                   </td>
                   <td className="px-4 py-3 text-sm font-semibold text-gray-900">
                     {r.amount}
