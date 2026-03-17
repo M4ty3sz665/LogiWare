@@ -23,9 +23,14 @@ function App() {
     setView('home')
   }
 
-  const handleRegister = (user) => {
+  const handleRegister = (user, token) => {
     console.log('Sikeres regisztráció:', user)
-    setView('login') // vissza a bejelentkezéshez
+    if (token) {
+      setIsLoggedIn(true)
+      setView('home')
+    } else {
+      setView('login')
+    }
   }
 
   const handleLogout = () => {

@@ -1,4 +1,3 @@
-import './App.css'
 import { useState, useEffect } from 'react'
 import Login from './Components/Login.jsx'
 import Register from './Components/Register.jsx'
