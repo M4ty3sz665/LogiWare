@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { login as apiLogin, validateEmail } from '../utils/auth'
 import { useToast } from './ToastProvider.jsx'
+import { useNavigate } from 'react-router-dom'
 
 function Login({ onLogin, onShowRegister }) {
   const toast = useToast()
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
@@ -37,6 +39,7 @@ function Login({ onLogin, onShowRegister }) {
       if (onLogin) {
         onLogin({ email, rememberMe })
       }
+      navigate('/app') // route váltás
     } catch (err) {
       setError(err.message || 'Hiba történt a bejelentkezés során.')
     } finally {

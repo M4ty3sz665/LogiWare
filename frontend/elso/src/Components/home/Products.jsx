@@ -13,7 +13,6 @@ function Products() {
   const toast = useToast()
   const [products, setProducts] = useState([])
   const [suppliers, setSuppliers] = useState([])
-  const [stockRows, setStockRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
@@ -40,13 +39,12 @@ function Products() {
       setLoading(true)
       setError('')
       try {
-        const [productsData, stockData, suppliersData] = await Promise.all([
+        const [productsData, suppliersData] = await Promise.all([
           apiFetch('/product', { auth: false, signal: controller.signal }),
-          apiFetch('/stock', { signal: controller.signal }),
           apiFetch('/supplier', { signal: controller.signal }),
         ])
+        console.log('DEBUG: productsData', productsData)
         setProducts(Array.isArray(productsData) ? productsData : [])
-        setStockRows(Array.isArray(stockData) ? stockData : [])
         setSuppliers(Array.isArray(suppliersData) ? suppliersData : [])
       } catch (e) {
         if (e?.name !== 'AbortError') {
@@ -67,23 +65,13 @@ function Products() {
     return m
   }, [suppliers])
 
-  const stockByItemId = useMemo(() => {
-    const map = new Map()
-    for (const r of stockRows) {
-      const itemId = r.item_id ?? r.product?.id ?? null
-      if (itemId == null) continue
-      map.set(itemId, (map.get(itemId) || 0) + Number(r.amount || 0))
-    }
-    return map
-  }, [stockRows])
-
   const viewRows = useMemo(() => {
     const list = (products || []).map((p) => ({
       key: p.id,
       productId: p.id,
       name: p.name,
       code: p.product_code || '-',
-      amount: stockByItemId.get(p.id) || 0,
+      amount: 0, // nincs stockByItemId, default 0
       low: Number(p.low_stock_threshold || 0),
       supplierName: supplierById.get(p.supplier_id)?.company_name || '-',
       price_net: p.price_net,
@@ -92,12 +80,12 @@ function Products() {
     }))
     list.sort((a, b) => String(a.name).localeCompare(String(b.name), 'hu'))
     return list
-  }, [products, stockByItemId, supplierById])
+  }, [products, supplierById])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     return viewRows.filter((p) => {
-      if (!showOutOfStock && p.amount <= 0) return false
+      // Minden termék látszódjon, ne szűrje ki a 0 készletet
       if (!q) return true
       return (
         String(p.productId ?? '').toLowerCase().includes(q) ||
@@ -106,7 +94,7 @@ function Products() {
         String(p.supplierName ?? '').toLowerCase().includes(q)
       )
     })
-  }, [products, query, showOutOfStock])
+  }, [viewRows, query])
 
   const openCreate = () => {
     setEditing(null)

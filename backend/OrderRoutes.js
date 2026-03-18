@@ -44,7 +44,7 @@ async function applyStockDeltaForOrderItems(items, orderId, deltaSign, transacti
 }
 
 module.exports = function (server) {
-  server.get('/order', middlewares.Auth(), async (req, res) => {
+  server.get(['/order', '/order/'], middlewares.Auth(), async (req, res) => {
     try {
       const rows = await dbHandler.Orders.findAll({
         include: [
@@ -64,7 +64,7 @@ module.exports = function (server) {
 
   // Create order with items and automatic stock deduction.
   // Body: { company_id, payment_method, due_date, due_time?, items:[{product_id, amount}] }
-  server.post('/order', middlewares.Auth(), async (req, res) => {
+  server.post(['/order', '/order/'], middlewares.Auth(), async (req, res) => {
     const items = Array.isArray(req.body.items) ? req.body.items : []
     try {
       if (!req.body.company_id) {
@@ -133,7 +133,7 @@ module.exports = function (server) {
   })
 
   // Update order status with flow enforcement
-  server.put('/order/:id/status', middlewares.Auth(), async (req, res) => {
+  server.put(['/order/:id/status', '/order/:id/status/'], middlewares.Auth(), async (req, res) => {
     try {
       const id = Number(req.params.id)
       const next = normalizeStatus(req.body.status)
@@ -184,7 +184,7 @@ module.exports = function (server) {
     }
   })
 
-  server.put('/order/:id/payment', middlewares.Auth(), async (req, res) => {
+  server.put(['/order/:id/payment', '/order/:id/payment/'], middlewares.Auth(), async (req, res) => {
     try {
       const id = Number(req.params.id)
       const order = await dbHandler.Orders.findByPk(id)
@@ -203,7 +203,7 @@ module.exports = function (server) {
   })
 
   // Delete order (admin): restores stock if not yet cancelled.
-  server.delete('/order/:id', middlewares.Auth(), async (req, res) => {
+  server.delete(['/order/:id', '/order/:id/'], middlewares.Auth(), async (req, res) => {
     if (!req.admin) {
       res.status(403).json({ message: 'Forbidden' }).end()
       return

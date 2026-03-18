@@ -2,7 +2,7 @@ const middlewares = require('./middlewares')
 const dbHandler = require('./dbHandler')
 
 module.exports = function (server) {
-  server.get('/clientcompany', middlewares.Auth(), async (req, res) => {
+  server.get(['/clientcompany', '/clientcompany/'], middlewares.Auth(), async (req, res) => {
     try {
       res.json(await dbHandler.ClientCompanies.findAll({ order: [['id', 'DESC']] })).end()
     } catch (err) {
@@ -10,7 +10,7 @@ module.exports = function (server) {
     }
   })
 
-  server.post('/clientcompany', middlewares.Auth(), async (req, res) => {
+  server.post(['/clientcompany', '/clientcompany/'], middlewares.Auth(), async (req, res) => {
     try {
       const created = await dbHandler.ClientCompanies.create({
         admitted_at: req.body.admitted_at,
