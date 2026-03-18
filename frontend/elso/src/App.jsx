@@ -2,48 +2,45 @@ import { useState, useEffect } from 'react'
 import Login from './Components/Login.jsx'
 import Register from './Components/Register.jsx'
 import HomePage from './Components/HomePage.jsx'
-import { ToastProvider } from './Components/ToastProvider.jsx'
+
 
 function App() {
-  const [view, setView] = useState('login') // 'login', 'register', or 'home'
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [view, setView] = useState('login'); // 'login', 'register', or 'home'
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Check if user is already logged in on mount
   useEffect(() => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token');
     if (token) {
-      setIsLoggedIn(true)
-      setView('home')
-    } 
-  }, [])
+      setIsLoggedIn(true);
+      setView('home');
+    }
+  }, []);
 
   const handleLogin = (user) => {
-    console.log('Sikeres bejelentkezés:', user)
-    setIsLoggedIn(true)
-    setView('home')
-  }
+    setIsLoggedIn(true);
+    setView('home');
+  };
 
   const handleRegister = (user) => {
-    console.log('Sikeres regisztráció:', user)
-    setView('login') // vissza a bejelentkezéshez
-  }
+    setView('login');
+  };
 
   const handleLogout = () => {
-    setIsLoggedIn(false)
-    setView('login')
-  }
+    setIsLoggedIn(false);
+    setView('login');
+    localStorage.removeItem('token');
+  };
 
-  return (
-    <ToastProvider>
-      {isLoggedIn && view === 'home' && <HomePage onLogout={handleLogout} />}
-      {!isLoggedIn && view === 'login' && (
-        <Login onLogin={handleLogin} onShowRegister={() => setView('register')} />
-      )}
-      {!isLoggedIn && view === 'register' && (
-        <Register onRegister={handleRegister} onShowLogin={() => setView('login')} />
-      )}
-    </ToastProvider>
-  )
+  if (isLoggedIn && view === 'home') {
+    return <HomePage onLogout={handleLogout} />;
+  }
+  if (!isLoggedIn && view === 'login') {
+    return <Login onLogin={handleLogin} onShowRegister={() => setView('register')} />;
+  }
+  if (!isLoggedIn && view === 'register') {
+    return <Register onRegister={handleRegister} onShowLogin={() => setView('login')} />;
+  }
+  return null;
 }
 
 export default App
