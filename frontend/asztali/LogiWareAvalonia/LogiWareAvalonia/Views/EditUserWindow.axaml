@@ -1,0 +1,96 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="LogiWareAvalonia.EditUserWindow"
+        MaxWidth="350"
+        MaxHeight="400"
+        CanResize="False"
+        Title="EditUserWindow">
+<Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style Selector="TextBox">
+            <Setter Property="MinHeight" Value="35"/>
+            <Setter Property="Margin" Value="0,8,0,0"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Background" Value="#2B2B30"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#555"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Foreground" Value="White" />
+	</Style>
+    </Window.Styles>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="12*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Grid.RowSpan="2"
+                Grid.ColumnSpan="2"
+                Background="#1E1E22" >
+            <Grid Margin="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4*"/>
+                    <ColumnDefinition Width="6*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="9*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="0.3*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,10,0,0">
+                    <TextBlock Text="name: " FontSize="18" Margin="0,10,0,20"/>
+                    <TextBlock Text="email: " FontSize="18" Margin="0,0,0,20"/>
+                    <TextBlock Text="phone: " FontSize="18" Margin="0,0,0,20"/>
+                    <TextBlock Text="password: " FontSize="18" Margin="0,0,0,20"/>
+                    <TextBlock Text="role: " FontSize="18" Margin="0,0,0,20"/>
+                    <TextBlock Text="joined_at: " FontSize="18" Margin="0,0,0,20"/>
+                    <TextBlock Text="admin: " FontSize="18" Margin="0,0,0,20"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <TextBox Name="UsernameBox"/>
+                    <TextBox Name="EmailBox"/>
+                    <TextBox Name="PhoneBox"/>
+                    <TextBox Name="PasswordBox" PasswordChar="*"/>
+                    <TextBox Name="RoleBox"/>
+                    <TextBox Name="JoinedAtBox"/>
+                    <TextBox Name="AdminBox"/>
+                </StackPanel>
+
+                <Border Grid.Row="1"
+                        Grid.ColumnSpan="2"
+                        Margin="0,13,0,0"
+                        Width="140"
+                        Height="40"
+                        Background="#7A3CFF"
+                        CornerRadius="10"
+                        ClipToBounds="True">
+                    <Button Content="Save Changes"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            VerticalAlignment="Stretch"
+                            VerticalContentAlignment="Center"
+                            Background="Transparent"
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontWeight="SemiBold"
+                            Cursor="Hand"
+                            Command="{Binding EditUserButtonClick}"
+                            CommandParameter="{Binding $parent[Window]}"/>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

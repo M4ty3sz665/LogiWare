@@ -68,7 +68,6 @@ namespace LogiWareAvalonia.Services
                 new MessageWindow(e.Message, "Error").Show();
                 return (false);
             }
-            return false;
         }
         public async Task<List<User>> Profiles()
         {

@@ -1,13 +1,106 @@
 <Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:LogiWareAvalonia.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="clr-namespace:LogiWareAvalonia.Views"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="LogiWareAvalonia.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="LogiWareAvalonia">
-        <views:MainView />
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:vm="clr-namespace:LogiWareAvalonia.ViewModels;assembly=LogiWareAvalonia"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:views="clr-namespace:LogiWareAvalonia.Views"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+		x:Class="LogiWareAvalonia.Views.MainWindow"
+		ExtendClientAreaToDecorationsHint="True"
+		RequestedThemeVariant="Dark"
+		Icon="/Assets/avalonia-logo.ico"
+		Title="LogiWareAvalonia">
+	<Window.Styles>
+		<Style Selector="TextBlock">
+			<Setter Property="Foreground" Value="White"/>
+		</Style>
+		<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Foreground" Value="White" />
+		</Style>
+		<Style Selector="Button">
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="Padding" Value="0,10,0,10"/>
+			<Setter Property="CornerRadius" Value="8"/>
+			<Setter Property="Margin" Value="0,0,0,5"/>
+		</Style>
+		<FluentTheme />
 
+		<Style Selector="TextBlock.WindowCaption">
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+		</Style>
+	</Window.Styles>
+	<Grid>
+		<views:MainView />
+		<Grid Name="MainSiteGrid"
+			  IsVisible="True"
+			  Background="#2B2B30">
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="2.5*"/>
+				<ColumnDefinition Width="4*"/>
+			</Grid.ColumnDefinitions>
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+			<TextBlock Classes="WindowCaption" Text="LogiWare - User Management" />
+			<Border Grid.Column="0"
+					Margin="10,30,5,10"
+					Background="#1E1E22"
+					CornerRadius="12"
+					Padding="10">
+				<StackPanel>
+					<Button Command="{Binding UsersButtonClick}" Name="UsersButton" Content="Users" Classes="DarkMenuButton"/>
+					<Button Command="{Binding StockButtonClick}"  Name="StockButton" Content="Stock" Classes="DarkMenuButton"/>
+					<Button Command="{Binding OrdersButtonClick}"  Name="OrdersButton" Content="Orders" Classes="DarkMenuButton"/>
+				</StackPanel>
+			</Border>
+
+			<Border Grid.Column="1"
+					Margin="5,30,5,10"
+					Background="#1E1E22"
+					CornerRadius="12"
+					Padding="20">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
+					<TextBlock Name="TitleLabel" Text="Title" FontSize="24" FontWeight="Bold"/>
+					<ScrollViewer Grid.Row="1" Margin="0,15,0,0">
+						<ItemsControl ItemsSource="{Binding Users}">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Border Background="#2B2B30"
+											Margin="0,0,0,10"
+											Padding="15"
+											CornerRadius="8">
+										<Grid ColumnDefinitions="*, Auto">
+											<WrapPanel Grid.Column="0">
+												<Label Content="{Binding name, StringFormat='{}{0}: '}" FontWeight="Bold" FontSize="16" VerticalContentAlignment="Center" Margin="0" />
+												<Label Content="{Binding email, StringFormat='{}{0}; '}" Foreground="Gray" FontSize="12" VerticalContentAlignment="Center"/>
+												<Label Content="{Binding phone, StringFormat='{}{0}; '}" Foreground="Gray" FontSize="12" VerticalContentAlignment="Center"/>
+												<Label Content="{Binding role, StringFormat='{}{0}; '}" Foreground="Gray" FontSize="12" VerticalContentAlignment="Center"/>
+												<Label Content="{Binding joined_at, StringFormat='{}{0}; '}" Foreground="Gray" FontSize="12" VerticalContentAlignment="Center"/>
+											</WrapPanel>
+											<Button Grid.Column="1"
+													Content="Edit"
+													Width="80"
+													Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenEditUserCommand}"
+													CommandParameter="{Binding}"/>
+										</Grid>
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</ScrollViewer>                </Grid>
+			</Border>
+		</Grid>
+	</Grid>
 </Window>
