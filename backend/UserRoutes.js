@@ -47,34 +47,82 @@ module.exports = function(server) {
     console.log(req.uid)
     res.status(200).json(await dbHandler.Users.findByPk(req.uid)).end()
 })
+    // Delete own account
     server.delete('/oneuser',middlewares.Auth(), async (req,res)=> {
-    if(req.admin){
         try{
-            await dbHandler.Users.destroy({where:{id:req.uid}})
+            const deleted = await dbHandler.Users.destroy({where:{id:req.uid}})
+            if(deleted === 0){
+                res.status(404).json({message:"user not found"}).end()
+                return
+            }
             res.status(200).json({message:"user deleted"}).end()
         }
         catch(err){
             console.log(err)
-            res.status(404).json({message:err}).end()
+            res.status(500).json({message:"Server error"}).end()
         }
-    }
  })
 
+    // Update own profile (admin can update role/admin too if sent)
     server.put('/oneuser', middlewares.Auth(), async (req, res) => {
-    if(req.admin){
-    try {
-        const updated = await dbHandler.Users.update(req.body, {where:{id:req.uid }})
-        if (updated[0] === 0) {
-            return res.status(404).json({ message: 'user not found' }).end()
+        try {
+            const payload = {}
+            if(typeof req.body.name === 'string') payload.name = req.body.name
+            if(typeof req.body.email === 'string') payload.email = req.body.email
+            if(typeof req.body.phone === 'string') payload.phone = req.body.phone
+
+            // role/admin only if admin
+            if(req.admin){
+                if(typeof req.body.role === 'string') payload.role = req.body.role
+                if(typeof req.body.admin === 'boolean') payload.admin = req.body.admin
+            }
+
+            const updated = await dbHandler.Users.update(payload, {where:{id:req.uid }})
+            if (updated[0] === 0) {
+                res.status(404).json({ message: 'user not found' }).end()
+                return
+            }
+            res.status(200).json({ message: 'user updated' }).end()
+        } catch (err) {
+            console.log(err)
+            res.status(500).json({ message: 'Server error' }).end()
         }
-        else{
-            res.json({ message: 'user updated' }).end()
+    })
+
+    // Change password for own user
+    server.put('/oneuser/password', middlewares.Auth(), async (req, res) => {
+        try{
+            const currentPassword = req.body.currentPassword
+            const newPassword = req.body.newPassword
+
+            if(!currentPassword || !newPassword){
+                res.status(400).json({message:"Missing currentPassword or newPassword"}).end()
+                return
+            }
+
+            if(typeof newPassword !== 'string' || newPassword.length < 6){
+                res.status(400).json({message:"Password must be at least 6 characters"}).end()
+                return
+            }
+
+            const user = await dbHandler.Users.findByPk(req.uid)
+            if(!user){
+                res.status(404).json({message:"user not found"}).end()
+                return
+            }
+
+            if(user.password !== currentPassword){
+                res.status(400).json({message:"Wrong current password"}).end()
+                return
+            }
+
+            await user.update({password:newPassword})
+            res.status(200).json({message:"password updated"}).end()
         }
-    } catch (err) {
-        console.log(err)
-        res.status(500).json({ message: 'Server error' }).end()
-    }
-    }
-})
+        catch(err){
+            console.log(err)
+            res.status(500).json({message:"Server error"}).end()
+        }
+    })
 
 }

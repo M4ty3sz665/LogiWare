@@ -44,8 +44,15 @@ function Register({ onRegister, onShowLogin }) {
     try {
       const data = await apiRegister({ name, email, phone, password, role })
       alert('Sikeres regisztráció!')
-      if (onRegister) {
-        onRegister({ name, email })
+      if (data.token) {
+        localStorage.setItem('token', data.token)
+        if (onRegister) {
+          onRegister({ name, email }, data.token)
+        }
+      } else {
+        if (onRegister) {
+          onRegister({ name, email })
+        }
       }
     } catch (err) {
       setError(err.message || 'Hiba történt a regisztráció során.')

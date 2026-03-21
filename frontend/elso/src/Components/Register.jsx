@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { register as apiRegister, validateEmail } from '../utils/auth'
+import { useToast } from './ToastProvider.jsx'
 
 function Register({ onRegister, onShowLogin }) {
+  const toast = useToast()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -43,7 +45,7 @@ function Register({ onRegister, onShowLogin }) {
 
     try {
       const data = await apiRegister({ name, email, phone, password, role })
-      alert('Sikeres regisztráció!')
+      toast.success('Sikeres regisztráció!')
       if (onRegister) {
         onRegister({ name, email })
       }
@@ -55,112 +57,161 @@ function Register({ onRegister, onShowLogin }) {
   }
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <h1 className="login-title">Regisztráció</h1>
-        <p className="login-subtitle">Hozz létre egy új fiókot.</p>
-
-        <form className="login-form" onSubmit={handleSubmit}>
-          <div className="login-field">
-            <label htmlFor="name">Név</label>
-            <input
-              id="name"
-              type="text"
-              placeholder="Teljes név"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoComplete="name"
-              disabled={isSubmitting}
-            />
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        <div className="bg-white/95 rounded-2xl shadow-xl border border-slate-100 px-8 py-10">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
+              LogiWare
+            </h1>
+            <p className="mt-2 text-sm font-medium uppercase tracking-[0.2em] text-blue-600">
+              Regisztráció
+            </p>
+            <p className="mt-4 text-sm text-slate-500">Hozz létre egy új fiókot.</p>
           </div>
 
-          <div className="login-field">
-            <label htmlFor="email">E‑mail cím</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="pelda@email.hu"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              disabled={isSubmitting}
-            />
-          </div>
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm font-medium">
+              {error}
+            </div>
+          )}
 
-          <div className="login-field">
-            <label htmlFor="phone">Telefonszám</label>
-            <input
-              id="phone"
-              type="tel"
-              placeholder="+36 30 123 4567"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              autoComplete="tel"
-              disabled={isSubmitting}
-            />
-          </div>
+          {/* Form */}
+          <form className="space-y-3" onSubmit={handleSubmit}>
+            {/* Name */}
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">
+                Teljes név
+              </label>
+              <input
+                id="name"
+                type="text"
+                placeholder="Teljes név"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition disabled:bg-gray-100 text-sm"
+              />
+            </div>
 
-          <div className="login-field">
-            <label htmlFor="password">Jelszó</label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
-              disabled={isSubmitting}
-            />
-          </div>
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+                E-mail cím
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="pelda@email.hu"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition disabled:bg-gray-100 text-sm"
+              />
+            </div>
 
-          <div className="login-field">
-            <label htmlFor="confirmPassword">Jelszó megerősítése</label>
-            <input
-              id="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              autoComplete="new-password"
-              disabled={isSubmitting}
-            />
-          </div>
+            {/* Phone */}
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-1">
+                Telefonszám
+              </label>
+              <input
+                id="phone"
+                type="tel"
+                placeholder="+36 30 123 4567"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                autoComplete="tel"
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition disabled:bg-gray-100 text-sm"
+              />
+            </div>
 
-          <div className="login-field">
-            <label htmlFor="role">Szerepkör</label>
-            <select
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
+            {/* Role */}
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-slate-700 mb-1">
+                Szerepkör
+              </label>
+              <select
+                id="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition disabled:bg-gray-100 text-sm bg-white"
+              >
+                <option value="">Válassz...</option>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
+                Jelszó
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition disabled:bg-gray-100 text-sm"
+              />
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-1">
+                Jelszó megerősítése
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition disabled:bg-gray-100 text-sm"
+              />
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
               disabled={isSubmitting}
+              className="w-full px-4 py-3 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed mt-4"
             >
-              <option value="">Válassz...</option>
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
+              {isSubmitting ? 'Regisztráció...' : 'Regisztráció'}
+            </button>
+          </form>
+
+          {/* Login Link */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-slate-500">
+              Már van fiókod?{' '}
+              <button
+                type="button"
+                onClick={onShowLogin}
+                className="text-blue-600 hover:text-blue-800 font-semibold transition"
+              >
+                Bejelentkezés
+              </button>
+            </p>
           </div>
+        </div>
 
-          {error && <div className="login-error">{error}</div>}
-
-          <button
-            type="submit"
-            className="login-submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Regisztráció...' : 'Regisztráció'}
-          </button>
-        </form>
-
-        <p className="login-footer">
-          Már van fiókod?{' '}
-          <button
-            type="button"
-            className="login-link-button"
-            onClick={onShowLogin}
-          >
-            Bejelentkezés
-          </button>
-        </p>
+        {/* Footer Info */}
+        <div className="mt-8 text-center text-xs text-slate-400">
+          <p>© 2026 LogiWare. Minden jog fenntartva.</p>
+        </div>
       </div>
     </div>
   )
