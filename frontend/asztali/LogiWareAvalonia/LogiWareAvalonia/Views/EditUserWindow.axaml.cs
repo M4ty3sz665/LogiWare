@@ -3,14 +3,21 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using LogiWareAvalonia.Classes;
 using LogiWareAvalonia.ViewModels;
-namespace LogiWareAvalonia;
 
-public partial class EditUserWindow : Window
+namespace LogiWareAvalonia.Views
 {
-    public EditUserWindow(User user)
+    public partial class EditUserWindow : Window
     {
-        InitializeComponent();
-        DataContext = new EditUserWindowViewModel(user);
+        public EditUserWindow()
+        {
+            InitializeComponent();
+        }
+
+        // The constructor we built earlier for universal editing
+        public EditUserWindow(object itemToEdit)
+        {
+            InitializeComponent();
+            DataContext = new LogiWareAvalonia.ViewModels.EditUserWindowViewModel(itemToEdit);
+        }
     }
-    public EditUserWindow() { }
 }

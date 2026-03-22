@@ -51,9 +51,12 @@ namespace LogiWareAvalonia.ViewModels
 
         private async Task OnLogin(Window window)
         {
+            if(await _conn.Login(Username, Password))
+            {
             MainWindow main = new MainWindow();
             main.Show();
             window?.Close();
+            }
             return;
         }
     }

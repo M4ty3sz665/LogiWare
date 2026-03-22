@@ -9,69 +9,56 @@ namespace LogiWareAvalonia.ViewModels
 {
     public partial class EditUserWindowViewModel : ViewModelBase
     {
-        private readonly int _userId;
-        private readonly User _userReference;
+
         private readonly ServerConnection _conn = new("http://localhost:3000");
 
-        [ObservableProperty] private string _name = string.Empty;
-        [ObservableProperty] private string _email = string.Empty;
-        [ObservableProperty] private string _phone = string.Empty;
-        [ObservableProperty] private string _password = string.Empty;
-        [ObservableProperty] private string _role = string.Empty;
+        // This holds the actual object (User, Stock, or Order)
+        [ObservableProperty]
+        private object _editingItem;
+        [ObservableProperty]
+        private string _title;
 
-        // Updated to include <Window> to accept the parameter from XAML
-        public AsyncRelayCommand<Window> EditUserButtonClick { get; }
+        public AsyncRelayCommand<Window> SaveCommand { get; }
 
-        public EditUserWindowViewModel(User user)
+        public EditUserWindowViewModel(object item)
         {
-            _userReference = user; // Store the local variable reference
-            _userId = user.id;
+            EditingItem = item;
 
-            // Map the Model data to these Observable properties
-            _userReference.name = Name;
-            _userReference.email = Email;
-            _userReference.phone = Phone;
-            _userReference.passsword = Password;
-            _userReference.role = Role;
-
-            EditUserButtonClick = new AsyncRelayCommand<Window>(EditUser);
-        }
-
-        public EditUserWindowViewModel() : this(new User { name = "User" }) { }
-
-        private async Task EditUser(Window window)
-        {
-            // 1. Update the local variable (the "baton")
-            _userReference.name = Name;
-            _userReference.email = Email;
-            _userReference.phone = Phone;
-            _userReference.passsword = Password;
-            _userReference.role = Role;
-
-            // 2. Prepare the object for the server
-            User updatedUser = new User
+            // Set window title based on the object type
+            Title = item switch
             {
-                id = _userId,
-                name = Name,
-                email = Email,
-                phone = Phone,
-                passsword = Password,
-                role = Role
+                User => "Edit User",
+                Stock => "Edit Stock",
+                Order => "Edit Order",
+                _ => "Edit Item"
             };
 
-            // 3. Send to server
-            //string result = await _conn.EditUser(updatedUser);
+            SaveCommand = new AsyncRelayCommand<Window>(Save);
+        }
 
-            // 4. Show result and close window if successful
-            //if (result != "Error")
+        private async Task Save(Window window)
+        {
+            string result = "Error";
+            bool regresult;
+            // Determine which API call to make based on the object type
+            if (EditingItem is User u)
             {
-                // Close the window directly after saving
-                window?.Close();
+                if (u.id != 0) result = await _conn.EditUser(u);
+                else regresult = await _conn.Register(u);
             }
-            //else
+            else if (EditingItem is Stock s)
             {
-                // Use your existing MessageWindow to show errors
-            //    await MessageWindow.Show(window, "Failed to update user on server.", "Update Error");
+                if (s.id != 0) result = await _conn.EditStock(s);
+                else regresult = await _conn.CreateStock(s);
+                if (result != "Error")
+                {
+                    window?.Close();
+                }
+            }
+            else if(EditingItem is Order o)
+            {
+                if (o.order_number != 0) result = await _conn.EditOrder(o);
+                else regresult = await _conn.CreateOrder(o);
             }
         }
     }

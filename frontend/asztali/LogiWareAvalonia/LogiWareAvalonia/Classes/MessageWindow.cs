@@ -13,6 +13,7 @@ namespace LogiWareAvalonia.Classes
 {
     public class MessageWindow : Window
     {
+        public Button okButton;
         public MessageWindow(string message, string type)
         {
             Width = 350;
@@ -29,8 +30,7 @@ namespace LogiWareAvalonia.Classes
                 Margin = new Thickness(0, 0, 0, 15)
             };
 
-            var okButton = new Button
-            {
+            okButton = new(){
                 Content = "OK",
                 Width = 80,
                 HorizontalAlignment = HorizontalAlignment.Center
