@@ -2,7 +2,7 @@ import { useCallback, useState, useEffect } from 'react'
 import Dashboard from './home/Dashboard.jsx'
 import CreateOrder from './home/CreateOrder.jsx'
 import Stock from './home/Stock.jsx'
-import Products from './home/Products.jsx'
+import Cart from './home/Cart.jsx'
 import Profile from './home/Profile.jsx'
 import Orders from './home/Orders.jsx'
 import { apiFetch } from '../utils/api'
@@ -51,9 +51,9 @@ function HomePage({ onLogout }) {
         : activeMenu === 'orders'
           ? '🧾 Rendelések'
         : activeMenu === 'stock'
-          ? '📦 Raktárkezelés'
-          : activeMenu === 'products'
-            ? '🛍️ Termékkezelés'
+          ? '🥕 Készletkezelés'
+          : activeMenu === 'cart'
+            ? '🍎 Kosár'
             : '👤 Profil'
 
   const renderContent = () => {
@@ -66,8 +66,8 @@ function HomePage({ onLogout }) {
         return <Orders />
       case 'stock':
         return <Stock />
-      case 'products':
-        return <Products />
+      case 'cart':
+        return <Cart />
       case 'profile':
         return (
           <Profile
@@ -100,7 +100,6 @@ function HomePage({ onLogout }) {
           <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
             LogiWare
           </h1>
-          <p className="text-sm text-gray-400 mt-2">{userInfo?.role?.toUpperCase()}</p>
         </div>
 
         <nav className="mt-8 space-y-2 px-4 overflow-y-auto" style={{ height: 'calc(100vh - 200px)' }}>
@@ -122,7 +121,7 @@ function HomePage({ onLogout }) {
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            ➕ Rendelés Lét.
+            ➕ Rendelés létrehozása
           </button>
           <button
             onClick={() => setActiveMenu('orders')}
@@ -142,17 +141,17 @@ function HomePage({ onLogout }) {
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            📦 Raktár
+            🥕 Készlet
           </button>
           <button
-            onClick={() => setActiveMenu('products')}
+            onClick={() => setActiveMenu('cart')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
-              activeMenu === 'products'
+              activeMenu === 'cart'
                 ? 'bg-blue-600 text-white shadow-lg'
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            🛍️ Termékek
+            🍎 Kosár
           </button>
           <button
             onClick={() => setActiveMenu('profile')}
@@ -183,14 +182,20 @@ function HomePage({ onLogout }) {
           <div className="flex justify-between items-center">
             <h2 className="text-3xl font-bold text-gray-800">{headerTitle}</h2>
             <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium text-gray-700">
-                {userInfo?.name}
-              </span>
-              <img
-                src={`https://ui-avatars.com/api/?name=${userInfo?.name}&background=667eea&color=fff`}
-                alt="Avatar"
-                className="w-10 h-10 rounded-full"
-              />
+              <button
+                className="flex items-center space-x-2 group focus:outline-none"
+                onClick={() => setActiveMenu('profile')}
+                title="Profil megtekintése"
+              >
+                <span className="text-sm font-medium text-gray-700 group-hover:underline">
+                  {userInfo?.name}
+                </span>
+                <img
+                  src={`https://ui-avatars.com/api/?name=${userInfo?.name}&background=667eea&color=fff`}
+                  alt="Avatar"
+                  className="w-10 h-10 rounded-full border-2 border-transparent group-hover:border-blue-500 transition"
+                />
+              </button>
             </div>
           </div>
         </div>

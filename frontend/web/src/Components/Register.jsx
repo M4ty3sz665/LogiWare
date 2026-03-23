@@ -7,19 +7,18 @@ function Register({ onRegister, onShowLogin }) {
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [role, setRole] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     if (error) setError('')
-  }, [name, email, phone, password, confirmPassword, role])
+  }, [name, email, phone, password, confirmPassword])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
-    if (!name || !email || !phone || !password || !confirmPassword || !role) {
+    if (!name || !email || !phone || !password || !confirmPassword) {
       setError('Kérlek tölts ki minden mezőt.')
       return
     }
@@ -42,7 +41,7 @@ function Register({ onRegister, onShowLogin }) {
     setIsSubmitting(true)
 
     try {
-      const data = await apiRegister({ name, email, phone, password, role })
+      const data = await apiRegister({ name, email, phone, password })
       alert('Sikeres regisztráció!')
       if (data.token) {
         localStorage.setItem('token', data.token)
@@ -131,20 +130,6 @@ function Register({ onRegister, onShowLogin }) {
               autoComplete="new-password"
               disabled={isSubmitting}
             />
-          </div>
-
-          <div className="login-field">
-            <label htmlFor="role">Szerepkör</label>
-            <select
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              disabled={isSubmitting}
-            >
-              <option value="">Válassz...</option>
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
           </div>
 
           {error && <div className="login-error">{error}</div>}

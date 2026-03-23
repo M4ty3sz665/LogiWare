@@ -7,7 +7,6 @@ function Profile({ userInfo, onUpdated, onLogout }) {
   const [name, setName] = useState(userInfo?.name || '')
   const [email, setEmail] = useState(userInfo?.email || '')
   const [phone, setPhone] = useState(userInfo?.phone || '')
-  const [role, setRole] = useState(userInfo?.role || '')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -31,7 +30,6 @@ function Profile({ userInfo, onUpdated, onLogout }) {
     setName(userInfo?.name || '')
     setEmail(userInfo?.email || '')
     setPhone(userInfo?.phone || '')
-    setRole(userInfo?.role || '')
   }, [userInfo])
 
   const handleSubmit = async (e) => {
@@ -46,7 +44,7 @@ function Profile({ userInfo, onUpdated, onLogout }) {
 
     setIsSubmitting(true)
     try {
-      await apiFetch('/oneuser', { method: 'PUT', body: { name, email, phone, role } })
+      await apiFetch('/oneuser', { method: 'PUT', body: { name, email, phone } })
       setSuccess('Mentve.')
       toast.success('Profil mentve.')
       if (onUpdated) onUpdated()
@@ -165,20 +163,6 @@ function Profile({ userInfo, onUpdated, onLogout }) {
               onChange={(e) => setPhone(e.target.value)}
               className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Szerepkör
-            </label>
-            <input
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <p className="mt-2 text-xs text-gray-500">
-              (Ezt később érdemes lesz a backendben korlátozni / csak adminnak engedni.)
-            </p>
           </div>
 
           <div className="pt-2 flex items-center gap-3">

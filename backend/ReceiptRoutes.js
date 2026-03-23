@@ -10,7 +10,6 @@ Server.server.post("/receipt",middlewares.Auth(), async (req, res) => {
     const onesupp = await dbHandler.Receipts.findOne({
         where:{
             title: req.body.title,
-            company_id: req.body.company_id,
             body:req.body.body
         }
     })
@@ -22,7 +21,6 @@ Server.server.post("/receipt",middlewares.Auth(), async (req, res) => {
         await dbHandler.Receipts.create({
             title: req.body.title,
             body: req.body.body,
-            company_id:req.body.company_id,
             order_id:req.body.order_id,
             status:req.body.status,
             created_at:req.body.created_at,
@@ -42,7 +40,6 @@ Server.server.put("/receipt/:id",middlewares.Auth(), async (req, res) => {
         await dbHandler.Receipts.update({
             title: req.body.title,
             body: req.body.body,
-            company_id:req.body.company_id,
             order_id:req.body.order_id,
             status:req.body.status,
             created_at:req.body.created_at,

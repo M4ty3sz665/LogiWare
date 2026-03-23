@@ -18,9 +18,6 @@ supplierRoutes(server)
 const stockMovementRoutes = require('./StockMovementRoutes')
 stockMovementRoutes(server)
 
-const clientCompanyRoutes = require('./ClientCompanyRoutes')
-clientCompanyRoutes(server)
-
 const orderRoutes = require('./OrderRoutes')
 orderRoutes(server)
 
@@ -64,6 +61,31 @@ async function ensureSchema() {
   }
   if (stockMovements.order_id && stockMovements.order_id.allowNull) {
     // keep current schema; we rely on defaultValue=0 in the model
+  }
+
+  // Legacy cleanup: remove old client-company schema artifacts.
+  try {
+    await dbHandler.sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
+
+    const orders = await qi.describeTable('orders')
+    if (orders.company_id) {
+      await qi.removeColumn('orders', 'company_id')
+    }
+
+    const receipts = await qi.describeTable('receipts')
+    if (receipts.company_id) {
+      await qi.removeColumn('receipts', 'company_id')
+    }
+
+    const tables = await qi.showAllTables()
+    const names = tables.map((t) => (typeof t === 'string' ? t : t.tableName || Object.values(t)[0]))
+    if (names.includes('client_companies')) {
+      await qi.dropTable('client_companies')
+    }
+  } catch (e) {
+    console.log('Legacy company cleanup skipped:', e?.parent?.sqlMessage || e?.message || e)
+  } finally {
+    await dbHandler.sequelize.query('SET FOREIGN_KEY_CHECKS = 1')
   }
 }
 

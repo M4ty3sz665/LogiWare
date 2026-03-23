@@ -42,12 +42,10 @@ function Orders() {
     const q = query.trim().toLowerCase()
     if (!q) return rows
     return rows.filter((o) => {
-      const company = o.client_company?.company_name || ''
       return (
         String(o.order_number).includes(q) ||
         String(o.status || '').toLowerCase().includes(q) ||
-        String(o.payment_status || '').toLowerCase().includes(q) ||
-        company.toLowerCase().includes(q)
+        String(o.payment_status || '').toLowerCase().includes(q)
       )
     })
   }, [rows, query])
@@ -58,20 +56,6 @@ function Orders() {
     try {
       await apiFetch(`/order/${orderNumber}/status`, { method: 'PUT', body: { status } })
       toast.success('Státusz frissítve.')
-      await load()
-    } catch (e) {
-      toast.error(e?.message || 'Nem sikerült menteni.')
-    } finally {
-      setSavingId(null)
-    }
-  }
-
-  const setPayment = async (orderNumber, payment_status) => {
-    if (savingId) return
-    setSavingId(orderNumber)
-    try {
-      await apiFetch(`/order/${orderNumber}/payment`, { method: 'PUT', body: { payment_status } })
-      toast.success('Fizetés státusz frissítve.')
       await load()
     } catch (e) {
       toast.error(e?.message || 'Nem sikerült menteni.')
@@ -100,7 +84,7 @@ function Orders() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="order#, cég, státusz..."
+            placeholder="order#, státusz..."
             className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -123,9 +107,6 @@ function Orders() {
                 Rendelés #
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-600">
-                Ügyfél cég
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-600">
                 Státusz
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-600">
@@ -140,13 +121,13 @@ function Orders() {
           <tbody className="divide-y divide-gray-100 bg-white">
             {loading ? (
               <tr>
-                <td className="px-4 py-4 text-sm text-gray-600" colSpan={5}>
+                <td className="px-4 py-4 text-sm text-gray-600" colSpan={4}>
                   Betöltés...
                 </td>
               </tr>
             ) : filtered.length === 0 ? (
               <tr>
-                <td className="px-4 py-6 text-sm text-gray-600" colSpan={5}>
+                <td className="px-4 py-6 text-sm text-gray-600" colSpan={4}>
                   Nincs rendelés.
                 </td>
               </tr>
@@ -154,9 +135,6 @@ function Orders() {
               filtered.map((o) => (
                 <tr key={o.order_number} className="hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm font-bold text-gray-900">{o.order_number}</td>
-                  <td className="px-4 py-3 text-sm text-gray-800">
-                    {o.client_company?.company_name || '-'}
-                  </td>
                   <td className="px-4 py-3 text-sm">
                     <span
                       className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${badge(
@@ -165,35 +143,10 @@ function Orders() {
                     >
                       {String(o.status || 'TBD').toUpperCase()}
                     </span>
-                    <div className="mt-2">
-                      <select
-                        value={String(o.status || 'TBD').toUpperCase()}
-                        disabled={savingId === o.order_number}
-                        onChange={(e) => setStatus(o.order_number, e.target.value)}
-                        className="w-44 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="TBD">TBD</option>
-                        <option value="IN_PROGRESS">IN_PROGRESS</option>
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="CANCELLED">CANCELLED</option>
-                      </select>
-                    </div>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-800">
-                    <div className="text-xs font-semibold text-gray-700">
+                    <div className="inline-flex items-center rounded-full bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
                       {o.payment_status || 'not processed'}
-                    </div>
-                    <div className="mt-2">
-                      <select
-                        value={o.payment_status || 'not processed'}
-                        disabled={savingId === o.order_number}
-                        onChange={(e) => setPayment(o.order_number, e.target.value)}
-                        className="w-44 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="not processed">not processed</option>
-                        <option value="paid">paid</option>
-                        <option value="overdue">overdue</option>
-                      </select>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-right">

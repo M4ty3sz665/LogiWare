@@ -9,19 +9,18 @@ function Register({ onRegister, onShowLogin }) {
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [role, setRole] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     if (error) setError('')
-  }, [name, email, phone, password, confirmPassword, role])
+  }, [name, email, phone, password, confirmPassword])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
-    if (!name || !email || !phone || !password || !confirmPassword || !role) {
+    if (!name || !email || !phone || !password || !confirmPassword) {
       setError('Kérlek tölts ki minden mezőt.')
       return
     }
@@ -44,7 +43,7 @@ function Register({ onRegister, onShowLogin }) {
     setIsSubmitting(true)
 
     try {
-      const data = await apiRegister({ name, email, phone, password, role })
+      await apiRegister({ name, email, phone, password })
       toast.success('Sikeres regisztráció!')
       if (onRegister) {
         onRegister({ name, email })
@@ -129,24 +128,6 @@ function Register({ onRegister, onShowLogin }) {
                 disabled={isSubmitting}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition disabled:bg-gray-100 text-sm"
               />
-            </div>
-
-            {/* Role */}
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-slate-700 mb-1">
-                Szerepkör
-              </label>
-              <select
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                disabled={isSubmitting}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition disabled:bg-gray-100 text-sm bg-white"
-              >
-                <option value="">Válassz...</option>
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
             </div>
 
             {/* Password */}

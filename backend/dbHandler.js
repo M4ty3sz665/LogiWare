@@ -29,7 +29,8 @@ const user = sequelize.define('user', {
 	},
     role:{
         type:DataTypes.STRING,
-        allowNull:false
+		allowNull:false,
+		defaultValue:'user'
     },
     joined_at:{
         type:DataTypes.DATE,
@@ -120,10 +121,6 @@ const order = sequelize.define('order', {
 		type: DataTypes.INTEGER,
 		allowNull: false
 	},
-	company_id: {
-		type: DataTypes.INTEGER,
-		allowNull: false
-	},
 	created_at: {
 		type: DataTypes.DATE,
         defaultValue:DataTypes.NOW
@@ -152,43 +149,6 @@ const order = sequelize.define('order', {
 	due_time:{
 		type:DataTypes.TIME
 	}
-})
-
-const client_company = sequelize.define('client_company', {
-	id: {
-		type: DataTypes.INTEGER,
-		primaryKey: true,
-		autoIncrement: true
-	},
-	admitted_at: {
-		type: DataTypes.DATEONLY,
-		defaultValue: DataTypes.NOW
-	},
-	company_name: {
-		type: DataTypes.STRING,
-		allowNull: false
-	},
-	tax_number: {
-		type: DataTypes.STRING
-	},
-	registration_number: {
-		type: DataTypes.STRING
-	},
-    address:{
-        type:DataTypes.STRING,
-        allowNull:false
-    },
-    billing_address:{
-        type:DataTypes.STRING
-    },
-    email:{
-        type:DataTypes.STRING,
-        allowNull:false
-    },
-    phone:{
-        type:DataTypes.STRING,
-        allowNull:false
-    }
 })
 
 const stock_movement = sequelize.define('stock_movement', {
@@ -256,10 +216,6 @@ const receipt = sequelize.define('receipt', {
 	body: {
 		type: DataTypes.STRING,
 	},
-	company_id: {
-		type: DataTypes.INTEGER,
-        allowNull:false
-	},
 	order_id: {
 		type: DataTypes.INTEGER
 	},
@@ -326,17 +282,11 @@ product.hasMany(orderItem, { foreignKey: 'product_id' })
 order.hasMany(orderItem, { foreignKey: 'order_id' })
 orderItem.belongsTo(order, { foreignKey: 'order_id' })
 
-client_company.hasMany(order, { foreignKey: 'company_id' })
-order.belongsTo(client_company, { foreignKey: 'company_id' })
-
 stock_movement.belongsTo(stock, { foreignKey: 'stock_id' })
 stock.hasMany(stock_movement, { foreignKey: 'stock_id' })
 
 stock.belongsTo(product, { foreignKey: 'item_id' })
 product.hasMany(stock, { foreignKey: 'item_id' })
-
-receipt.belongsTo(client_company, { foreignKey: 'company_id' })
-client_company.hasMany(receipt, { foreignKey: 'company_id' })
 
 receipt.belongsTo(order, { foreignKey: 'order_id' })
 order.hasMany(receipt, { foreignKey: 'order_id' })
@@ -348,7 +298,6 @@ exports.Users = user
 exports.Products = product
 exports.OrderItems = orderItem
 exports.Orders = order
-exports.ClientCompanies = client_company
 exports.Suppliers = supplier
 exports.stockMovements = stock_movement
 exports.Stock = stock
