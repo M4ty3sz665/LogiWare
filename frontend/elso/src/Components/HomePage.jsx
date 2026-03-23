@@ -2,7 +2,7 @@ import { useCallback, useState, useEffect } from 'react'
 import Dashboard from './home/Dashboard.jsx'
 import CreateOrder from './home/CreateOrder.jsx'
 import Stock from './home/Stock.jsx'
-import Products from './home/Products.jsx'
+import Cart from './home/Cart.jsx'
 import Profile from './home/Profile.jsx'
 import Orders from './home/Orders.jsx'
 import { apiFetch } from '../utils/api'
@@ -52,8 +52,8 @@ function HomePage({ onLogout }) {
           ? '🧾 Rendelések'
         : activeMenu === 'stock'
           ? '🥕 Készletkezelés'
-          : activeMenu === 'products'
-            ? '🍎 Zöldségek és gyümölcsök'
+          : activeMenu === 'cart'
+            ? '🍎 Kosár'
             : '👤 Profil'
 
   const renderContent = () => {
@@ -66,8 +66,8 @@ function HomePage({ onLogout }) {
         return <Orders />
       case 'stock':
         return <Stock />
-      case 'products':
-        return <Products />
+      case 'cart':
+        return <Cart />
       case 'profile':
         return (
           <Profile
@@ -121,7 +121,7 @@ function HomePage({ onLogout }) {
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            ➕ Új Rendelés
+            ➕ Rendelés létrehozása
           </button>
           <button
             onClick={() => setActiveMenu('orders')}
@@ -144,14 +144,14 @@ function HomePage({ onLogout }) {
             🥕 Készlet
           </button>
           <button
-            onClick={() => setActiveMenu('products')}
+            onClick={() => setActiveMenu('cart')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
-              activeMenu === 'products'
+              activeMenu === 'cart'
                 ? 'bg-blue-600 text-white shadow-lg'
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            🍎 Áruk
+            🍎 Kosár
           </button>
           <button
             onClick={() => setActiveMenu('profile')}
