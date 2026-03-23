@@ -51,9 +51,9 @@ function HomePage({ onLogout }) {
         : activeMenu === 'orders'
           ? '🧾 Rendelések'
         : activeMenu === 'stock'
-          ? '📦 Raktárkezelés'
+          ? '🥕 Készletkezelés'
           : activeMenu === 'products'
-            ? '🛍️ Termékkezelés'
+            ? '🍎 Zöldségek és gyümölcsök'
             : '👤 Profil'
 
   const renderContent = () => {
@@ -121,7 +121,7 @@ function HomePage({ onLogout }) {
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            ➕ Rendelés Lét.
+            ➕ Új Rendelés
           </button>
           <button
             onClick={() => setActiveMenu('orders')}
@@ -141,7 +141,7 @@ function HomePage({ onLogout }) {
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            📦 Raktár
+            🥕 Készlet
           </button>
           <button
             onClick={() => setActiveMenu('products')}
@@ -151,7 +151,7 @@ function HomePage({ onLogout }) {
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            🛍️ Termékek
+            🍎 Áruk
           </button>
           <button
             onClick={() => setActiveMenu('profile')}

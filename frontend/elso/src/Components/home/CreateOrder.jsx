@@ -122,11 +122,10 @@ function CreateOrder() {
   const handleCreate = async () => {
     if (orderItems.length === 0 || isSubmitting) return
     if (!dueDate) {
-      toast.error('Adj meg határidő dátumot.')
+      toast.error('Adj meg teljesítési dátumot.')
       return
     }
 
-    // Validate stock availability
     for (const it of orderItems) {
       if (it.qty > it.available) {
         toast.error(`Nincs elég készlet: ${it.name} (max ${it.available})`)
@@ -142,14 +141,13 @@ function CreateOrder() {
         items: orderItems.map((i) => ({ product_id: i.id, amount: i.qty })),
       }
       const res = await apiFetch('/order', { method: 'POST', body: payload })
-      toast.success(`Rendelés létrehozva (#${res?.order_number}).`)
+      toast.success(`Rendelés rögzítve (#${res?.order_number}).`)
       setOrderQtyById({})
       setQuery('')
-      // refresh stock
       const s = await apiFetch('/stock')
       setStock(Array.isArray(s) ? s : [])
     } catch (e) {
-      toast.error(e?.message || 'Nem sikerült a rendelés létrehozása.')
+      toast.error(e?.message || 'Nem sikerült a rendelés rögzítése.')
     } finally {
       setIsSubmitting(false)
     }
@@ -161,7 +159,7 @@ function CreateOrder() {
         <div>
           <h3 className="text-lg font-bold text-gray-800">Rendelés létrehozása</h3>
           <p className="mt-1 text-sm text-gray-500">
-            Készletből adj hozzá tételeket, jobb oldalt áll össze a rendelés.
+            Válassz zöldséget vagy gyümölcsöt a készletből, jobb oldalt áll össze a rendelés.
           </p>
         </div>
 
@@ -172,7 +170,7 @@ function CreateOrder() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="termék név..."
+            placeholder="pl. alma, paradicsom..."
             className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -202,7 +200,7 @@ function CreateOrder() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold tracking-wide text-gray-600">Határidő (due date)</label>
+              <label className="block text-xs font-semibold tracking-wide text-gray-600">Teljesítési dátum</label>
               <input
                 type="date"
                 value={dueDate}
@@ -214,134 +212,121 @@ function CreateOrder() {
         </div>
 
         <div className="lg:col-span-2">
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Stock */}
-        <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
-          <div className="grid grid-cols-[1fr_auto] gap-3 border-b border-gray-200 pb-3">
-            <div className="text-xs font-bold tracking-wider text-gray-700">
-              STOCK ITEMS
-            </div>
-            <div className="text-xs font-bold tracking-wider text-gray-700">PRICE</div>
-          </div>
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
+              <div className="grid grid-cols-[1fr_auto] gap-3 border-b border-gray-200 pb-3">
+                <div className="text-xs font-bold tracking-wider text-gray-700">KÉSZLET TÉTELEK</div>
+                <div className="text-xs font-bold tracking-wider text-gray-700">ÁR</div>
+              </div>
 
-          <div className="mt-3 space-y-2">
-            {filteredStock.map((item) => (
-              <div
-                key={item.id}
-                className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg bg-white px-3 py-2 shadow-sm"
-              >
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-medium text-gray-800">
-                    {item.name}{' '}
-                    <span className="text-xs text-gray-500">({item.code})</span>
-                  </div>
-                  <div className="mt-1 text-xs text-gray-500">
-                    Készlet: <span className="font-semibold">{item.available}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="whitespace-nowrap text-sm font-semibold text-gray-700">
-                    {HUF.format(item.price)}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => addOne(item.id)}
-                    disabled={item.available <= 0}
-                    className="rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 transition"
+              <div className="mt-3 space-y-2">
+                {filteredStock.map((item) => (
+                  <div
+                    key={item.id}
+                    className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg bg-white px-3 py-2 shadow-sm"
                   >
-                    add
-                  </button>
-                </div>
-              </div>
-            ))}
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium text-gray-800">
+                        {item.name}{' '}
+                        <span className="text-xs text-gray-500">({item.code})</span>
+                      </div>
+                      <div className="mt-1 text-xs text-gray-500">
+                        Készlet: <span className="font-semibold">{item.available}</span>
+                      </div>
+                    </div>
 
-            {filteredStock.length === 0 && (
-              <div className="rounded-lg bg-white px-3 py-3 text-sm text-gray-600">
-                Nincs találat.
-              </div>
-            )}
-          </div>
-        </div>
+                    <div className="flex items-center gap-3">
+                      <div className="whitespace-nowrap text-sm font-semibold text-gray-700">
+                        {HUF.format(item.price)}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => addOne(item.id)}
+                        disabled={item.available <= 0}
+                        className="rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 transition"
+                      >
+                        hozzáad
+                      </button>
+                    </div>
+                  </div>
+                ))}
 
-        {/* Order */}
-        <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
-          <div className="grid grid-cols-[1fr_auto] gap-3 border-b border-gray-200 pb-3">
-            <div className="text-xs font-bold tracking-wider text-gray-700">
-              ORDER ITEMS
+                {filteredStock.length === 0 && (
+                  <div className="rounded-lg bg-white px-3 py-3 text-sm text-gray-600">
+                    Nincs találat.
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="text-xs font-bold tracking-wider text-gray-700">PRICE</div>
+
+            <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
+              <div className="grid grid-cols-[1fr_auto] gap-3 border-b border-gray-200 pb-3">
+                <div className="text-xs font-bold tracking-wider text-gray-700">RENDELÉSI TÉTELEK</div>
+                <div className="text-xs font-bold tracking-wider text-gray-700">ÁR</div>
+              </div>
+
+              <div className="mt-3 space-y-2">
+                {orderItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg bg-white px-3 py-2 shadow-sm"
+                  >
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium text-gray-800">{item.name}</div>
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Menny.</span>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          max={999}
+                          value={item.qty}
+                          onChange={(e) => setQty(item.id, e.target.value)}
+                          className="w-20 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeOne(item.id)}
+                          className="rounded-full bg-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-900 hover:bg-gray-300 transition"
+                        >
+                          töröl
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <div className="whitespace-nowrap text-sm font-semibold text-gray-700">{HUF.format(item.price)}</div>
+                      <div className="mt-1 whitespace-nowrap text-xs text-gray-500">
+                        {HUF.format(item.price * item.qty)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {orderItems.length === 0 && (
+                  <div className="rounded-lg bg-white px-3 py-6 text-center text-sm text-gray-600">
+                    Még nincs tétel a rendelésben.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className="mt-3 space-y-2">
-            {orderItems.map((item) => (
-              <div
-                key={item.id}
-                className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg bg-white px-3 py-2 shadow-sm"
-              >
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-medium text-gray-800">
-                    {item.name}
-                  </div>
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className="text-xs text-gray-500">Qty</span>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min={0}
-                      max={999}
-                      value={item.qty}
-                      onChange={(e) => setQty(item.id, e.target.value)}
-                      className="w-20 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeOne(item.id)}
-                      className="rounded-full bg-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-900 hover:bg-gray-300 transition"
-                    >
-                      remove
-                    </button>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <div className="whitespace-nowrap text-sm font-semibold text-gray-700">
-                    {HUF.format(item.price)}
-                  </div>
-                  <div className="mt-1 whitespace-nowrap text-xs text-gray-500">
-                    {HUF.format(item.price * item.qty)}
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {orderItems.length === 0 && (
-              <div className="rounded-lg bg-white px-3 py-6 text-center text-sm text-gray-600">
-                Még nincs tétel a rendelésben.
-              </div>
-            )}
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+            <div className="text-sm font-semibold text-gray-700">
+              Össz ár:{' '}
+              <span className="ml-1 text-lg font-bold text-gray-900">{HUF.format(total)}</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleCreate}
+              disabled={orderItems.length === 0 || isSubmitting || loading}
+              className="sm:ml-6 inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? 'Létrehozás...' : 'Rendelés létrehozása'}
+            </button>
           </div>
         </div>
-      </div>
-
-      {/* Bottom bar */}
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-        <div className="text-sm font-semibold text-gray-700">
-          Össz ár:{' '}
-          <span className="ml-1 text-lg font-bold text-gray-900">
-            {HUF.format(total)}
-          </span>
-        </div>
-        <button
-          type="button"
-          onClick={handleCreate}
-          disabled={orderItems.length === 0 || isSubmitting || loading}
-          className="sm:ml-6 inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? 'Létrehozás...' : 'Létrehozás'}
-        </button>
-      </div>
-      </div>
       </div>
     </div>
   )
