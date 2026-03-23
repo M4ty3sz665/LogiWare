@@ -50,8 +50,8 @@ export default function LandingPage() {
           </div>
         </header>
 
-        <main className="grid flex-1 grid-cols-1 items-center gap-10 py-10 lg:grid-cols-[1.05fr_1fr] lg:py-14">
-          <section className="max-w-xl">
+        <main className="flex flex-1 items-center py-10 lg:py-14">
+          <section className="max-w-2xl">
             <p className="mb-3 inline-flex rounded-full border border-cyan-200/30 bg-cyan-300/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-cyan-100">
               Zöldség és gyümölcs platform
             </p>
@@ -87,50 +87,55 @@ export default function LandingPage() {
               ))}
             </ul>
           </section>
+        </main>
 
-          <section className="relative mx-auto w-full max-w-[620px]">
-            <div className="absolute -left-8 -top-8 h-32 w-32 rounded-full bg-cyan-300/25 blur-3xl" />
-            <div className="absolute -bottom-10 right-10 h-40 w-40 rounded-full bg-indigo-300/20 blur-3xl" />
+        <section className="mb-6 rounded-[24px] border border-white/12 bg-[#050916]/80 p-6 sm:p-8">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            
 
-            <div className="relative rounded-[28px] border border-white/15 bg-[#101a4f]/85 p-3 shadow-[0_30px_60px_rgba(8,12,45,0.7)] backdrop-blur-md sm:p-4">
-              <div className="rounded-[20px] border border-white/10 bg-[#0b133b] p-3 sm:p-4">
-                <div className="mb-3 flex items-center justify-between text-xs text-white/70 sm:text-sm">
-                  <span className="rounded-full bg-white/10 px-3 py-1">Napi áttekintés</span>
-                  <span>12 rendelés</span>
-                </div>
-
-                <div className="space-y-2 rounded-xl bg-white/5 p-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Alma</span>
-                    <span className="font-bold">84 kg</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-white/15">
-                    <div className="h-2 w-[72%] rounded-full bg-cyan-300" />
-                  </div>
-
-                  <div className="mt-3 flex items-center justify-between text-sm">
-                    <span>Paradicsom</span>
-                    <span className="font-bold">53 kg</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-white/15">
-                    <div className="h-2 w-[49%] rounded-full bg-emerald-300" />
-                  </div>
-                </div>
-
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-white/5 p-3">
-                    <p className="text-xs text-white/65">Mai forgalom</p>
-                    <p className="mt-1 text-xl font-black">287 500 Ft</p>
-                  </div>
-                  <div className="rounded-xl bg-white/5 p-3">
-                    <p className="text-xs text-white/65">Nyitott rendelés</p>
-                    <p className="mt-1 text-xl font-black">6</p>
-                  </div>
-                </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <h2 className="text-sm font-extrabold uppercase tracking-[0.16em] text-cyan-300">Információk</h2>
+              <div className="mt-4 space-y-2 text-base">
+                <a href="#" className="block text-white/90 transition hover:text-cyan-300">Adatvédelmi tájékoztató</a>
+                <a href="#" className="block text-white/90 transition hover:text-cyan-300">ÁSZF</a>
+                <a href="#" className="block text-white/90 transition hover:text-cyan-300">Kapcsolat</a>
               </div>
             </div>
-          </section>
-        </main>
+
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <h2 className="text-sm font-extrabold uppercase tracking-[0.16em] text-cyan-300">Elérhetőség</h2>
+              <div className="mt-4 space-y-3 text-base text-white/90">
+                <p><span className="text-white/55">Telefon:</span> +36 30 555 1122</p>
+                <p><span className="text-white/55">E-mail:</span> info@logiware.hu</p>
+                <p><span className="text-white/55">Cím:</span> Budapest, Egressy út 71, 1149</p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <h2 className="text-sm font-extrabold uppercase tracking-[0.16em] text-cyan-300">Lokáció</h2>
+              <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
+                <iframe
+                  title="LogiWare térkép"
+                    src="https://www.google.com/maps?q=Budapest%2C%20Egressy%20%C3%BAt%2071%2C%201149&z=16&output=embed"
+                  className="h-44 w-full"
+                  loading="lazy"
+                />
+              </div>
+              <a
+                  href="https://www.google.com/maps/search/?api=1&query=Budapest%2C%20Egressy%20%C3%BAt%2071%2C%201149"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex rounded-lg border border-white/25 px-3 py-2 text-xs font-bold text-white transition hover:bg-white/10"
+              >
+                Megnyitás térképen
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-6 border-t border-white/10 pt-4 text-sm font-semibold text-white/55">
+            © LOGIWARE Kft. 2025-2026 • Minden jog fenntartva.
+          </div>
+        </section>
       </div>
     </div>
   )
