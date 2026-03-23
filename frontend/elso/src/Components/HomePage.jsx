@@ -183,14 +183,20 @@ function HomePage({ onLogout }) {
           <div className="flex justify-between items-center">
             <h2 className="text-3xl font-bold text-gray-800">{headerTitle}</h2>
             <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium text-gray-700">
-                {userInfo?.name}
-              </span>
-              <img
-                src={`https://ui-avatars.com/api/?name=${userInfo?.name}&background=667eea&color=fff`}
-                alt="Avatar"
-                className="w-10 h-10 rounded-full"
-              />
+              <button
+                className="flex items-center space-x-2 group focus:outline-none"
+                onClick={() => setActiveMenu('profile')}
+                title="Profil megtekintése"
+              >
+                <span className="text-sm font-medium text-gray-700 group-hover:underline">
+                  {userInfo?.name}
+                </span>
+                <img
+                  src={`https://ui-avatars.com/api/?name=${userInfo?.name}&background=667eea&color=fff`}
+                  alt="Avatar"
+                  className="w-10 h-10 rounded-full border-2 border-transparent group-hover:border-blue-500 transition"
+                />
+              </button>
             </div>
           </div>
         </div>
