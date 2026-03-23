@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { apiFetch } from '../../utils/api'
+import BadgeIcon from '../ui/BadgeIcon.jsx'
 
 function collectOrderItems(order) {
   if (Array.isArray(order?.order_items)) return order.order_items
@@ -52,14 +53,17 @@ function Dashboard({ userInfo, onNavigate }) {
               <p className="text-gray-500 text-sm font-medium">Teljes Rendelések</p>
               <p className="text-4xl font-bold text-gray-800 mt-2">{NUMBER.format(totalOrderedAmount)}</p>
             </div>
-            <div className="text-4xl">📋</div>
+            <BadgeIcon label="RD" tone="amber" size="lg" />
           </div>
         </div>
       </div>
 
       {/* User Info */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">👤 Fiók Adatai</h3>
+        <h3 className="mb-4 inline-flex items-center gap-3 text-xl font-bold text-gray-800">
+          <BadgeIcon label="PR" tone="slate" size="md" />
+          <span>Fiók Adatai</span>
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <p className="text-gray-500 text-sm">Név</p>

@@ -6,6 +6,7 @@ import Cart from './home/Cart.jsx'
 import Profile from './home/Profile.jsx'
 import Orders from './home/Orders.jsx'
 import { apiFetch } from '../utils/api'
+import BadgeIcon from './ui/BadgeIcon.jsx'
 
 function HomePage({ onLogout }) {
   const [userInfo, setUserInfo] = useState(null)
@@ -44,18 +45,16 @@ function HomePage({ onLogout }) {
     return () => window.removeEventListener('auth:logout', handler)
   }, [handleLogout])
 
-  const headerTitle =
-    activeMenu === 'dashboard'
-      ? '📊 Dashboard'
-      : activeMenu === 'create-order'
-        ? '➕ Rendelés Létrehozása'
-        : activeMenu === 'orders'
-          ? '🧾 Rendelések'
-        : activeMenu === 'stock'
-          ? '🥕 Készletkezelés'
-          : activeMenu === 'cart'
-            ? '🍎 Kosár'
-            : '👤 Profil'
+  const menuMeta = {
+    dashboard: { title: 'Dashboard', label: 'DB', tone: 'indigo' },
+    'create-order': { title: 'Rendelés Létrehozása', label: 'UJ', tone: 'cyan' },
+    orders: { title: 'Rendelések', label: 'RD', tone: 'amber' },
+    stock: { title: 'Készletkezelés', label: 'KS', tone: 'emerald' },
+    cart: { title: 'Kosár', label: 'KR', tone: 'rose' },
+    profile: { title: 'Profil', label: 'PR', tone: 'slate' },
+  }
+
+  const currentMenu = menuMeta[activeMenu] || menuMeta.profile
 
   const selectMenu = (menu) => {
     setActiveMenu(menu)
@@ -130,7 +129,10 @@ function HomePage({ onLogout }) {
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            📊 Dashboard
+            <span className="inline-flex items-center gap-3">
+              <BadgeIcon label="DB" tone="indigo" size="sm" />
+              <span>Dashboard</span>
+            </span>
           </button>
           <button
             onClick={() => selectMenu('create-order')}
@@ -140,7 +142,10 @@ function HomePage({ onLogout }) {
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            ➕ Rendelés létrehozása
+            <span className="inline-flex items-center gap-3">
+              <BadgeIcon label="UJ" tone="cyan" size="sm" />
+              <span>Rendelés létrehozása</span>
+            </span>
           </button>
           <button
             onClick={() => selectMenu('orders')}
@@ -150,7 +155,10 @@ function HomePage({ onLogout }) {
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            🧾 Rendelések
+            <span className="inline-flex items-center gap-3">
+              <BadgeIcon label="RD" tone="amber" size="sm" />
+              <span>Rendelések</span>
+            </span>
           </button>
           <button
             onClick={() => selectMenu('stock')}
@@ -160,7 +168,10 @@ function HomePage({ onLogout }) {
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            🥕 Készlet
+            <span className="inline-flex items-center gap-3">
+              <BadgeIcon label="KS" tone="emerald" size="sm" />
+              <span>Készlet</span>
+            </span>
           </button>
           <button
             onClick={() => selectMenu('cart')}
@@ -170,7 +181,10 @@ function HomePage({ onLogout }) {
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            🍎 Kosár
+            <span className="inline-flex items-center gap-3">
+              <BadgeIcon label="KR" tone="rose" size="sm" />
+              <span>Kosár</span>
+            </span>
           </button>
           <button
             onClick={() => selectMenu('profile')}
@@ -180,16 +194,20 @@ function HomePage({ onLogout }) {
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
           >
-            👤 Profil
+            <span className="inline-flex items-center gap-3">
+              <BadgeIcon label="PR" tone="slate" size="sm" />
+              <span>Profil</span>
+            </span>
           </button>
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700 w-64">
           <button
             onClick={handleLogout}
-            className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium"
+            className="w-full inline-flex items-center justify-center gap-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium"
           >
-            🚪 Kijelentkezés
+            <BadgeIcon label="KI" tone="rose" size="sm" />
+            <span>Kijelentkezés</span>
           </button>
         </div>
       </div>
@@ -206,9 +224,16 @@ function HomePage({ onLogout }) {
                 className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700"
                 aria-label="Menü nyitása"
               >
-                ☰
+                <span className="inline-flex flex-col gap-1">
+                  <span className="h-0.5 w-4 bg-gray-700" />
+                  <span className="h-0.5 w-4 bg-gray-700" />
+                  <span className="h-0.5 w-4 bg-gray-700" />
+                </span>
               </button>
-              <h2 className="text-xl md:text-3xl font-bold text-gray-800 truncate">{headerTitle}</h2>
+              <div className="flex min-w-0 items-center gap-3">
+                <BadgeIcon label={currentMenu.label} tone={currentMenu.tone} size="md" />
+                <h2 className="text-xl md:text-3xl font-bold text-gray-800 truncate">{currentMenu.title}</h2>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <button

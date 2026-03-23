@@ -1,5 +1,7 @@
+
 import { useEffect, useMemo, useState } from 'react'
 import { apiFetch } from '../../utils/api'
+import BadgeIcon from '../ui/BadgeIcon.jsx'
 import { useToast } from '../ToastProvider.jsx'
 
 function money(value) {
@@ -223,9 +225,10 @@ function Products() {
           <button
             type="button"
             onClick={openCreate}
-            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition"
           >
-            ➕ Új áru
+            <BadgeIcon label="UJ" tone="cyan" size="sm" />
+            <span>Új áru</span>
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React from 'react'
+import BadgeIcon from './ui/BadgeIcon.jsx'
 
 const highlights = [
   'Készlet valós időben',
@@ -26,7 +27,7 @@ export default function LandingPage() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-[1240px] flex-col px-4 pb-10 pt-5 sm:px-6 lg:px-8">
         <header className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-md">
           <a href="/" className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-lg">🍎</div>
+            <BadgeIcon label="LW" tone="cyan" size="lg" />
             <span className="text-2xl font-extrabold tracking-tight">LogiWare</span>
           </a>
 
@@ -71,7 +72,7 @@ export default function LandingPage() {
             <ul className="mt-7 space-y-2 text-sm font-semibold text-cyan-50/90 sm:text-base">
               {highlights.map((item) => (
                 <li key={item} className="flex items-center gap-2">
-                  <span className="text-cyan-200">✦</span>
+                  <span className="h-2 w-2 rotate-45 rounded-[2px] bg-cyan-200" />
                   <span>{item}</span>
                 </li>
               ))}
