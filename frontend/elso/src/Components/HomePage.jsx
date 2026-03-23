@@ -12,6 +12,7 @@ function HomePage({ onLogout }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [activeMenu, setActiveMenu] = useState('dashboard')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const fetchUserInfo = useCallback(async () => {
     try {
@@ -56,6 +57,11 @@ function HomePage({ onLogout }) {
             ? '🍎 Kosár'
             : '👤 Profil'
 
+  const selectMenu = (menu) => {
+    setActiveMenu(menu)
+    setMobileMenuOpen(false)
+  }
+
   const renderContent = () => {
     switch (activeMenu) {
       case 'dashboard':
@@ -94,8 +100,21 @@ function HomePage({ onLogout }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
+      {mobileMenuOpen && (
+        <button
+          type="button"
+          aria-label="Menü bezárása"
+          onClick={() => setMobileMenuOpen(false)}
+          className="fixed inset-0 z-20 bg-black/45 md:hidden"
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="w-64 bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl fixed h-screen">
+      <div
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl h-screen transform transition-transform duration-300 md:translate-x-0 ${
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         <div className="p-6 border-b border-slate-700">
           <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
             LogiWare
@@ -104,7 +123,7 @@ function HomePage({ onLogout }) {
 
         <nav className="mt-8 space-y-2 px-4 overflow-y-auto" style={{ height: 'calc(100vh - 200px)' }}>
           <button
-            onClick={() => setActiveMenu('dashboard')}
+            onClick={() => selectMenu('dashboard')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'dashboard'
                 ? 'bg-blue-600 text-white shadow-lg'
@@ -114,7 +133,7 @@ function HomePage({ onLogout }) {
             📊 Dashboard
           </button>
           <button
-            onClick={() => setActiveMenu('create-order')}
+            onClick={() => selectMenu('create-order')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'create-order'
                 ? 'bg-blue-600 text-white shadow-lg'
@@ -124,7 +143,7 @@ function HomePage({ onLogout }) {
             ➕ Rendelés létrehozása
           </button>
           <button
-            onClick={() => setActiveMenu('orders')}
+            onClick={() => selectMenu('orders')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'orders'
                 ? 'bg-blue-600 text-white shadow-lg'
@@ -134,7 +153,7 @@ function HomePage({ onLogout }) {
             🧾 Rendelések
           </button>
           <button
-            onClick={() => setActiveMenu('stock')}
+            onClick={() => selectMenu('stock')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'stock'
                 ? 'bg-blue-600 text-white shadow-lg'
@@ -144,7 +163,7 @@ function HomePage({ onLogout }) {
             🥕 Készlet
           </button>
           <button
-            onClick={() => setActiveMenu('cart')}
+            onClick={() => selectMenu('cart')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'cart'
                 ? 'bg-blue-600 text-white shadow-lg'
@@ -154,7 +173,7 @@ function HomePage({ onLogout }) {
             🍎 Kosár
           </button>
           <button
-            onClick={() => setActiveMenu('profile')}
+            onClick={() => selectMenu('profile')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'profile'
                 ? 'bg-blue-600 text-white shadow-lg'
@@ -176,18 +195,28 @@ function HomePage({ onLogout }) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 md:ml-64 flex flex-col h-screen overflow-hidden">
         {/* Header */}
-        <div className="bg-white shadow-md border-b border-gray-200 p-6 sticky top-0 z-10">
+        <div className="bg-white shadow-md border-b border-gray-200 px-4 py-4 md:p-6 sticky top-0 z-10">
           <div className="flex justify-between items-center">
-            <h2 className="text-3xl font-bold text-gray-800">{headerTitle}</h2>
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen((v) => !v)}
+                className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700"
+                aria-label="Menü nyitása"
+              >
+                ☰
+              </button>
+              <h2 className="text-xl md:text-3xl font-bold text-gray-800 truncate">{headerTitle}</h2>
+            </div>
             <div className="flex items-center space-x-4">
               <button
                 className="flex items-center space-x-2 group focus:outline-none"
                 onClick={() => setActiveMenu('profile')}
                 title="Profil megtekintése"
               >
-                <span className="text-sm font-medium text-gray-700 group-hover:underline">
+                <span className="hidden sm:inline text-sm font-medium text-gray-700 group-hover:underline">
                   {userInfo?.name}
                 </span>
                 <img
@@ -201,7 +230,7 @@ function HomePage({ onLogout }) {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-8 bg-gray-50">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50">
           {error && (
             <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg font-medium">
               {error}
