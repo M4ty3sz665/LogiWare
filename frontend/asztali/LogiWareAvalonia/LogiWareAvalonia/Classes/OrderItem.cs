@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace LogiWareAvalonia.Classes
 {
-    public class Token
+    class OrderItem
     {
-        public static string token { get; set; }
-        public static bool IsAdmin { get; set; }
+        public int Order_number { get; set; }
+        public int Product_id { get; set; }
+        public int amount { get; set; }
+
     }
 }

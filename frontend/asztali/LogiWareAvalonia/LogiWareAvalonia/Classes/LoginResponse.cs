@@ -10,5 +10,6 @@ namespace LogiWareAvalonia.Classes
     {
         public string token { get; set; }
         public string message { get; set; }
+        public bool admin { get; set; }
     }
 }

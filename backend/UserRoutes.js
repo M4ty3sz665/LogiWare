@@ -12,7 +12,7 @@ module.exports = function(server) {
         if(user){
             const token = middlewares.JWT.sign({"uid":user.id , "admin":user.admin}, process.env.SECRETKEY, {expiresIn: "6h"})
             console.log(token)
-            res.json({"token": token, "message":"Successful login"}).end()
+            res.json({"token": token, "message":"Successful login", admin:user.admin}).end()
         }
         else{
             res.status(400).json({"message":"Wrong username or password"}).end()

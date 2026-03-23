@@ -21,13 +21,14 @@ namespace LogiWareAvalonia.Classes
             CanResize = false;
             WindowStartupLocation = WindowStartupLocation.CenterOwner;
             Title = type;
-
+            Background = new SolidColorBrush(Color.Parse("#2B2B30"));
             var text = new TextBlock
             {
                 Text = message,
                 TextWrapping = TextWrapping.Wrap,
                 FontSize = 16,
-                Margin = new Thickness(0, 0, 0, 15)
+                Margin = new Thickness(0, 0, 0, 15),
+                Foreground = Brushes.White
             };
 
             okButton = new(){
@@ -35,7 +36,7 @@ namespace LogiWareAvalonia.Classes
                 Width = 80,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
-            okButton.Click += (_, _) => Close();
+            okButton.Click += (s,e) => this.Close();
 
             var layout = new StackPanel
             {

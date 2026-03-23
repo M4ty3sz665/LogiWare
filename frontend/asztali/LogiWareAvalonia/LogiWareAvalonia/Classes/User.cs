@@ -17,7 +17,6 @@ namespace LogiWareAvalonia.Classes
         public string passsword { get; set; }
         public string role { get; set; }
         public string joined_at { get; set; }
-        public bool admin { get; set; }
-        public string token { get; set; }
+        public int admin { get; set; }
     }
 }

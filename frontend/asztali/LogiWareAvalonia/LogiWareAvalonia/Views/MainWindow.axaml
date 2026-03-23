@@ -8,13 +8,23 @@
 		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 		x:Class="LogiWareAvalonia.Views.MainWindow"
 		x:DataType="vm:MainWindowViewModel"
-		ExtendClientAreaToDecorationsHint="True"
 		RequestedThemeVariant="Dark"
 		Icon="/Assets/avalonia-logo.ico"
 		Title="LogiWareAvalonia">
 
 	<Window.DataTemplates>
-		
+		<DataTemplate DataType="vm:Order">
+			<Border Background="#2B2B30" Margin="0,0,0,10" Padding="15" CornerRadius="8">
+				<Grid ColumnDefinitions="*, Auto">
+					<TextBlock Text="{Binding ProductName}" VerticalAlignment="Center" FontSize="16"/>
+					<NumericUpDown Grid.Column="1" 
+								   Value="{Binding Item.amount}" 
+								   Minimum="0" Width="130" 
+								   Foreground="White"/>
+				</Grid>
+			</Border>
+		</DataTemplate>
+
 		<DataTemplate DataType="models:User">
 			<Border Background="#2B2B30" Margin="0,0,0,10" Padding="15" CornerRadius="8">
 				<Grid ColumnDefinitions="*, Auto">
@@ -26,7 +36,7 @@
 					<Button Grid.Column="1"
 							Content="Edit"
 							Width="80"
-							Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenEditUserCommand}"
+							Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditCommand}"
 							CommandParameter="{Binding}"/>
 				</Grid>
 			</Border>
@@ -42,7 +52,7 @@
 					<Button Grid.Column="1"
 							Content="Edit"
 							Width="80"
-							Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenEditUserCommand}"
+							Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditCommand}"
 							CommandParameter="{Binding}"/>
 				</Grid>
 			</Border>
@@ -58,12 +68,11 @@
 					<Button Grid.Column="1"
 							Content="Edit"
 							Width="80"
-							Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenEditUserCommand}"
+							Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditCommand}"
 							CommandParameter="{Binding}"/>
 				</Grid>
 			</Border>
 		</DataTemplate>
-		
 	</Window.DataTemplates>
 
 	<Window.Styles>
@@ -108,24 +117,23 @@
 			<TextBlock Classes="WindowCaption" Text="LogiWare Management System" Margin="10,5"/>
 
 			<Border Grid.Column="0" Margin="10,30,5,10" Background="#1E1E22" CornerRadius="12" Padding="10">
-				<StackPanel>
+				<Grid RowDefinitions="*,auto">
+					<StackPanel Grid.Row="0" VerticalAlignment="Top" Spacing="2">
+						<Button Command="{Binding UsersButtonClick}" Content="Users" />
+						<Button Command="{Binding StockButtonClick}" Content="Stock" />
+						<Button Command="{Binding OrdersButtonClick}" Content="Orders" />
+						<Button Command="{Binding ProductsButtonClick}" Content="Products"/>
+					</StackPanel>
 					
-				<StackPanel VerticalAlignment="Stretch" Height="350">
-					<Button Command="{Binding UsersButtonClick}" Content="Users" />
-					<Button Command="{Binding StockButtonClick}" Content="Stock" />
-					<Button Command="{Binding OrdersButtonClick}" Content="Orders" />
-				</StackPanel>
-				<Button Command="{Binding LogOutClick}" CommandParameter="{Binding $parent[Window]}" VerticalAlignment="Bottom">Log Out</Button>
-				</StackPanel>
+					<Button Grid.Row="1" 
+							Command="{Binding LogOutClick}" 
+							CommandParameter="{Binding $parent[Window]}"
+							Background="#CC3333">Exit</Button>
+				</Grid>
 			</Border>
 
 			<Border Grid.Column="1" Margin="5,30,5,10" Background="#1E1E22" CornerRadius="12" Padding="20">
-				<Grid>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto"/>
-						<RowDefinition Height="*"/>
-					</Grid.RowDefinitions>
-					<Grid Grid.Row="0" ColumnDefinitions="*,auto">
+				<Grid RowDefinitions="Auto, *, Auto"> <Grid Grid.Row="0" ColumnDefinitions="*,auto">
 						<TextBlock Name="TitleLabel" Text="{Binding TitleLabel}" FontSize="24" FontWeight="Bold"/>
 						<Button Grid.Column="1"
 								Width="100"
@@ -140,6 +148,15 @@
 					<ScrollViewer Grid.Row="1" Margin="0,15,0,0">
 						<ItemsControl ItemsSource="{Binding CurrentItems}" />
 					</ScrollViewer>
+
+					<Button Grid.Row="2" 
+							Content="Confirm and Place Order"
+							Command="{Binding SubmitIntegratedOrderCommand}"
+							IsVisible="{Binding IsPlaceOrderVisible}"
+							Background="#7A3CFF" 
+							Height="45"
+							FontWeight="Bold"
+							Margin="0,15,0,0" />
 				</Grid>
 			</Border>
 		</Grid>

@@ -42,11 +42,10 @@ namespace LogiWareAvalonia.Services
                 response.EnsureSuccessStatusCode();
                 string result = await response.Content.ReadAsStringAsync();
                 var loginData = JsonSerializer.Deserialize<LoginResponse>(result);
-                var loggeduser = JsonSerializer.Deserialize<User>(result);
                 if (loginData != null)
                 {
                     Token.token = loginData.token;
-                    Token.IsAdmin = loggeduser.admin;
+                    Token.IsAdmin = loginData.admin;
                     return true;
                 }
                 return false;
@@ -77,6 +76,7 @@ namespace LogiWareAvalonia.Services
                 response.EnsureSuccessStatusCode();
                 string result = await response.Content.ReadAsStringAsync();
                 User data = JsonSerializer.Deserialize<User>(result);
+                new MessageWindow("User created Successfully", "Success").Show();
                 return true;
             }
             catch (Exception e)
@@ -119,6 +119,24 @@ namespace LogiWareAvalonia.Services
             {
                 new MessageWindow(e.Message, "Error").Show();
                 return new List<Stock>();
+            }
+            return all;
+        }
+        public async Task<List<Product>> GetProducts()
+        {
+            List<Product> all = new List<Product>();
+            string url = serverUrl + "/product";
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                string result = await response.Content.ReadAsStringAsync();
+                all = JsonSerializer.Deserialize<List<Product>>(result).ToList();
+            }
+            catch (Exception e)
+            {
+                new MessageWindow(e.Message, "Error").Show();
+                return new List<Product>();
             }
             return all;
         }
@@ -230,7 +248,6 @@ namespace LogiWareAvalonia.Services
                 var jsonInfo = new
                 {
                     order_number = oneorder.order_number,
-                    item_id = oneorder.item_id,
                     company_id = oneorder.company_id,
                     status = oneorder.status,
                     payment_status = oneorder.payment_status,

@@ -9,7 +9,6 @@ namespace LogiWareAvalonia.Classes
     public class Order
     {
         public int order_number { get; set; }
-        public int item_id { get; set; }
         public int company_id { get; set; }
         public DateTime created_at { get; set; }
         public DateOnly due_date { get; set; }

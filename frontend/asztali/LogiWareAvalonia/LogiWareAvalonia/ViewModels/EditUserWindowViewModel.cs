@@ -25,7 +25,7 @@ namespace LogiWareAvalonia.ViewModels
             EditingItem = item;
 
             // Set window title based on the object type
-            Title = item switch
+            Title = EditingItem switch
             {
                 User => "Edit User",
                 Stock => "Edit Stock",
@@ -39,18 +39,22 @@ namespace LogiWareAvalonia.ViewModels
         private async Task Save(Window window)
         {
             string result = "Error";
-            bool regresult;
+            bool regresult = false;
             // Determine which API call to make based on the object type
             if (EditingItem is User u)
             {
                 if (u.id != 0) result = await _conn.EditUser(u);
                 else regresult = await _conn.Register(u);
+                if (result != "Error" || regresult != false)
+                {
+                    window?.Close();
+                }
             }
             else if (EditingItem is Stock s)
             {
                 if (s.id != 0) result = await _conn.EditStock(s);
                 else regresult = await _conn.CreateStock(s);
-                if (result != "Error")
+                if (result != "Error" || regresult != false)
                 {
                     window?.Close();
                 }
@@ -59,6 +63,10 @@ namespace LogiWareAvalonia.ViewModels
             {
                 if (o.order_number != 0) result = await _conn.EditOrder(o);
                 else regresult = await _conn.CreateOrder(o);
+                if (result != "Error" || regresult != false)
+                {
+                    window?.Close();
+                }
             }
         }
     }
