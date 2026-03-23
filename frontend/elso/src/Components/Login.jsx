@@ -36,7 +36,7 @@ function Login({ onLogin, onShowRegister }) {
       localStorage.setItem('token', data.token)
       toast.success('Sikeres bejelentkezés!')
       if (onLogin) {
-        onLogin({ email, rememberMe })
+        onLogin({ email })
       }
       navigate('/app') // route váltás
     } catch (err) {
