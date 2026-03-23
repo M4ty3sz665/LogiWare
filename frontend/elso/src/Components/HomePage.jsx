@@ -46,12 +46,12 @@ function HomePage({ onLogout }) {
   }, [handleLogout])
 
   const menuMeta = {
-    dashboard: { title: 'Dashboard', label: 'DB', tone: 'indigo' },
-    'create-order': { title: 'Rendelés Létrehozása', label: 'UJ', tone: 'cyan' },
-    orders: { title: 'Rendelések', label: 'RD', tone: 'amber' },
-    stock: { title: 'Készletkezelés', label: 'KS', tone: 'emerald' },
-    cart: { title: 'Kosár', label: 'KR', tone: 'rose' },
-    profile: { title: 'Profil', label: 'PR', tone: 'slate' },
+    dashboard: { title: 'Dashboard', icon: 'dashboard', tone: 'indigo' },
+    'create-order': { title: 'Rendelés Létrehozása', icon: 'create', tone: 'cyan' },
+    orders: { title: 'Rendelések', icon: 'orders', tone: 'amber' },
+    stock: { title: 'Készletkezelés', icon: 'stock', tone: 'emerald' },
+    cart: { title: 'Kosár', icon: 'cart', tone: 'rose' },
+    profile: { title: 'Profil', icon: 'profile', tone: 'slate' },
   }
 
   const currentMenu = menuMeta[activeMenu] || menuMeta.profile
@@ -130,7 +130,7 @@ function HomePage({ onLogout }) {
             }`}
           >
             <span className="inline-flex items-center gap-3">
-              <BadgeIcon label="DB" tone="indigo" size="sm" />
+              <BadgeIcon icon="dashboard" tone="indigo" size="sm" />
               <span>Dashboard</span>
             </span>
           </button>
@@ -143,7 +143,7 @@ function HomePage({ onLogout }) {
             }`}
           >
             <span className="inline-flex items-center gap-3">
-              <BadgeIcon label="UJ" tone="cyan" size="sm" />
+              <BadgeIcon icon="create" tone="cyan" size="sm" />
               <span>Rendelés létrehozása</span>
             </span>
           </button>
@@ -156,7 +156,7 @@ function HomePage({ onLogout }) {
             }`}
           >
             <span className="inline-flex items-center gap-3">
-              <BadgeIcon label="RD" tone="amber" size="sm" />
+              <BadgeIcon icon="orders" tone="amber" size="sm" />
               <span>Rendelések</span>
             </span>
           </button>
@@ -169,7 +169,7 @@ function HomePage({ onLogout }) {
             }`}
           >
             <span className="inline-flex items-center gap-3">
-              <BadgeIcon label="KS" tone="emerald" size="sm" />
+              <BadgeIcon icon="stock" tone="emerald" size="sm" />
               <span>Készlet</span>
             </span>
           </button>
@@ -182,7 +182,7 @@ function HomePage({ onLogout }) {
             }`}
           >
             <span className="inline-flex items-center gap-3">
-              <BadgeIcon label="KR" tone="rose" size="sm" />
+              <BadgeIcon icon="cart" tone="rose" size="sm" />
               <span>Kosár</span>
             </span>
           </button>
@@ -195,7 +195,7 @@ function HomePage({ onLogout }) {
             }`}
           >
             <span className="inline-flex items-center gap-3">
-              <BadgeIcon label="PR" tone="slate" size="sm" />
+              <BadgeIcon icon="profile" tone="slate" size="sm" />
               <span>Profil</span>
             </span>
           </button>
@@ -206,7 +206,7 @@ function HomePage({ onLogout }) {
             onClick={handleLogout}
             className="w-full inline-flex items-center justify-center gap-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium"
           >
-            <BadgeIcon label="KI" tone="rose" size="sm" />
+            <BadgeIcon icon="logout" tone="rose" size="sm" />
             <span>Kijelentkezés</span>
           </button>
         </div>
@@ -231,7 +231,7 @@ function HomePage({ onLogout }) {
                 </span>
               </button>
               <div className="flex min-w-0 items-center gap-3">
-                <BadgeIcon label={currentMenu.label} tone={currentMenu.tone} size="md" />
+                <BadgeIcon icon={currentMenu.icon} tone={currentMenu.tone} size="md" />
                 <h2 className="text-xl md:text-3xl font-bold text-gray-800 truncate">{currentMenu.title}</h2>
               </div>
             </div>

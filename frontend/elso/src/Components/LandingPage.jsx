@@ -27,7 +27,7 @@ export default function LandingPage() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-[1240px] flex-col px-4 pb-10 pt-5 sm:px-6 lg:px-8">
         <header className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-md">
           <a href="/" className="flex items-center gap-3">
-            <BadgeIcon label="LW" tone="cyan" size="lg" />
+            <BadgeIcon icon="brand" tone="cyan" size="lg" />
             <span className="text-2xl font-extrabold tracking-tight">LogiWare</span>
           </a>
 

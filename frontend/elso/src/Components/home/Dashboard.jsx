@@ -53,7 +53,7 @@ function Dashboard({ userInfo, onNavigate }) {
               <p className="text-gray-500 text-sm font-medium">Teljes Rendelések</p>
               <p className="text-4xl font-bold text-gray-800 mt-2">{NUMBER.format(totalOrderedAmount)}</p>
             </div>
-            <BadgeIcon label="RD" tone="amber" size="lg" />
+            <BadgeIcon icon="orders" tone="amber" size="lg" />
           </div>
         </div>
       </div>
@@ -61,7 +61,7 @@ function Dashboard({ userInfo, onNavigate }) {
       {/* User Info */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <h3 className="mb-4 inline-flex items-center gap-3 text-xl font-bold text-gray-800">
-          <BadgeIcon label="PR" tone="slate" size="md" />
+          <BadgeIcon icon="profile" tone="slate" size="md" />
           <span>Fiók Adatai</span>
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

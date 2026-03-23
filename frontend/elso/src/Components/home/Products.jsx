@@ -227,7 +227,7 @@ function Products() {
             onClick={openCreate}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition"
           >
-            <BadgeIcon label="UJ" tone="cyan" size="sm" />
+            <BadgeIcon icon="create" tone="cyan" size="sm" />
             <span>Új áru</span>
           </button>
         </div>

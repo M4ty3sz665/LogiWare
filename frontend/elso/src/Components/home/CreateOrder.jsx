@@ -53,7 +53,9 @@ function CreateOrder() {
         setProducts(Array.isArray(p) ? p : [])
         setStock(Array.isArray(s) ? s : [])
       } catch (e) {
-        setError(e?.message || 'Nem sikerült betölteni az adatokat.')
+        if (e?.name !== 'AbortError') {
+          setError(e?.message || 'Nem sikerült betölteni az adatokat.')
+        }
       } finally {
         setLoading(false)
       }
