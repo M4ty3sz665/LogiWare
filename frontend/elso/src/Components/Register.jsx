@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { register as apiRegister, validateEmail } from '../utils/auth'
 import { useToast } from './ToastProvider.jsx'
+import { useNavigate } from 'react-router-dom'
 
 function Register({ onRegister, onShowLogin }) {
   const toast = useToast()
+  const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -56,9 +58,24 @@ function Register({ onRegister, onShowLogin }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="bg-white/95 rounded-2xl shadow-xl border border-slate-100 px-8 py-10">
+    <div className="relative min-h-screen overflow-hidden bg-[#0a102c] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(70,118,255,0.35),transparent_40%),radial-gradient(circle_at_80%_70%,rgba(57,200,255,0.2),transparent_45%),linear-gradient(180deg,#081030_0%,#152a8f_100%)]" />
+
+      <div className="pointer-events-none absolute inset-0 opacity-70">
+        <span className="absolute left-[8%] top-[12%] h-1.5 w-1.5 rounded-full bg-white/70" />
+        <span className="absolute left-[20%] top-[30%] h-1 w-1 rounded-full bg-white/60" />
+        <span className="absolute left-[38%] top-[18%] h-1.5 w-1.5 rounded-full bg-white/70" />
+        <span className="absolute left-[62%] top-[10%] h-1.5 w-1.5 rounded-full bg-white/60" />
+        <span className="absolute left-[78%] top-[26%] h-1 w-1 rounded-full bg-white/70" />
+        <span className="absolute left-[88%] top-[14%] h-1.5 w-1.5 rounded-full bg-white/70" />
+        <span className="absolute left-[12%] top-[62%] h-1 w-1 rounded-full bg-white/60" />
+        <span className="absolute left-[52%] top-[72%] h-1.5 w-1.5 rounded-full bg-white/60" />
+        <span className="absolute left-[83%] top-[60%] h-1 w-1 rounded-full bg-white/60" />
+      </div>
+
+      <div className="relative mx-auto flex min-h-screen w-full max-w-[1240px] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md">
+          <div className="bg-white/95 rounded-2xl shadow-xl border border-slate-100 px-8 py-10 text-slate-900">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
@@ -180,7 +197,7 @@ function Register({ onRegister, onShowLogin }) {
               Már van fiókod?{' '}
               <button
                 type="button"
-                onClick={onShowLogin}
+                onClick={() => navigate('/login')}
                 className="text-blue-600 hover:text-blue-800 font-semibold transition"
               >
                 Bejelentkezés
@@ -194,6 +211,7 @@ function Register({ onRegister, onShowLogin }) {
           <p>© 2026 LogiWare. Minden jog fenntartva.</p>
         </div>
       </div>
+    </div>
     </div>
   )
 }
