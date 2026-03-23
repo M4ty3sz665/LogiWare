@@ -5,7 +5,36 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="LogiWareAvalonia.Window1"
         Title="Login">
+    <Window.Styles>
+    <Style Selector="TextBlock">
+		<Setter Property="Foreground" Value="#FFFFFF"/>
+    </Style>
+	<Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+		<Setter Property="Background" Value="#2B2B30"/>
+		<Setter Property="BorderBrush" Value="#7A3CFF"/>
+		<Setter Property="BorderThickness" Value="1"/>
+	</Style>
 
+	<Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+		<Setter Property="Background" Value="#2B2B30"/>
+		<Setter Property="BorderBrush" Value="#555"/>
+	</Style>
+
+	<Style Selector="TextBox:focus">
+		<Setter Property="Foreground" Value="White"/>
+	</Style>
+<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="BorderBrush" Value="Transparent" />
+		<Setter Property="Foreground" Value="White" />
+	</Style>
+
+	<Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="BorderBrush" Value="Transparent" />
+		<Setter Property="Foreground" Value="White" />
+	</Style>
+</Window.Styles>
     <Grid>
         <!-- LOGIN GRID -->
         <Grid Name="LoginGrid"
@@ -63,15 +92,18 @@
                     <Border  CornerRadius="10"
                              Background="#7A3CFF">
                         <Button Name="LoginButton"
-                                Padding="150,8,0,0"
                                 Content="Login"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
                                 MinHeight="38"
                                 Foreground="White"
                                 Background="Transparent"
                                 BorderThickness="0"
                                 FontWeight="SemiBold"
                                 Cursor="Hand"
-                                Command="{Binding Login}"/>
+                                Command="{Binding LoginCommand}"
+                                CommandParameter="{Binding $parent[Window]}"/>
                     </Border>
                 </StackPanel>
             </Border>

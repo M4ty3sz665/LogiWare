@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace LogiWareAvalonia.Classes
 {
-    public class Token
+    public class LoginResponse
     {
-        public static string token { get; set; }
-        public static bool IsAdmin { get; set; } = false;
+        public string token { get; set; }
+        public string message { get; set; }
     }
 }

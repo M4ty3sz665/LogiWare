@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LogiWareAvalonia.Services;
 
 namespace LogiWareAvalonia.Classes
 {
     public class User
     {
+        private ServerConnection _conn = new ServerConnection("http://localhost:3000");
         public int id { get; set; }
         public string name { get; set; }
         public string email { get; set; }

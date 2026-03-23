@@ -1,13 +1,147 @@
 <Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:LogiWareAvalonia.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="clr-namespace:LogiWareAvalonia.Views"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="LogiWareAvalonia.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="LogiWareAvalonia">
-        <views:MainView />
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:vm="clr-namespace:LogiWareAvalonia.ViewModels;assembly=LogiWareAvalonia"
+		xmlns:models="using:LogiWareAvalonia.Classes"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:views="clr-namespace:LogiWareAvalonia.Views"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+		x:Class="LogiWareAvalonia.Views.MainWindow"
+		x:DataType="vm:MainWindowViewModel"
+		ExtendClientAreaToDecorationsHint="True"
+		RequestedThemeVariant="Dark"
+		Icon="/Assets/avalonia-logo.ico"
+		Title="LogiWareAvalonia">
 
+	<Window.DataTemplates>
+		
+		<DataTemplate DataType="models:User">
+			<Border Background="#2B2B30" Margin="0,0,0,10" Padding="15" CornerRadius="8">
+				<Grid ColumnDefinitions="*, Auto">
+					<WrapPanel Grid.Column="0">
+						<Label Content="{Binding name}" FontWeight="Bold" FontSize="16" VerticalContentAlignment="Center" />
+						<Label Content="{Binding email}" Foreground="Gray" FontSize="12" VerticalContentAlignment="Center" Margin="10,0,0,0"/>
+						<Label Content="{Binding role}" Foreground="Gray" FontSize="12" VerticalContentAlignment="Center" Margin="10,0,0,0"/>
+					</WrapPanel>
+					<Button Grid.Column="1"
+							Content="Edit"
+							Width="80"
+							Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenEditUserCommand}"
+							CommandParameter="{Binding}"/>
+				</Grid>
+			</Border>
+		</DataTemplate>
+
+		<DataTemplate DataType="models:Stock">
+			<Border Background="#2B2B30" Margin="0,0,0,10" Padding="15" CornerRadius="8">
+				<Grid ColumnDefinitions="*, Auto">
+					<StackPanel Grid.Column="0">
+						<TextBlock Text="{Binding product_name}" FontWeight="Bold" FontSize="16"/>
+						<TextBlock Text="{Binding amount, StringFormat='Quantity: {0}'}" Foreground="Gray" FontSize="12"/>
+					</StackPanel>
+					<Button Grid.Column="1"
+							Content="Edit"
+							Width="80"
+							Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenEditUserCommand}"
+							CommandParameter="{Binding}"/>
+				</Grid>
+			</Border>
+		</DataTemplate>
+
+		<DataTemplate DataType="models:Order">
+			<Border Background="#2B2B30" Margin="0,0,0,10" Padding="15" CornerRadius="8">
+				<Grid ColumnDefinitions="*, Auto">
+					<StackPanel Grid.Column="0">
+						<TextBlock Text="{Binding order_number, StringFormat='Order #{0}'}" FontWeight="Bold" FontSize="16"/>
+						<TextBlock Text="{Binding status}" Foreground="#7A3CFF" FontSize="12" FontWeight="SemiBold"/>
+					</StackPanel>
+					<Button Grid.Column="1"
+							Content="Edit"
+							Width="80"
+							Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenEditUserCommand}"
+							CommandParameter="{Binding}"/>
+				</Grid>
+			</Border>
+		</DataTemplate>
+		
+	</Window.DataTemplates>
+
+	<Window.Styles>
+		<Style Selector="TextBlock">
+			<Setter Property="Foreground" Value="White"/>
+		</Style>
+		<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Foreground" Value="White" />
+		</Style>
+		<Style Selector="Button">
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="Padding" Value="0,10,0,10"/>
+			<Setter Property="CornerRadius" Value="8"/>
+			<Setter Property="Margin" Value="0,0,0,5"/>
+		</Style>
+		<FluentTheme />
+
+		<Style Selector="TextBlock.WindowCaption">
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+		</Style>
+	</Window.Styles>
+
+	<Grid>
+		<views:MainView />
+		<Grid Name="MainSiteGrid" IsVisible="True" Background="#2B2B30">
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="2.5*"/>
+				<ColumnDefinition Width="4*"/>
+			</Grid.ColumnDefinitions>
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+			
+			<TextBlock Classes="WindowCaption" Text="LogiWare Management System" Margin="10,5"/>
+
+			<Border Grid.Column="0" Margin="10,30,5,10" Background="#1E1E22" CornerRadius="12" Padding="10">
+				<StackPanel>
+					
+				<StackPanel VerticalAlignment="Stretch" Height="350">
+					<Button Command="{Binding UsersButtonClick}" Content="Users" />
+					<Button Command="{Binding StockButtonClick}" Content="Stock" />
+					<Button Command="{Binding OrdersButtonClick}" Content="Orders" />
+				</StackPanel>
+				<Button Command="{Binding LogOutClick}" CommandParameter="{Binding $parent[Window]}" VerticalAlignment="Bottom">Log Out</Button>
+				</StackPanel>
+			</Border>
+
+			<Border Grid.Column="1" Margin="5,30,5,10" Background="#1E1E22" CornerRadius="12" Padding="20">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
+					<Grid Grid.Row="0" ColumnDefinitions="*,auto">
+						<TextBlock Name="TitleLabel" Text="{Binding TitleLabel}" FontSize="24" FontWeight="Bold"/>
+						<Button Grid.Column="1"
+								Width="100"
+								Height="40"
+								Background="#7A3CFF"
+								VerticalAlignment="Center"
+								VerticalContentAlignment="Center"
+								Foreground="White"
+								Command="{Binding NewItemCommand}">New</Button>
+					</Grid>
+
+					<ScrollViewer Grid.Row="1" Margin="0,15,0,0">
+						<ItemsControl ItemsSource="{Binding CurrentItems}" />
+					</ScrollViewer>
+				</Grid>
+			</Border>
+		</Grid>
+	</Grid>
 </Window>

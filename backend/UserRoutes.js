@@ -40,12 +40,14 @@ module.exports = function(server) {
         const token = middlewares.JWT.sign({"uid":newUser.id , "admin":newUser.admin}, process.env.SECRETKEY, {expiresIn: "6h"})
         res.status(201).json({"message":"Successful registration", "token": token}).end()
     }
-    res.end()
 })
 
     server.get('/oneuser', middlewares.Auth(), async (req,res)=>{
     console.log(req.uid)
     res.status(200).json(await dbHandler.Users.findByPk(req.uid)).end()
+})
+    server.get('/profiles', middlewares.Auth(), async (req,res)=>{
+    res.status(200).json(await dbHandler.Users.findAll()).end()
 })
     // Delete own account
     server.delete('/oneuser',middlewares.Auth(), async (req,res)=> {

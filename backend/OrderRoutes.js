@@ -131,7 +131,22 @@ module.exports = function (server) {
       res.status(500).json({ message: err?.parent?.sqlMessage || err?.message || 'Server error' }).end()
     }
   })
-
+server.put(['/order/:id', '/order/:id/'], middlewares.Auth(), async (req, res) => {
+    try {
+      const id = Number(req.params.id)
+      const order = await dbHandler.Orders.findByPk(id)
+      if (!order) {
+        res.status(404).json({ message: 'Order does not exist' }).end()
+        return
+      }
+      await order.update(req.body)
+      res.status(200).json({ message: 'Order updated successfully' }).end()
+    } catch (err) {
+      res.status(500).json({ 
+        message: err?.parent?.sqlMessage || err?.message || 'Server error' 
+      }).end()
+    }
+  })
   // Update order status with flow enforcement
   server.put(['/order/:id/status', '/order/:id/status/'], middlewares.Auth(), async (req, res) => {
     try {

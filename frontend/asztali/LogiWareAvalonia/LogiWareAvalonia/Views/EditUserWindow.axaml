@@ -1,0 +1,62 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:LogiWareAvalonia.ViewModels"
+        xmlns:models="clr-namespace:LogiWareAvalonia.Classes;assembly=LogiWareAvalonia"
+        x:Class="LogiWareAvalonia.Views.EditUserWindow"
+        x:DataType="vm:EditUserWindowViewModel"
+        Title="{Binding Title}"
+        Width="350" SizeToContent="Height"
+        Background="#1E1E22">
+
+    <Window.DataTemplates>
+        <DataTemplate DataType="models:User" x:DataType="models:User">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Name:"/>
+                <TextBox Text="{Binding name}"/>
+                <TextBlock Text="Email:"/>
+                <TextBox Text="{Binding email}"/>
+                <TextBlock Text="Phone:"/>
+                <TextBox Text="{Binding phone}"/>
+                <TextBlock Text="Password:"/>
+                <TextBox Text="{Binding passsword}"/>
+                <TextBlock Text="Role:"/>
+                <TextBox Text="{Binding role}"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="models:Stock" x:DataType="models:Stock">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Product Name:"/>
+                <TextBox Text="{Binding product_name}"/>
+                <TextBlock Text="Quantity:"/>
+                <NumericUpDown Value="{Binding amount}" Foreground="White"/>
+                <TextBlock Text="Item ID:"/>
+                <TextBox Text="{Binding item_id}" IsReadOnly="True" Opacity="0.5"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="models:Order" x:DataType="models:Order">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Order Number:"/>
+                <TextBox Text="{Binding order_number}" IsReadOnly="True"/>
+                <TextBlock Text="Status:"/>
+                <TextBox Text="{Binding status}"/>
+                <TextBlock Text="Payment:"/>
+                <TextBox Text="{Binding payment_method}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.DataTemplates>
+
+    <DockPanel Margin="20">
+        <Border DockPanel.Dock="Bottom" Margin="0,20,0,0" Height="40" Background="#7A3CFF" CornerRadius="8">
+            <Button Content="Save Changes" 
+                    Command="{Binding SaveCommand}" 
+                    CommandParameter="{Binding $parent[Window]}"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                    Background="Transparent" Foreground="White"/>
+        </Border>
+
+        <ContentControl Content="{Binding EditingItem}"/>
+    </DockPanel>
+</Window>

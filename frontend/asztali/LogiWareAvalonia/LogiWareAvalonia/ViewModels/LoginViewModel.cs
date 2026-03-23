@@ -1,18 +1,20 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using LogiWareAvalonia.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using CommunityToolkit.Mvvm.Input;
+using LogiWareAvalonia.Services;
+using LogiWareAvalonia.Views;
 
 namespace LogiWareAvalonia.ViewModels
 {
-    public class LoginViewModel : ViewModelBase
+    public partial class LoginViewModel : ViewModelBase
     {
-        ServerConnection conn = new ServerConnection("http://localhost:3000");
-        private  string _username;
-        private  string _password;
+        private readonly ServerConnection _conn = new ServerConnection("http://localhost:3000");
+        // Initializing these to string.Empty fixes the "not null" error
+        private string _username = string.Empty;
+        private string _password = string.Empty;
+
         public string Username
         {
             get => _username;
@@ -25,6 +27,7 @@ namespace LogiWareAvalonia.ViewModels
                 }
             }
         }
+
         public string Password
         {
             get => _password;
@@ -37,18 +40,24 @@ namespace LogiWareAvalonia.ViewModels
                 }
             }
         }
-        public RelayCommand Login { get; }
+
+        public  AsyncRelayCommand<Window> LoginCommand { get; }
+
         public LoginViewModel()
         {
-            Login = new RelayCommand(OnLogin);
+            // We point directly to the method
+            LoginCommand = new AsyncRelayCommand<Window>(OnLogin);
         }
-        async void OnLogin()
+
+        private async Task OnLogin(Window window)
         {
-            if( await conn.Login(Username, Password))
+            if(await _conn.Login(Username, Password))
             {
-                var main = new Views.MainWindow();
-                main.Show();
+            MainWindow main = new MainWindow();
+            main.Show();
+            window?.Close();
             }
+            return;
         }
     }
 }
