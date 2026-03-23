@@ -84,10 +84,6 @@ function HomePage({ onLogout, userEmail }) {
                 <span className="info-value">{userInfo.phone}</span>
               </div>
               <div className="info-row">
-                <span className="info-label">Szerepkör:</span>
-                <span className="info-value">{userInfo.role}</span>
-              </div>
-              <div className="info-row">
                 <span className="info-label">Csatlakozás dátuma:</span>
                 <span className="info-value">
                   {new Date(userInfo.joined_at).toLocaleDateString('hu-HU')}

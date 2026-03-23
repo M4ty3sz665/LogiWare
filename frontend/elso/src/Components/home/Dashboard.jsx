@@ -32,12 +32,6 @@ function Dashboard({ userInfo, onNavigate }) {
             <p className="text-gray-500 text-sm">Telefonszám</p>
             <p className="text-lg font-semibold text-gray-800">{userInfo.phone}</p>
           </div>
-          <div>
-            <p className="text-gray-500 text-sm">Szerepkör</p>
-            <span className="inline-block mt-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
-              {userInfo.role}
-            </span>
-          </div>
         </div>
       </div>
     </div>

@@ -100,7 +100,6 @@ function HomePage({ onLogout }) {
           <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
             LogiWare
           </h1>
-          <p className="text-sm text-gray-400 mt-2">{userInfo?.role?.toUpperCase()}</p>
         </div>
 
         <nav className="mt-8 space-y-2 px-4 overflow-y-auto" style={{ height: 'calc(100vh - 200px)' }}>
