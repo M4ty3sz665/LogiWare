@@ -38,6 +38,6 @@ export function login({ email, password }) {
   return request('login', { email, password })
 }
 
-export function register({ name, email, phone, password, role }) {
-  return request('register', { name, email, phone, password, role })
+export function register({ name, email, phone, password }) {
+  return request('register', { name, email, phone, password })
 }
