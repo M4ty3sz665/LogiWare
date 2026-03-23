@@ -201,7 +201,7 @@ function CreateOrder() {
         <div>
           <h3 className="text-lg font-bold text-gray-800">Rendelés létrehozása</h3>
           <p className="mt-1 text-sm text-gray-500">
-            Válassz zöldséget vagy gyümölcsöt a készletből, jobb oldalt áll össze a rendelés.
+            Válassz zöldséget vagy gyümölcsöt az áruk közül, jobb oldalt áll össze a kosár.
           </p>
         </div>
 
@@ -257,7 +257,7 @@ function CreateOrder() {
           <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
             <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
               <div className="grid grid-cols-[1fr_auto] gap-3 border-b border-gray-200 pb-3">
-                <div className="text-xs font-bold tracking-wider text-gray-700">KÉSZLET TÉTELEK</div>
+                <div className="text-xs font-bold tracking-wider text-gray-700">ÁRUK</div>
                 <div className="text-xs font-bold tracking-wider text-gray-700">ÁR</div>
               </div>
 
@@ -303,7 +303,7 @@ function CreateOrder() {
 
             <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
               <div className="grid grid-cols-[1fr_auto] gap-3 border-b border-gray-200 pb-3">
-                <div className="text-xs font-bold tracking-wider text-gray-700">RENDELÉSI TÉTELEK</div>
+                <div className="text-xs font-bold tracking-wider text-gray-700">KOSÁR</div>
                 <div className="text-xs font-bold tracking-wider text-gray-700">ÁR</div>
               </div>
 
@@ -347,7 +347,7 @@ function CreateOrder() {
 
                 {orderItems.length === 0 && (
                   <div className="rounded-lg bg-white px-3 py-6 text-center text-sm text-gray-600">
-                    Még nincs tétel a rendelésben.
+                    Még nincs tétel a kosárban.
                   </div>
                 )}
               </div>
