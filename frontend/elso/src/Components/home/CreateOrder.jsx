@@ -257,7 +257,7 @@ function CreateOrder() {
           <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
             <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
               <div className="grid grid-cols-[1fr_auto] gap-3 border-b border-gray-200 pb-3">
-                <div className="text-xs font-bold tracking-wider text-gray-700">ÁRUK</div>
+                <div className="text-xs font-bold tracking-wider text-gray-700">KOSÁR</div>
                 <div className="text-xs font-bold tracking-wider text-gray-700">ÁR</div>
               </div>
 
