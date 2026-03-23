@@ -26,6 +26,7 @@ function Cart() {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [expandedByOrder, setExpandedByOrder] = useState({})
 
   useEffect(() => {
     const controller = new AbortController()
@@ -64,6 +65,15 @@ function Cart() {
       }
     })
   }, [rows])
+
+  const isExpanded = (orderNumber) => expandedByOrder[orderNumber] !== false
+
+  const toggleExpanded = (orderNumber) => {
+    setExpandedByOrder((prev) => ({
+      ...prev,
+      [orderNumber]: !(prev[orderNumber] !== false),
+    }))
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
@@ -105,43 +115,54 @@ function Cart() {
                   <span className="inline-flex items-center rounded-full bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
                     {order.payment_status || 'not processed'}
                   </span>
+                  <button
+                    type="button"
+                    onClick={() => toggleExpanded(order.order_number)}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition"
+                    aria-label={isExpanded(order.order_number) ? 'Termékek elrejtése' : 'Termékek megjelenítése'}
+                    title={isExpanded(order.order_number) ? 'Termékek elrejtése' : 'Termékek megjelenítése'}
+                  >
+                    <span className="text-sm leading-none">{isExpanded(order.order_number) ? '▾' : '▸'}</span>
+                  </button>
                 </div>
               </div>
 
-              <div className="mt-3 grid grid-cols-1 gap-2">
-                {order._items.length === 0 ? (
-                  <div className="rounded-lg bg-white px-3 py-2 text-sm text-gray-600">
-                    Nincs tétel ehhez a rendeléshez.
-                  </div>
-                ) : (
-                  order._items.map((item) => {
-                    const qty = Number(item?.amount || 0)
-                    const unit = Number(item?.unit_price_gross || 0)
-                    const lineTotal = qty * unit
-                    return (
-                      <div
-                        key={item.id}
-                        className="grid grid-cols-1 gap-2 rounded-lg bg-white px-3 py-2 text-sm text-gray-800 sm:grid-cols-[1fr_auto_auto] sm:items-center"
-                      >
-                        <div>
-                          <div className="font-semibold text-gray-900">
-                            {item?.product?.name || `Termék #${item?.product_id}`}
+              {isExpanded(order.order_number) && (
+                <div className="mt-3 grid grid-cols-1 gap-2">
+                  {order._items.length === 0 ? (
+                    <div className="rounded-lg bg-white px-3 py-2 text-sm text-gray-600">
+                      Nincs tétel ehhez a rendeléshez.
+                    </div>
+                  ) : (
+                    order._items.map((item) => {
+                      const qty = Number(item?.amount || 0)
+                      const unit = Number(item?.unit_price_gross || 0)
+                      const lineTotal = qty * unit
+                      return (
+                        <div
+                          key={item.id}
+                          className="grid grid-cols-1 gap-2 rounded-lg bg-white px-3 py-2 text-sm text-gray-800 sm:grid-cols-[1fr_auto_auto] sm:items-center"
+                        >
+                          <div>
+                            <div className="font-semibold text-gray-900">
+                              {item?.product?.name || `Termék #${item?.product_id}`}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Kód: {item?.product?.product_code || '-'}
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-500">
-                            Kód: {item?.product?.product_code || '-'}
+                          <div className="text-xs font-semibold text-gray-700">
+                            {qty} db
+                          </div>
+                          <div className="text-xs font-semibold text-gray-700">
+                            {HUF.format(lineTotal)}
                           </div>
                         </div>
-                        <div className="text-xs font-semibold text-gray-700">
-                          {qty} db
-                        </div>
-                        <div className="text-xs font-semibold text-gray-700">
-                          {HUF.format(lineTotal)}
-                        </div>
-                      </div>
-                    )
-                  })
-                )}
-              </div>
+                      )
+                    })
+                  )}
+                </div>
+              )}
 
               <div className="mt-3 border-t border-gray-200 pt-3 text-right text-sm font-semibold text-gray-800">
                 Összesen: <span className="text-base font-bold text-gray-900">{HUF.format(order._totalGross)}</span>
