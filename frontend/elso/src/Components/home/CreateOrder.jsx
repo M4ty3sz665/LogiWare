@@ -13,6 +13,18 @@ function clampQty(n) {
   return Math.max(0, Math.min(999, n))
 }
 
+function downloadCsv(filename, rows) {
+  const esc = (v) => `"${String(v ?? '').replaceAll('"', '""')}"`
+  const csv = rows.map((r) => r.map(esc).join(',')).join('\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 function CreateOrder() {
   const toast = useToast()
   const [query, setQuery] = useState('')
@@ -26,6 +38,7 @@ function CreateOrder() {
 
   const [paymentMethod, setPaymentMethod] = useState('cash')
   const [dueDate, setDueDate] = useState('')
+  const [draftSavedAt, setDraftSavedAt] = useState('')
 
   useEffect(() => {
     const controller = new AbortController()
@@ -119,19 +132,47 @@ function CreateOrder() {
     })
   }
 
-  const handleCreate = async () => {
-    if (orderItems.length === 0 || isSubmitting) return
+  const validateOrder = () => {
+    if (orderItems.length === 0) {
+      toast.error('Adj legalább egy tételt a rendeléshez.')
+      return false
+    }
     if (!dueDate) {
       toast.error('Adj meg teljesítési dátumot.')
-      return
+      return false
     }
 
     for (const it of orderItems) {
       if (it.qty > it.available) {
         toast.error(`Nincs elég készlet: ${it.name} (max ${it.available})`)
-        return
+        return false
       }
     }
+
+    return true
+  }
+
+  const handleSaveDraftCsv = () => {
+    if (!validateOrder()) return
+
+    const now = new Date()
+    const stamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`
+
+    downloadCsv(`order-draft-${stamp}.csv`, [
+      ['type', 'payment_method', 'due_date', 'total_huf', 'saved_at'],
+      ['draft', paymentMethod, dueDate, total, now.toISOString()],
+      [],
+      ['product_id', 'product_name', 'product_code', 'qty', 'unit_price_huf', 'line_total_huf'],
+      ...orderItems.map((i) => [i.id, i.name, i.code, i.qty, i.price, i.price * i.qty]),
+    ])
+
+    setDraftSavedAt(now.toLocaleString('hu-HU'))
+    toast.success('Rendelés piszkozat CSV mentve. Még nincs adatbázisba küldve.')
+  }
+
+  const handleFinalizeOrder = async () => {
+    if (isSubmitting) return
+    if (!validateOrder()) return
 
     setIsSubmitting(true)
     try {
@@ -141,13 +182,14 @@ function CreateOrder() {
         items: orderItems.map((i) => ({ product_id: i.id, amount: i.qty })),
       }
       const res = await apiFetch('/order', { method: 'POST', body: payload })
-      toast.success(`Rendelés rögzítve (#${res?.order_number}).`)
+      toast.success(`Rendelés véglegesítve (#${res?.order_number}).`)
       setOrderQtyById({})
       setQuery('')
+      setDraftSavedAt('')
       const s = await apiFetch('/stock')
       setStock(Array.isArray(s) ? s : [])
     } catch (e) {
-      toast.error(e?.message || 'Nem sikerült a rendelés rögzítése.')
+      toast.error(e?.message || 'Nem sikerült a rendelés véglegesítése.')
     } finally {
       setIsSubmitting(false)
     }
@@ -317,13 +359,26 @@ function CreateOrder() {
               Össz ár:{' '}
               <span className="ml-1 text-lg font-bold text-gray-900">{HUF.format(total)}</span>
             </div>
+            {draftSavedAt && (
+              <div className="text-xs text-gray-500">
+                Utolsó CSV mentés: {draftSavedAt}
+              </div>
+            )}
             <button
               type="button"
-              onClick={handleCreate}
+              onClick={handleSaveDraftCsv}
+              disabled={orderItems.length === 0 || loading}
+              className="inline-flex items-center justify-center rounded-full bg-gray-900 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              CSV mentés (piszkozat)
+            </button>
+            <button
+              type="button"
+              onClick={handleFinalizeOrder}
               disabled={orderItems.length === 0 || isSubmitting || loading}
               className="sm:ml-6 inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Létrehozás...' : 'Rendelés létrehozása'}
+              {isSubmitting ? 'Véglegesítés...' : 'Rendelés véglegesítése'}
             </button>
           </div>
         </div>
