@@ -29,7 +29,8 @@ const user = sequelize.define('user', {
 	},
     role:{
         type:DataTypes.STRING,
-        allowNull:false
+		allowNull:false,
+		defaultValue:'user'
     },
     joined_at:{
         type:DataTypes.DATE,

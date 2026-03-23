@@ -33,9 +33,9 @@ module.exports = function(server) {
             name: req.body.name,
             password: req.body.password,
             phone:req.body.phone,
-            role:req.body.role,
+            role:'user',
             email:req.body.email,
-            admin:req.body.admin
+            admin:false
         })
         const token = middlewares.JWT.sign({"uid":newUser.id , "admin":newUser.admin}, process.env.SECRETKEY, {expiresIn: "6h"})
         res.status(201).json({"message":"Successful registration", "token": token}).end()
