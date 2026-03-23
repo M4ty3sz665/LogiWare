@@ -3,11 +3,11 @@ import React from 'react';
 const features = [
   {
     title: 'Mi a LogiWare?',
-    description: 'A LogiWare egy modern, felhőalapú készlet- és rendeléskezelő rendszer, amely segít vállalkozásodnak átláthatóan kezelni a raktárkészletet, rendeléseket és ügyfeleket.'
+    description: 'A LogiWare egy modern, felhőalapú rendszer zöldségek és gyümölcsök értékesítéséhez, amely segít átláthatóan kezelni a készletet, rendeléseket és beszállítókat.'
   },
   {
     title: 'Mire jó?',
-    description: 'Készletkezelés, rendeléskövetés, ügyfél- és beszállító-nyilvántartás, mozgások naplózása, riportok, jogosultságkezelés.'
+    description: 'Friss áru készletkezelés, rendeléskövetés, beszállító-nyilvántartás, készletmozgások naplózása, riportok és jogosultságkezelés.'
   },
   {
     title: 'Előnyök',
@@ -24,7 +24,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-200 flex flex-col items-center justify-center px-4 py-12">
       <div className="max-w-3xl w-full text-center">
         <h1 className="text-5xl font-extrabold text-blue-900 mb-4 drop-shadow-lg">LogiWare</h1>
-        <p className="text-xl text-blue-700 mb-8">Modern készlet- és rendeléskezelés vállalkozásoknak</p>
+        <p className="text-xl text-blue-700 mb-8">Zöldség- és gyümölcskereskedelemre szabott készlet- és rendeléskezelés</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
           {features.map((f, i) => (
             <div key={i} className="bg-white/90 rounded-xl shadow-lg p-6 border border-blue-100">
@@ -40,7 +40,7 @@ export default function LandingPage() {
         </div>
         <div className="mt-8">
           <img src="/assets/dashboard_demo.png" alt="Dashboard demo" className="mx-auto rounded-xl shadow-lg border border-blue-100 max-h-80" />
-          <p className="text-xs text-blue-400 mt-2">Képernyőkép a LogiWare dashboardról</p>
+          <p className="text-xs text-blue-400 mt-2">Képernyőkép a LogiWare zöldség-gyümölcs dashboardról</p>
         </div>
       </div>
     </div>

@@ -48,7 +48,7 @@ function Products() {
         setSuppliers(Array.isArray(suppliersData) ? suppliersData : [])
       } catch (e) {
         if (e?.name !== 'AbortError') {
-          setError(e?.message || 'Nem sikerült betölteni a termékeket.')
+          setError(e?.message || 'Nem sikerült betölteni az árukat.')
         }
       } finally {
         setLoading(false)
@@ -85,7 +85,7 @@ function Products() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     return viewRows.filter((p) => {
-      // Minden termék látszódjon, ne szűrje ki a 0 készletet
+      // Minden áru látszódjon, ne szűrje ki a 0 készletet
       if (!q) return true
       return (
         String(p.productId ?? '').toLowerCase().includes(q) ||
@@ -167,7 +167,7 @@ function Products() {
       const refreshedData = await apiFetch('/product', { auth: false })
       setProducts(Array.isArray(refreshedData) ? refreshedData : [])
       setShowForm(false)
-      toast.success(editing ? 'Termék frissítve.' : 'Termék létrehozva.')
+      toast.success(editing ? 'Áru frissítve.' : 'Áru létrehozva.')
     } catch (err) {
       setFormError(err?.message || 'Nem sikerült menteni.')
     } finally {
@@ -176,12 +176,12 @@ function Products() {
   }
 
   const deleteProduct = async (productId) => {
-    const sure = window.confirm('Biztos törlöd a terméket?')
+    const sure = window.confirm('Biztos törlöd az árut?')
     if (!sure) return
     try {
       await apiFetch(`/product/${productId}`, { method: 'DELETE' })
       setProducts((prev) => prev.filter((p) => p.id !== productId))
-      toast.success('Termék törölve.')
+      toast.success('Áru törölve.')
     } catch (err) {
       toast.error(err?.message || 'Nem sikerült törölni.')
     }
@@ -191,9 +191,9 @@ function Products() {
     <div className="bg-white rounded-xl shadow-lg p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h3 className="text-lg font-bold text-gray-800">Termékek</h3>
+          <h3 className="text-lg font-bold text-gray-800">Zöldségek és gyümölcsök</h3>
           <p className="mt-1 text-sm text-gray-500">
-            Termék törzs + készlet (raktárból összesítve).
+            Friss áru törzs + készlet (raktárból összesítve).
           </p>
         </div>
 
@@ -225,7 +225,7 @@ function Products() {
             onClick={openCreate}
             className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition"
           >
-            ➕ Új termék
+            ➕ Új áru
           </button>
         </div>
       </div>
@@ -241,7 +241,7 @@ function Products() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-600">
-                Termék
+                Áru
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-600">
                 Kód
@@ -280,7 +280,7 @@ function Products() {
             ) : filtered.length === 0 ? (
               <tr>
                 <td className="px-4 py-6 text-sm text-gray-600" colSpan={9}>
-                  Nincs megjeleníthető termék.
+                  Nincs megjeleníthető áru.
                 </td>
               </tr>
             ) : (
@@ -348,10 +348,10 @@ function Products() {
             <div className="flex items-start justify-between border-b border-gray-100 p-6">
               <div>
                 <h4 className="text-lg font-bold text-gray-900">
-                  {editing ? 'Termék szerkesztése' : 'Új termék'}
+                  {editing ? 'Áru szerkesztése' : 'Új áru'}
                 </h4>
                 <p className="mt-1 text-sm text-gray-500">
-                  Név, kód, árak, ÁFA, beszállító, low-stock küszöb.
+                  Név, kód, árak, ÁFA, beszállító, alacsony készlet küszöb.
                 </p>
               </div>
               <button
