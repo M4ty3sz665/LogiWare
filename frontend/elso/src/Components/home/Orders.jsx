@@ -64,20 +64,6 @@ function Orders() {
     }
   }
 
-  const setPayment = async (orderNumber, payment_status) => {
-    if (savingId) return
-    setSavingId(orderNumber)
-    try {
-      await apiFetch(`/order/${orderNumber}/payment`, { method: 'PUT', body: { payment_status } })
-      toast.success('Fizetés státusz frissítve.')
-      await load()
-    } catch (e) {
-      toast.error(e?.message || 'Nem sikerült menteni.')
-    } finally {
-      setSavingId(null)
-    }
-  }
-
   const cancelOrder = async (orderNumber) => {
     const ok = window.confirm('Biztos lemondod? (készlet vissza lesz töltve)')
     if (!ok) return
@@ -157,35 +143,10 @@ function Orders() {
                     >
                       {String(o.status || 'TBD').toUpperCase()}
                     </span>
-                    <div className="mt-2">
-                      <select
-                        value={String(o.status || 'TBD').toUpperCase()}
-                        disabled={savingId === o.order_number}
-                        onChange={(e) => setStatus(o.order_number, e.target.value)}
-                        className="w-44 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="TBD">TBD</option>
-                        <option value="IN_PROGRESS">IN_PROGRESS</option>
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="CANCELLED">CANCELLED</option>
-                      </select>
-                    </div>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-800">
-                    <div className="text-xs font-semibold text-gray-700">
+                    <div className="inline-flex items-center rounded-full bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
                       {o.payment_status || 'not processed'}
-                    </div>
-                    <div className="mt-2">
-                      <select
-                        value={o.payment_status || 'not processed'}
-                        disabled={savingId === o.order_number}
-                        onChange={(e) => setPayment(o.order_number, e.target.value)}
-                        className="w-44 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="not processed">not processed</option>
-                        <option value="paid">paid</option>
-                        <option value="overdue">overdue</option>
-                      </select>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-right">
