@@ -48,7 +48,6 @@ module.exports = function (server) {
     try {
       const rows = await dbHandler.Orders.findAll({
         include: [
-          { model: dbHandler.ClientCompanies },
           {
             model: dbHandler.OrderItems,
             include: [{ model: dbHandler.Products }],
@@ -63,14 +62,10 @@ module.exports = function (server) {
   })
 
   // Create order with items and automatic stock deduction.
-  // Body: { company_id, payment_method, due_date, due_time?, items:[{product_id, amount}] }
+  // Body: { payment_method, due_date, due_time?, items:[{product_id, amount}] }
   server.post(['/order', '/order/'], middlewares.Auth(), async (req, res) => {
     const items = Array.isArray(req.body.items) ? req.body.items : []
     try {
-      if (!req.body.company_id) {
-        res.status(400).json({ message: 'Missing company_id' }).end()
-        return
-      }
       if (!req.body.payment_method) {
         res.status(400).json({ message: 'Missing payment_method' }).end()
         return
@@ -88,7 +83,6 @@ module.exports = function (server) {
         const order = await dbHandler.Orders.create(
           {
             item_id: Number(items[0]?.product_id || 0),
-            company_id: Number(req.body.company_id),
             payment_method: String(req.body.payment_method),
             due_date: req.body.due_date,
             due_time: req.body.due_time,

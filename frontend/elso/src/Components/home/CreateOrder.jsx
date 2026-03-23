@@ -23,9 +23,7 @@ function CreateOrder() {
   const [error, setError] = useState('')
   const [products, setProducts] = useState([])
   const [stock, setStock] = useState([])
-  const [companies, setCompanies] = useState([])
 
-  const [companyId, setCompanyId] = useState('')
   const [paymentMethod, setPaymentMethod] = useState('cash')
   const [dueDate, setDueDate] = useState('')
 
@@ -35,15 +33,12 @@ function CreateOrder() {
       setLoading(true)
       setError('')
       try {
-        const [p, s, c] = await Promise.all([
+        const [p, s] = await Promise.all([
           apiFetch('/product', { auth: false, signal: controller.signal }),
           apiFetch('/stock', { signal: controller.signal }),
-          apiFetch('/clientcompany', { signal: controller.signal }),
         ])
         setProducts(Array.isArray(p) ? p : [])
         setStock(Array.isArray(s) ? s : [])
-        setCompanies(Array.isArray(c) ? c : [])
-        if (!companyId && Array.isArray(c) && c[0]?.id) setCompanyId(String(c[0].id))
       } catch (e) {
         setError(e?.message || 'Nem sikerült betölteni az adatokat.')
       } finally {
@@ -126,10 +121,6 @@ function CreateOrder() {
 
   const handleCreate = async () => {
     if (orderItems.length === 0 || isSubmitting) return
-    if (!companyId) {
-      toast.error('Válassz ügyfél céget.')
-      return
-    }
     if (!dueDate) {
       toast.error('Adj meg határidő dátumot.')
       return
@@ -146,7 +137,6 @@ function CreateOrder() {
     setIsSubmitting(true)
     try {
       const payload = {
-        company_id: Number(companyId),
         payment_method: paymentMethod,
         due_date: dueDate,
         items: orderItems.map((i) => ({ product_id: i.id, amount: i.qty })),
@@ -198,25 +188,6 @@ function CreateOrder() {
         <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
           <div className="text-xs font-bold tracking-wider text-gray-700">RENDELÉS ADATOK</div>
           <div className="mt-3 grid grid-cols-1 gap-3">
-            <div>
-              <label className="block text-xs font-semibold tracking-wide text-gray-600">Ügyfél cég</label>
-              <select
-                value={companyId}
-                onChange={(e) => setCompanyId(e.target.value)}
-                disabled={loading}
-                className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {companies.length === 0 ? (
-                  <option value="">— nincs ügyfél cég —</option>
-                ) : (
-                  companies.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.company_name}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
             <div>
               <label className="block text-xs font-semibold tracking-wide text-gray-600">Fizetési mód</label>
               <select
