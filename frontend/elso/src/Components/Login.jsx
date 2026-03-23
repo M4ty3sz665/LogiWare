@@ -107,7 +107,7 @@ function Login({ onLogin, onShowRegister }) {
               />
             </div>
 
-            {/* Remember Me & Forgot Password */}
+            {/* Remember Me */}
             <div className="flex items-center justify-between mt-1">
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
@@ -118,14 +118,6 @@ function Login({ onLogin, onShowRegister }) {
                 />
                 <span className="text-sm text-slate-700">Emlékezz rám</span>
               </label>
-
-              <button
-                type="button"
-                onClick={() => toast.info('Jelszó visszaállítás funkció - hamarosan')}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium transition"
-              >
-                Elfelejtett jelszó?
-              </button>
             </div>
 
             {/* Submit Button */}
