@@ -8,7 +8,6 @@ function Login({ onLogin, onShowRegister }) {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -105,19 +104,6 @@ function Login({ onLogin, onShowRegister }) {
                 disabled={isSubmitting}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-100"
               />
-            </div>
-
-            {/* Remember Me */}
-            <div className="flex items-center justify-between mt-1">
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="text-sm text-slate-700">Emlékezz rám</span>
-              </label>
             </div>
 
             {/* Submit Button */}
