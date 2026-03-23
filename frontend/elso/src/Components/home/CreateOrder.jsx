@@ -227,6 +227,7 @@ function CreateOrder() {
                 <option value="cash">készpénz</option>
                 <option value="card">kártya</option>
                 <option value="transfer">átutalás</option>
+                <option value="invoice">számlás fizetés</option>
               </select>
             </div>
             <div>
