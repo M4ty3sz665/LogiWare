@@ -1,7 +1,5 @@
 import React from 'react'
 
-const navItems = ['Megoldás', 'Funkciók', 'Árazás', 'Támogatás', 'Blog']
-
 const highlights = [
   'Készlet valós időben',
   'Rendelések egy nézetben',
@@ -31,14 +29,6 @@ export default function LandingPage() {
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-lg">🍎</div>
             <span className="text-2xl font-extrabold tracking-tight">LogiWare</span>
           </a>
-
-          <nav className="hidden items-center gap-7 lg:flex">
-            {navItems.map((item) => (
-              <a key={item} href="#" className="text-base font-semibold text-white/90 transition hover:text-white">
-                {item}
-              </a>
-            ))}
-          </nav>
 
           <div className="flex items-center gap-3">
             <a href="/register" className="hidden rounded-xl border border-white/25 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 sm:inline-block">
