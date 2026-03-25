@@ -226,6 +226,34 @@ describe('LogiWare Backend Tests', () => {
             expect(res.body).toHaveProperty('id');
             expect(res.body).toHaveProperty('email');
         });
+
+        test('PUT /oneuser - should return 401 when Authorization header is missing', async () => {
+            const res = await request(server)
+                .put('/oneuser')
+                .send({ name: 'updated-name' });
+
+            expect(res.statusCode).toBe(401);
+            expect(res.body).toHaveProperty('message');
+        });
+
+        test('DELETE /oneuser - should return 401 when Authorization header is missing', async () => {
+            const res = await request(server).delete('/oneuser');
+
+            expect(res.statusCode).toBe(401);
+            expect(res.body).toHaveProperty('message');
+        });
+
+        test('PUT /oneuser/password - should return 401 when Authorization header is missing', async () => {
+            const res = await request(server)
+                .put('/oneuser/password')
+                .send({
+                    currentPassword: 'a',
+                    newPassword: 'abcdef'
+                });
+
+            expect(res.statusCode).toBe(401);
+            expect(res.body).toHaveProperty('message');
+        });
     });
 
     describe('Authentication - Register', () => {
