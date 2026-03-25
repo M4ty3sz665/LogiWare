@@ -379,6 +379,50 @@ describe('LogiWare Backend Tests', () => {
                 });
             expect([201, 400, 401, 403, 404, 500]).toContain(res.statusCode);
         });
+
+        test('POST /stock - should return 401 without authentication', async () => {
+            const res = await request(server)
+                .post('/stock')
+                .send({ item_id: 1, amount: 5 });
+
+            expect(res.statusCode).toBe(401);
+        });
+
+        test('PUT /stock/:id - should return 401 without authentication', async () => {
+            const res = await request(server)
+                .put('/stock/1')
+                .send({ amount: 99 });
+
+            expect(res.statusCode).toBe(401);
+        });
+
+        test('PUT /stock/:id - should return 404 for non-existing stock row when authenticated', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .put('/stock/999999')
+                .set('Authorization', token)
+                .send({ amount: 99 });
+
+            expect(res.statusCode).toBe(404);
+            expect(res.body).toHaveProperty('message');
+        });
+
+        test('DELETE /stock/:id - should return 401 without authentication', async () => {
+            const res = await request(server).delete('/stock/1');
+            expect(res.statusCode).toBe(401);
+        });
+
+        test('DELETE /stock/:id - should return 403 for authenticated non-admin user', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .delete('/stock/999999')
+                .set('Authorization', token);
+
+            expect(res.statusCode).toBe(403);
+            expect(res.body).toHaveProperty('message', 'Forbidden');
+        });
     });
 
     describe('Orders Operations', () => {
