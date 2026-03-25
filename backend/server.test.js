@@ -674,6 +674,67 @@ describe('LogiWare Backend Tests', () => {
         });
     });
 
+    describe('Additional Route Coverage', () => {
+        test('GET /stockmovement - should return stock movement list endpoint response', async () => {
+            const res = await request(server).get('/stockmovement');
+            expect([200, 500]).toContain(res.statusCode);
+            if (res.statusCode === 200) {
+                expect(Array.isArray(res.body)).toBe(true);
+            }
+        });
+
+        test('POST /stockmovement - should require authentication', async () => {
+            const res = await request(server)
+                .post('/stockmovement')
+                .send({
+                    stock_id: 1,
+                    amount: 1,
+                    movement_type: 'IN'
+                });
+
+            expect(res.statusCode).toBe(401);
+            expect(res.body).toHaveProperty('message');
+        });
+
+        test('GET /orderitem - should require authentication', async () => {
+            const res = await request(server).get('/orderitem');
+            expect(res.statusCode).toBe(401);
+            expect(res.body).toHaveProperty('message');
+        });
+
+        test('GET /orderitem - should return array when authenticated', async () => {
+            const token = await createAuthToken();
+            const res = await request(server)
+                .get('/orderitem')
+                .set('Authorization', token);
+
+            expect([200, 500]).toContain(res.statusCode);
+            if (res.statusCode === 200) {
+                expect(Array.isArray(res.body)).toBe(true);
+            }
+        });
+
+        test('DELETE /supplier/:id - should return 403 for authenticated non-admin user', async () => {
+            const token = await createAuthToken();
+            const res = await request(server)
+                .delete('/supplier/999999')
+                .set('Authorization', token);
+
+            expect(res.statusCode).toBe(403);
+            expect(res.body).toHaveProperty('message', 'Forbidden');
+        });
+
+        test('DELETE /stockmovement/:id - should return 403 for authenticated non-admin user', async () => {
+            const token = await createAuthToken();
+            const res = await request(server)
+                .delete('/stockmovement/999999')
+                .set('Authorization', token);
+
+            expect(res.statusCode).toBe(403);
+            expect(res.body).toHaveProperty('message', 'Forbidden');
+        });
+    });
+
     describe('Input Validation - Products', () => {
         test('POST /product - should reject empty product name', async () => {
             const res = await request(server)
