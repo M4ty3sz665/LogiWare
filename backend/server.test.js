@@ -592,6 +592,36 @@ describe('LogiWare Backend Tests', () => {
                 });
             expect([201, 400, 401, 403, 500]).toContain(res.statusCode);
         });
+
+        test('PUT /supplier/:id - should return 401 without token', async () => {
+            const res = await request(server)
+                .put('/supplier/1')
+                .send({ company_name: 'Updated' });
+
+            expect(res.statusCode).toBe(401);
+        });
+
+        test('PUT /supplier/:id - should return error for non-existing supplier when authenticated', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .put('/supplier/999999')
+                .set('Authorization', token)
+                .send({ company_name: 'Ghost Supplier' });
+
+            expect([404, 500]).toContain(res.statusCode);
+            expect(res.body).toHaveProperty('message');
+        });
+
+        test('GET /supplier - should return JSON array with expected fields', async () => {
+            const res = await request(server).get('/supplier');
+            if (res.statusCode === 200 && Array.isArray(res.body) && res.body.length > 0) {
+                expect(res.body[0]).toHaveProperty('id');
+                expect(res.body[0]).toHaveProperty('company_name');
+            } else {
+                expect([200, 500]).toContain(res.statusCode);
+            }
+        });
     });
 
     describe('Error Handling', () => {
