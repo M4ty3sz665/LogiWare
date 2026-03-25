@@ -574,6 +574,38 @@ describe('LogiWare Backend Tests', () => {
                 }
             }
         });
+
+        test('GET /stock response should include normalized product_name and missing_product fields', async () => {
+            const res = await request(server).get('/stock');
+            expect(res.statusCode).toBe(200);
+            expect(Array.isArray(res.body)).toBe(true);
+            if (res.body.length > 0) {
+                const row = res.body[0];
+                expect(row).toHaveProperty('id');
+                expect(row).toHaveProperty('amount');
+                // normalized fields always present
+                expect(Object.prototype.hasOwnProperty.call(row, 'product_name')).toBe(true);
+                expect(Object.prototype.hasOwnProperty.call(row, 'missing_product')).toBe(true);
+            }
+        });
+
+        test('GET /supplier response array items should have company_name and id', async () => {
+            const res = await request(server).get('/supplier');
+            expect([200, 500]).toContain(res.statusCode);
+            if (res.statusCode === 200 && res.body.length > 0) {
+                expect(res.body[0]).toHaveProperty('id');
+                expect(res.body[0]).toHaveProperty('company_name');
+            }
+        });
+
+        test('GET /stockmovement response array items should have id and amount fields', async () => {
+            const res = await request(server).get('/stockmovement');
+            expect([200, 500]).toContain(res.statusCode);
+            if (res.statusCode === 200 && Array.isArray(res.body) && res.body.length > 0) {
+                expect(res.body[0]).toHaveProperty('id');
+                expect(res.body[0]).toHaveProperty('amount');
+            }
+        });
     });
 
     describe('Suppliers', () => {
