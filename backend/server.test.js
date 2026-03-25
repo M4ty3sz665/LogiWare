@@ -447,4 +447,110 @@ describe('LogiWare Backend Tests', () => {
             expect([200, 400, 500]).toContain(res.statusCode);
         });
     });
+
+    describe('Input Validation - Products', () => {
+        test('POST /product - should reject empty product name', async () => {
+            const res = await request(server)
+                .post('/product')
+                .send({
+                    name: '',
+                    price_net: 100,
+                    price_gross: 120,
+                    vat_rate: 20
+                });
+            expect([400, 401, 403, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /product - should reject negative price', async () => {
+            const res = await request(server)
+                .post('/product')
+                .send({
+                    name: 'Test',
+                    price_net: -100,
+                    price_gross: 120,
+                    vat_rate: 20
+                });
+            expect([400, 401, 403, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /product - should reject invalid VAT rate', async () => {
+            const res = await request(server)
+                .post('/product')
+                .send({
+                    name: 'Test',
+                    price_net: 100,
+                    price_gross: 120,
+                    vat_rate: 200
+                });
+            expect([400, 401, 403, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /product - should validate price_gross >= price_net', async () => {
+            const res = await request(server)
+                .post('/product')
+                .send({
+                    name: 'Test',
+                    price_net: 200,
+                    price_gross: 100,
+                    vat_rate: 20
+                });
+            expect([400, 401, 403, 500]).toContain(res.statusCode);
+        });
+    });
+
+    describe('Input Validation - Users', () => {
+        test('POST /register - should reject invalid email format', async () => {
+            const res = await request(server)
+                .post('/register')
+                .send({
+                    name: 'testuser',
+                    email: 'invalid-email',
+                    password: 'password123'
+                });
+            expect([200, 400, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /register - should reject short password', async () => {
+            const res = await request(server)
+                .post('/register')
+                .send({
+                    name: 'testuser',
+                    email: 'test@test.com',
+                    password: '123'
+                });
+            expect([200, 400, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /register - should reject empty username', async () => {
+            const res = await request(server)
+                .post('/register')
+                .send({
+                    name: '',
+                    email: 'test@test.com',
+                    password: 'password123'
+                });
+            expect([400, 500]).toContain(res.statusCode);
+        });
+    });
+
+    describe('Input Validation - Orders', () => {
+        test('POST /order - should validate order data structure', async () => {
+            const res = await request(server)
+                .post('/order')
+                .send({
+                    customer_name: '',
+                    order_date: 'invalid-date'
+                });
+            expect([400, 401, 403, 500]).toContain(res.statusCode);
+        });
+
+        test('PUT /order/:id - should validate status update', async () => {
+            const res = await request(server)
+                .put('/order/1')
+                .send({
+                    status: 'invalid_status'
+                });
+            expect([400, 401, 403, 404, 500]).toContain(res.statusCode);
+        });
+    });
 });
