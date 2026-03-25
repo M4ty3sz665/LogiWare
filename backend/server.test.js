@@ -570,6 +570,53 @@ describe('LogiWare Backend Tests', () => {
             expect(res.statusCode).toBe(400);
             expect(res.body).toHaveProperty('message', 'Invalid type');
         });
+
+        test('POST /inventory/move - should reject missing product_id for authenticated request', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .post('/inventory/move')
+                .set('Authorization', token)
+                .send({
+                    type: 'IN',
+                    amount: 2
+                });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Missing product_id');
+        });
+
+        test('POST /inventory/move - should reject negative amount for authenticated request', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .post('/inventory/move')
+                .set('Authorization', token)
+                .send({
+                    product_id: 1,
+                    type: 'IN',
+                    amount: -5
+                });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Invalid amount');
+        });
+
+        test('POST /inventory/move - should return 404 for non-existing product on authenticated request', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .post('/inventory/move')
+                .set('Authorization', token)
+                .send({
+                    product_id: 999999,
+                    type: 'IN',
+                    amount: 1
+                });
+
+            expect(res.statusCode).toBe(404);
+            expect(res.body).toHaveProperty('message', 'No such product');
+        });
     });
 
     describe('Input Validation - Products', () => {
