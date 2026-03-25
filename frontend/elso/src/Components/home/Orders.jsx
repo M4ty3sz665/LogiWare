@@ -26,7 +26,9 @@ function Orders() {
       const data = await apiFetch('/order', { signal })
       setRows(Array.isArray(data) ? data : [])
     } catch (e) {
-      setError(e?.message || 'Nem sikerült betölteni a rendeléseket.')
+      if (e?.name !== 'AbortError') {
+        setError(e?.message || 'Nem sikerült betölteni a rendeléseket.')
+      }
     } finally {
       setLoading(false)
     }
