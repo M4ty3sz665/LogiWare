@@ -258,7 +258,7 @@ function CreateOrder() {
         </div>
 
         <div className="lg:col-span-2">
-          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:mt-0 lg:grid-cols-2">
             <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
               <div className="grid grid-cols-[1fr_auto] gap-3 border-b border-gray-200 pb-3">
                 <div className="text-xs font-bold tracking-wider text-gray-700">Kosár</div>
@@ -354,13 +354,13 @@ function CreateOrder() {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-            <div className="text-sm font-semibold text-gray-700">
+          <div className="mt-6 flex w-full flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-start sm:gap-4">
+            <div className="inline-flex h-12 items-center text-sm font-semibold text-gray-700">
               Össz ár:{' '}
               <span className="ml-1 text-lg font-bold text-gray-900">{HUF.format(total)}</span>
             </div>
             {draftSavedAt && (
-              <div className="text-xs text-gray-500">
+              <div className="inline-flex h-12 items-center text-xs text-gray-500">
                 Utolsó CSV mentés: {draftSavedAt}
               </div>
             )}
@@ -376,7 +376,7 @@ function CreateOrder() {
               type="button"
               onClick={handleFinalizeOrder}
               disabled={orderItems.length === 0 || isSubmitting || loading}
-              className={`sm:ml-6 ${BTN_PRIMARY_PILL}`}
+              className={BTN_PRIMARY_PILL}
             >
               {isSubmitting ? 'Véglegesítés...' : 'Rendelés véglegesítése'}
             </button>
