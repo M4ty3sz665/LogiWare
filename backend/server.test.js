@@ -370,6 +370,30 @@ describe('LogiWare Backend Tests', () => {
             expect(res.statusCode).toBe(404);
             expect(res.body).toHaveProperty('message', 'No such order');
         });
+
+        test('PUT /order/:id/payment - should require authentication', async () => {
+            const res = await request(server)
+                .put('/order/1/payment')
+                .send({ payment_status: 'processed' });
+
+            expect(res.statusCode).toBe(401);
+            expect(res.body).toHaveProperty('message');
+        });
+
+        test('PUT /order/:id/payment - should return 404 for unknown order when authenticated', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .put('/order/999999/payment')
+                .set('Authorization', token)
+                .send({
+                    payment_status: 'processed',
+                    payment_method: 'card'
+                });
+
+            expect(res.statusCode).toBe(404);
+            expect(res.body).toHaveProperty('message', 'No such order');
+        });
     });
 
     describe('HTTP Methods & Errors', () => {
