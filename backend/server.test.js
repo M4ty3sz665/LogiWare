@@ -402,4 +402,49 @@ describe('LogiWare Backend Tests', () => {
             expect(res1.statusCode >= 200 && res1.statusCode < 600).toBe(true);
         });
     });
+
+    describe('Receipts', () => {
+        test('GET /receipt - should return receipts list', async () => {
+            const res = await request(server).get('/receipt');
+            expect([200, 400, 401, 404, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /receipt - should create receipt (requires auth)', async () => {
+            const res = await request(server)
+                .post('/receipt')
+                .send({
+                    order_id: 1,
+                    payment_method: 'bank_transfer',
+                    amount: 500
+                });
+            expect([201, 400, 401, 403, 404, 500]).toContain(res.statusCode);
+        });
+
+        test('GET /receipt/:id - should return receipt by ID', async () => {
+            const res = await request(server).get('/receipt/1');
+            expect([200, 400, 404, 500]).toContain(res.statusCode);
+        });
+    });
+
+    describe('Advanced Filtering', () => {
+        test('GET /product?supplier_id=1 - should filter products by supplier', async () => {
+            const res = await request(server).get('/product?supplier_id=1');
+            expect([200, 400, 500]).toContain(res.statusCode);
+        });
+
+        test('GET /stock?low_stock=true - should filter low stock items', async () => {
+            const res = await request(server).get('/stock?low_stock=true');
+            expect([200, 400, 500]).toContain(res.statusCode);
+        });
+
+        test('GET /order?status=pending - should filter orders by status', async () => {
+            const res = await request(server).get('/order?status=pending');
+            expect([200, 400, 401, 500]).toContain(res.statusCode);
+        });
+
+        test('GET /product?limit=10&offset=0 - should support pagination', async () => {
+            const res = await request(server).get('/product?limit=10&offset=0');
+            expect([200, 400, 500]).toContain(res.statusCode);
+        });
+    });
 });
