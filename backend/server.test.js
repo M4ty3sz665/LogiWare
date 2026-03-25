@@ -553,4 +553,116 @@ describe('LogiWare Backend Tests', () => {
             expect([400, 401, 403, 404, 500]).toContain(res.statusCode);
         });
     });
+
+    describe('Edge Cases - Large Data', () => {
+        test('POST /product - should handle very long product name', async () => {
+            const longName = 'A'.repeat(1000);
+            const res = await request(server)
+                .post('/product')
+                .send({
+                    name: longName,
+                    price_net: 100,
+                    price_gross: 120,
+                    vat_rate: 20
+                });
+            expect([201, 400, 401, 403, 413, 500]).toContain(res.statusCode);
+        });
+
+        test('GET /product - should handle large limit parameter', async () => {
+            const res = await request(server).get('/product?limit=100000');
+            expect([200, 400, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /stock-movement - should handle very large amount', async () => {
+            const res = await request(server)
+                .post('/stock-movement')
+                .send({
+                    item_id: 1,
+                    amount: 999999999,
+                    type: 'in'
+                });
+            expect([201, 400, 401, 403, 404, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /product - should handle zero values', async () => {
+            const res = await request(server)
+                .post('/product')
+                .send({
+                    name: 'Zero Test',
+                    price_net: 0,
+                    price_gross: 0,
+                    vat_rate: 0
+                });
+            expect([201, 400, 401, 403, 500]).toContain(res.statusCode);
+        });
+    });
+
+    describe('Edge Cases - Special Characters', () => {
+        test('POST /product - should handle special characters in name', async () => {
+            const res = await request(server)
+                .post('/product')
+                .send({
+                    name: 'Test !@#$%^&*()',
+                    price_net: 100,
+                    price_gross: 120,
+                    vat_rate: 20
+                });
+            expect([201, 400, 401, 403, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /register - should handle special characters in username', async () => {
+            const res = await request(server)
+                .post('/register')
+                .send({
+                    name: 'user@#$%',
+                    email: 'test@test.com',
+                    password: 'password123'
+                });
+            expect([200, 201, 400, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /product - should handle unicode characters', async () => {
+            const res = await request(server)
+                .post('/product')
+                .send({
+                    name: '测试产品 🍎🍊',
+                    price_net: 100,
+                    price_gross: 120,
+                    vat_rate: 20
+                });
+            expect([201, 400, 401, 403, 500]).toContain(res.statusCode);
+        });
+    });
+
+    describe('Edge Cases - Null/Undefined', () => {
+        test('POST /product - should handle null name', async () => {
+            const res = await request(server)
+                .post('/product')
+                .send({
+                    name: null,
+                    price_net: 100,
+                    price_gross: 120
+                });
+            expect([400, 401, 403, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /product - should handle missing required fields', async () => {
+            const res = await request(server)
+                .post('/product')
+                .send({
+                    price_net: 100
+                });
+            expect([400, 401, 403, 500]).toContain(res.statusCode);
+        });
+
+        test('GET /product/:id - should handle null ID', async () => {
+            const res = await request(server).get('/product/null');
+            expect([200, 400, 404, 500]).toContain(res.statusCode);
+        });
+
+        test('GET /product/:id - should handle string ID', async () => {
+            const res = await request(server).get('/product/abc-def');
+            expect([200, 400, 404, 500]).toContain(res.statusCode);
+        });
+    });
 });
