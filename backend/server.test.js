@@ -532,6 +532,46 @@ describe('LogiWare Backend Tests', () => {
         });
     });
 
+    describe('Route Alias and Inventory Coverage', () => {
+        test('GET /order and GET /order/ - should both enforce authentication', async () => {
+            const noSlash = await request(server).get('/order');
+            const withSlash = await request(server).get('/order/');
+
+            expect(noSlash.statusCode).toBe(401);
+            expect(withSlash.statusCode).toBe(401);
+        });
+
+        test('POST /inventory/move - should return 401 without Authorization header', async () => {
+            const res = await request(server)
+                .post('/inventory/move')
+                .send({
+                    product_id: 1,
+                    type: 'IN',
+                    amount: 1
+                });
+
+            expect(res.statusCode).toBe(401);
+            expect(res.body).toHaveProperty('message');
+            expect(String(res.body.message)).toContain('jwt must be provided');
+        });
+
+        test('POST /inventory/move - should reject invalid move type for authenticated request', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .post('/inventory/move')
+                .set('Authorization', token)
+                .send({
+                    product_id: 1,
+                    type: 'INVALID_TYPE',
+                    amount: 3
+                });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Invalid type');
+        });
+    });
+
     describe('Input Validation - Products', () => {
         test('POST /product - should reject empty product name', async () => {
             const res = await request(server)
