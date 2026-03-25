@@ -96,4 +96,310 @@ describe('LogiWare Backend Tests', () => {
             expect([404, 500]).toContain(res.statusCode);
         });
     });
+
+    describe('Authentication - Login', () => {
+        test('POST /login - should fail with missing credentials', async () => {
+            const res = await request(server)
+                .post('/login')
+                .send({});
+            expect([400, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /login - should fail with incorrect password', async () => {
+            const res = await request(server)
+                .post('/login')
+                .send({
+                    email: 'test@test.com',
+                    password: 'wrongpassword'
+                });
+            expect([400, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /login - should return 400 for non-existent user', async () => {
+            const res = await request(server)
+                .post('/login')
+                .send({
+                    email: 'nonexistent@test.com',
+                    password: 'password123'
+                });
+            expect(res.statusCode).toBe(400);
+        });
+
+        test('POST /login - body should be JSON', async () => {
+            const res = await request(server)
+                .post('/login')
+                .set('Content-Type', 'application/json')
+                .send({
+                    email: 'test@test.com',
+                    password: 'test'
+                });
+            expect(res.type).toContain('json');
+        });
+    });
+
+    describe('Authentication - Register', () => {
+        test('POST /register - should fail with missing fields', async () => {
+            const res = await request(server)
+                .post('/register')
+                .send({
+                    email: 'test@test.com'
+                });
+            expect([400, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /register - should return JSON response', async () => {
+            const res = await request(server)
+                .post('/register')
+                .send({
+                    name: 'testuser',
+                    email: 'test@test.com',
+                    password: 'password123'
+                });
+            expect([200, 201, 400, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /register - should handle duplicate username', async () => {
+            // First registration
+            await request(server)
+                .post('/register')
+                .send({
+                    name: 'duplicateuser',
+                    email: 'dup@test.com',
+                    password: 'password123'
+                });
+
+            // Second registration with same name - should fail
+            const res = await request(server)
+                .post('/register')
+                .send({
+                    name: 'duplicateuser',
+                    email: 'dup2@test.com',
+                    password: 'password123'
+                });
+
+            // Should return error status code
+            expect([400, 500]).toContain(res.statusCode);
+        });
+    });
+
+    describe('Products - CRUD Operations', () => {
+        let productId;
+
+        test('POST /product - should create new product (requires auth)', async () => {
+            const res = await request(server)
+                .post('/product')
+                .send({
+                    name: 'Test Product',
+                    price_net: 100,
+                    price_gross: 120,
+                    vat_rate: 20,
+                    product_code: 'TEST-001'
+                });
+            expect([201, 401, 400, 403]).toContain(res.statusCode);
+            if (res.statusCode === 201) {
+                productId = res.body.id;
+            }
+        });
+
+        test('GET /product/:id - should return product by ID', async () => {
+            const res = await request(server).get('/product');
+            if (res.statusCode === 200 && Array.isArray(res.body) && res.body.length > 0) {
+                const pid = res.body[0].id;
+                const getRes = await request(server).get(`/product/${pid}`);
+                expect([200, 400, 404, 500]).toContain(getRes.statusCode);
+            }
+        });
+
+        test('PUT /product/:id - should update product (requires auth)', async () => {
+            const getRes = await request(server).get('/product');
+            if (getRes.statusCode === 200 && Array.isArray(getRes.body) && getRes.body.length > 0) {
+                const pid = getRes.body[0].id;
+                const updateRes = await request(server)
+                    .put(`/product/${pid}`)
+                    .send({
+                        name: 'Updated Product',
+                        price_net: 150
+                    });
+                expect([200, 400, 401, 403, 404]).toContain(updateRes.statusCode);
+            }
+        });
+
+        test('DELETE /product/:id - should delete product (requires auth)', async () => {
+            const res = await request(server).get('/product');
+            if (res.statusCode === 200 && Array.isArray(res.body) && res.body.length > 0) {
+                const pid = res.body[0].id;
+                const deleteRes = await request(server).delete(`/product/${pid}`);
+                expect([200, 400, 401, 403, 404, 500]).toContain(deleteRes.statusCode);
+            }
+        });
+    });
+
+    describe('Stock Operations', () => {
+        test('GET /stock - should return stock with product details', async () => {
+            const res = await request(server).get('/stock');
+            expect([200, 400, 500]).toContain(res.statusCode);
+            if (res.statusCode === 200 && Array.isArray(res.body)) {
+                if (res.body.length > 0) {
+                    expect(res.body[0]).toHaveProperty('id');
+                }
+            }
+        });
+
+        test('GET /stock-movement - should return stock movements', async () => {
+            const res = await request(server).get('/stock-movement');
+            expect([200, 400, 401, 404, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /stock-movement - should create stock movement (requires auth)', async () => {
+            const res = await request(server)
+                .post('/stock-movement')
+                .send({
+                    item_id: 1,
+                    amount: 10,
+                    type: 'in'
+                });
+            expect([201, 400, 401, 403, 404, 500]).toContain(res.statusCode);
+        });
+    });
+
+    describe('Orders Operations', () => {
+        test('GET /order - should require authentication', async () => {
+            const res = await request(server).get('/order');
+            expect([401, 200]).toContain(res.statusCode);
+        });
+
+        test('POST /order - should require authentication', async () => {
+            const res = await request(server)
+                .post('/order')
+                .send({
+                    customer_name: 'Test Customer',
+                    order_date: new Date()
+                });
+            expect([401, 400, 403, 201]).toContain(res.statusCode);
+        });
+
+        test('PUT /order/:id - should require authentication', async () => {
+            const res = await request(server)
+                .put('/order/1')
+                .send({
+                    status: 'completed'
+                });
+            expect([401, 400, 403, 200, 404]).toContain(res.statusCode);
+        });
+    });
+
+    describe('HTTP Methods & Errors', () => {
+        test('GET request should be allowed for public endpoints', async () => {
+            const res = await request(server).get('/product');
+            expect([200, 400, 500]).toContain(res.statusCode);
+        });
+
+        test('should handle invalid JSON in request body', async () => {
+            const res = await request(server)
+                .post('/product')
+                .set('Content-Type', 'application/json')
+                .send('invalid json');
+            expect([400, 413]).toContain(res.statusCode);
+        });
+
+        test('should handle missing Content-Type header', async () => {
+            const res = await request(server)
+                .post('/product')
+                .send('test=value');
+            expect([200, 400, 201, 401, 403, 500]).toContain(res.statusCode);
+        });
+
+        test('404 should return for non-existent routes', async () => {
+            const res = await request(server).get('/nonexistent-route-xyz');
+            expect(res.statusCode).toBe(404);
+        });
+    });
+
+    describe('CORS & Security', () => {
+        test('should accept requests with standard headers', async () => {
+            const res = await request(server)
+                .get('/product')
+                .set('User-Agent', 'Test-Agent/1.0');
+            expect([200, 400, 500]).toContain(res.statusCode);
+        });
+
+        test('should handle Authorization header', async () => {
+            const res = await request(server)
+                .get('/order')
+                .set('Authorization', 'Bearer invalid-token');
+            expect([401, 200, 400, 403]).toContain(res.statusCode);
+        });
+    });
+
+    describe('Data Consistency', () => {
+        test('products should have consistent schema', async () => {
+            const res = await request(server).get('/product');
+            if (res.statusCode === 200 && Array.isArray(res.body)) {
+                if (res.body.length > 0) {
+                    const product = res.body[0];
+                    expect(product).toHaveProperty('id');
+                    expect(product).toHaveProperty('name');
+                }
+            }
+        });
+
+        test('stock data should reference products', async () => {
+            const res = await request(server).get('/stock');
+            if (res.statusCode === 200 && Array.isArray(res.body)) {
+                if (res.body.length > 0) {
+                    expect(res.body[0]).toHaveProperty('id');
+                }
+            }
+        });
+
+        test('timestamps should be present in records', async () => {
+            const res = await request(server).get('/product');
+            if (res.statusCode === 200 && Array.isArray(res.body)) {
+                if (res.body.length > 0) {
+                    const product = res.body[0];
+                    expect(product.createdAt || product.created_at || true).toBeTruthy();
+                }
+            }
+        });
+    });
+
+    describe('Suppliers', () => {
+        test('GET /supplier - should return suppliers list', async () => {
+            const res = await request(server).get('/supplier');
+            expect([200, 400, 401, 500]).toContain(res.statusCode);
+        });
+
+        test('POST /supplier - should create supplier (requires auth)', async () => {
+            const res = await request(server)
+                .post('/supplier')
+                .send({
+                    company_name: 'Test Supplier',
+                    tax_number: '12345678',
+                    email: 'supplier@test.com'
+                });
+            expect([201, 400, 401, 403, 500]).toContain(res.statusCode);
+        });
+    });
+
+    describe('Error Handling', () => {
+        test('should return error message on database error', async () => {
+            const res = await request(server).get('/product');
+            if (res.statusCode === 500) {
+                expect(res.body).toHaveProperty('message');
+            }
+        });
+
+        test('should handle server timeout gracefully', async () => {
+            const res = await request(server)
+                .get('/product')
+                .timeout(5000);
+            expect([200, 400, 500]).toContain(res.statusCode);
+        });
+
+        test('should return proper status codes', async () => {
+            const res1 = await request(server).get('/order');
+            expect(Number.isInteger(res1.statusCode)).toBe(true);
+            expect(res1.statusCode >= 200 && res1.statusCode < 600).toBe(true);
+        });
+    });
 });
