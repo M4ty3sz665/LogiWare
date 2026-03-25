@@ -50,6 +50,7 @@ function Register({ onRegister, onShowLogin }) {
       if (onRegister) {
         onRegister({ name, email })
       }
+      navigate('/login')
     } catch (err) {
       setError(err.message || 'Hiba történt a regisztráció során.')
     } finally {
