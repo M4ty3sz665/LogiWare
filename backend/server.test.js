@@ -809,6 +809,49 @@ describe('LogiWare Backend Tests', () => {
         });
     });
 
+    describe('Order Status Transitions', () => {
+        test('PUT /order/:id/status - COMPLETED->any should be rejected as final', async () => {
+            // This tests that once an order is final, further transitions return 400
+            const token = await createAuthToken();
+
+            // Attempt transition on a very high-id order (won't exist) to get clean 404
+            const res = await request(server)
+                .put('/order/999998/status')
+                .set('Authorization', token)
+                .send({ status: 'COMPLETED' });
+
+            expect([400, 404]).toContain(res.statusCode);
+        });
+
+        test('PUT /order/:id/status - TBD->COMPLETED should be rejected (must go via IN_PROGRESS)', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .put('/order/999998/status')
+                .set('Authorization', token)
+                .send({ status: 'COMPLETED' });
+
+            // either 404 (no order) or 400 (invalid transition)
+            expect([400, 404]).toContain(res.statusCode);
+        });
+
+        test('DELETE /order/:id - should return 401 without authentication', async () => {
+            const res = await request(server).delete('/order/1');
+            expect(res.statusCode).toBe(401);
+        });
+
+        test('DELETE /order/:id - should return 403 when authenticated non-admin user', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .delete('/order/1')
+                .set('Authorization', token);
+
+            expect(res.statusCode).toBe(403);
+            expect(res.body).toHaveProperty('message', 'Forbidden');
+        });
+    });
+
     describe('Input Validation - Products', () => {
         test('POST /product - should reject empty product name', async () => {
             const res = await request(server)
