@@ -346,6 +346,30 @@ describe('LogiWare Backend Tests', () => {
                 });
             expect([401, 400, 403, 200, 404]).toContain(res.statusCode);
         });
+
+        test('PUT /order/:id/status - should reject invalid status with 400 when authenticated', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .put('/order/999999/status')
+                .set('Authorization', token)
+                .send({ status: 'invalid_status_value' });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Invalid status');
+        });
+
+        test('PUT /order/:id/status - should normalize translated status and continue to order lookup', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .put('/order/999999/status')
+                .set('Authorization', token)
+                .send({ status: 'folyamatban' });
+
+            expect(res.statusCode).toBe(404);
+            expect(res.body).toHaveProperty('message', 'No such order');
+        });
     });
 
     describe('HTTP Methods & Errors', () => {
