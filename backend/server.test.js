@@ -8,6 +8,35 @@ describe('LogiWare Backend Tests', () => {
         await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for server startup
     });
 
+    async function createAuthToken() {
+        const uniquePart = `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+        const email = `authtest-${uniquePart}@example.com`;
+        const password = 'password123';
+
+        const registerRes = await request(server)
+            .post('/register')
+            .send({
+                name: `authtest-${uniquePart}`,
+                email,
+                password,
+                phone: '0000000000'
+            });
+
+        if (registerRes.statusCode === 201 && registerRes.body && registerRes.body.token) {
+            return registerRes.body.token;
+        }
+
+        const loginRes = await request(server)
+            .post('/login')
+            .send({ email, password });
+
+        if (loginRes.statusCode === 200 && loginRes.body && loginRes.body.token) {
+            return loginRes.body.token;
+        }
+
+        throw new Error(`Unable to create auth token. Register status: ${registerRes.statusCode}, login status: ${loginRes.statusCode}`);
+    }
+
     afterAll(async () => {
         // Keep connection alive for graceful shutdown
     });
@@ -134,6 +163,37 @@ describe('LogiWare Backend Tests', () => {
                     password: 'test'
                 });
             expect(res.type).toContain('json');
+        });
+
+        test('POST /login - should return documented error message for bad credentials', async () => {
+            const res = await request(server)
+                .post('/login')
+                .send({
+                    email: 'does-not-exist@example.com',
+                    password: 'wrongpassword'
+                });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Wrong username or password');
+        });
+    });
+
+    describe('Authentication Contract Details', () => {
+        test('GET /oneuser - should return 401 and jwt message when Authorization header is missing', async () => {
+            const res = await request(server).get('/oneuser');
+
+            expect(res.statusCode).toBe(401);
+            expect(res.body).toHaveProperty('message');
+            expect(String(res.body.message)).toContain('jwt must be provided');
+        });
+
+        test('GET /oneuser - should reject invalid token with 401', async () => {
+            const res = await request(server)
+                .get('/oneuser')
+                .set('Authorization', 'invalid-token-value');
+
+            expect(res.statusCode).toBe(401);
+            expect(res.body).toHaveProperty('message');
         });
     });
 
