@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { apiFetch } from '../../utils/api'
+import { apiFetch, isAbortError } from '../../utils/api'
 import BadgeIcon from '../ui/BadgeIcon.jsx'
 
 function collectOrderItems(order) {
@@ -22,7 +22,7 @@ function Dashboard({ userInfo, onNavigate }) {
         const data = await apiFetch('/order', { signal: controller.signal })
         setRows(Array.isArray(data) ? data : [])
       } catch (error) {
-        if (error?.name !== 'AbortError') {
+        if (!isAbortError(error)) {
           setRows([])
         }
       }

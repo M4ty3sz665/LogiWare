@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { apiFetch } from '../../utils/api'
+import { apiFetch, isAbortError } from '../../utils/api'
 
 function downloadCsv(filename, rows) {
   const esc = (v) => `"${String(v ?? '').replaceAll('"', '""')}"`
@@ -39,7 +39,7 @@ function Stock() {
         setRows(Array.isArray(stockData) ? stockData : [])
         setProducts(Array.isArray(productsData) ? productsData : [])
       } catch (e) {
-        if (e?.name !== 'AbortError') {
+        if (!isAbortError(e)) {
           setError(e?.message || 'Nem sikerült betölteni a raktár adatokat.')
         }
       } finally {

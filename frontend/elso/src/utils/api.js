@@ -7,6 +7,13 @@ export class ApiError extends Error {
   }
 }
 
+export function isAbortError(error) {
+  return (
+    error?.name === 'AbortError' ||
+    (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'AbortError')
+  )
+}
+
 function getToken() {
   return localStorage.getItem('token')
 }

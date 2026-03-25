@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { apiFetch } from '../../utils/api'
+import { apiFetch, isAbortError } from '../../utils/api'
 
 const HUF = new Intl.NumberFormat('hu-HU', {
   style: 'currency',
@@ -38,7 +38,7 @@ function Cart() {
         const data = await apiFetch('/order', { signal: controller.signal })
         setRows(Array.isArray(data) ? data : [])
       } catch (e) {
-        if (e?.name !== 'AbortError') {
+        if (!isAbortError(e)) {
           setError(e?.message || 'Nem sikerült betölteni a kosarat.')
         }
       } finally {

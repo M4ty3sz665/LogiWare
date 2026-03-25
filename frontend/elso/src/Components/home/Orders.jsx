@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { apiFetch } from '../../utils/api'
+import { apiFetch, isAbortError } from '../../utils/api'
 import { useToast } from '../ToastProvider.jsx'
 import { SkeletonTable } from '../ui/Skeleton.jsx'
 
@@ -26,7 +26,7 @@ function Orders() {
       const data = await apiFetch('/order', { signal })
       setRows(Array.isArray(data) ? data : [])
     } catch (e) {
-      if (e?.name !== 'AbortError') {
+      if (!isAbortError(e)) {
         setError(e?.message || 'Nem sikerült betölteni a rendeléseket.')
       }
     } finally {

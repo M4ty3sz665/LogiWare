@@ -1,6 +1,6 @@
 
 import { useEffect, useMemo, useState } from 'react'
-import { apiFetch } from '../../utils/api'
+import { apiFetch, isAbortError } from '../../utils/api'
 import BadgeIcon from '../ui/BadgeIcon.jsx'
 import { useToast } from '../ToastProvider.jsx'
 
@@ -49,7 +49,7 @@ function Products() {
         setProducts(Array.isArray(productsData) ? productsData : [])
         setSuppliers(Array.isArray(suppliersData) ? suppliersData : [])
       } catch (e) {
-        if (e?.name !== 'AbortError') {
+        if (!isAbortError(e)) {
           setError(e?.message || 'Nem sikerült betölteni az árukat.')
         }
       } finally {

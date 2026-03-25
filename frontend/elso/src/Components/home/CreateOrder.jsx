@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { apiFetch } from '../../utils/api'
+import { apiFetch, isAbortError } from '../../utils/api'
 import { useToast } from '../ToastProvider.jsx'
 
 const HUF = new Intl.NumberFormat('hu-HU', {
@@ -53,7 +53,7 @@ function CreateOrder() {
         setProducts(Array.isArray(p) ? p : [])
         setStock(Array.isArray(s) ? s : [])
       } catch (e) {
-        if (e?.name !== 'AbortError') {
+        if (!isAbortError(e)) {
           setError(e?.message || 'Nem sikerült betölteni az adatokat.')
         }
       } finally {
