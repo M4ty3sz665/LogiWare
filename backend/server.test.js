@@ -439,6 +439,52 @@ describe('LogiWare Backend Tests', () => {
             expect(res.body).toHaveProperty('message');
         });
 
+        test('POST /order - should return 400 when payment_method is missing', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .post('/order')
+                .set('Authorization', token)
+                .send({
+                    due_date: '2099-01-01',
+                    items: [{ product_id: 1, amount: 1 }]
+                });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Missing payment_method');
+        });
+
+        test('POST /order - should return 400 when due_date is missing', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .post('/order')
+                .set('Authorization', token)
+                .send({
+                    payment_method: 'card',
+                    items: [{ product_id: 1, amount: 1 }]
+                });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Missing due_date');
+        });
+
+        test('POST /order - should return 400 when items array is empty', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .post('/order')
+                .set('Authorization', token)
+                .send({
+                    payment_method: 'card',
+                    due_date: '2099-01-01',
+                    items: []
+                });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Missing items');
+        });
+
         test('PUT /order/:id/payment - should return 404 for unknown order when authenticated', async () => {
             const token = await createAuthToken();
 
