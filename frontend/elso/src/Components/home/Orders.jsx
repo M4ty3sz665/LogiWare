@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { apiFetch, isAbortError } from '../../utils/api'
 import { useToast } from '../ToastProvider.jsx'
 import { SkeletonTable } from '../ui/Skeleton.jsx'
+import { TableEmptyRow } from '../ui/StateBlocks.jsx'
+import { BTN_DANGER } from '../ui/buttonStyles.js'
 
 function badge(status) {
   const s = String(status || '').toUpperCase()
@@ -121,18 +123,8 @@ function Orders() {
           </thead>
 
           <tbody className="divide-y divide-gray-100 bg-white">
-            {loading ? (
-              <tr>
-                <td className="px-4 py-4 text-sm text-gray-600" colSpan={4}>
-                  Betöltés...
-                </td>
-              </tr>
-            ) : filtered.length === 0 ? (
-              <tr>
-                <td className="px-4 py-6 text-sm text-gray-600" colSpan={4}>
-                  Nincs rendelés.
-                </td>
-              </tr>
+            {filtered.length === 0 ? (
+              <TableEmptyRow colSpan={4} message="Nincs rendelés." />
             ) : (
               filtered.map((o) => (
                 <tr key={o.order_number} className="hover:bg-gray-50">
@@ -156,9 +148,9 @@ function Orders() {
                       type="button"
                       disabled={savingId === o.order_number}
                       onClick={() => cancelOrder(o.order_number)}
-                      className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                      className={BTN_DANGER}
                     >
-                      Lemondás
+                      {savingId === o.order_number ? 'Mentés...' : 'Lemondás'}
                     </button>
                   </td>
                 </tr>

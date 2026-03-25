@@ -3,6 +3,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { apiFetch, isAbortError } from '../../utils/api'
 import BadgeIcon from '../ui/BadgeIcon.jsx'
 import { useToast } from '../ToastProvider.jsx'
+import { SkeletonTable } from '../ui/Skeleton.jsx'
+import { TableEmptyRow } from '../ui/StateBlocks.jsx'
+import { BTN_DANGER, BTN_GHOST, BTN_NEUTRAL, BTN_PRIMARY } from '../ui/buttonStyles.js'
 
 function money(value) {
   if (value == null || value === '') return '-'
@@ -225,7 +228,7 @@ function Products() {
           <button
             type="button"
             onClick={openCreate}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition"
+            className={BTN_PRIMARY}
           >
             <BadgeIcon icon="create" tone="cyan" size="sm" />
             <span>Új áru</span>
@@ -240,6 +243,9 @@ function Products() {
       )}
 
       <div className="mt-5 overflow-x-auto rounded-xl border border-gray-200">
+        {loading ? (
+          <SkeletonTable rows={6} cols={9} />
+        ) : (
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -274,18 +280,8 @@ function Products() {
           </thead>
 
           <tbody className="divide-y divide-gray-100 bg-white">
-            {loading ? (
-              <tr>
-                <td className="px-4 py-4 text-sm text-gray-600" colSpan={9}>
-                  Betöltés...
-                </td>
-              </tr>
-            ) : filtered.length === 0 ? (
-              <tr>
-                <td className="px-4 py-6 text-sm text-gray-600" colSpan={9}>
-                  Nincs megjeleníthető áru.
-                </td>
-              </tr>
+            {filtered.length === 0 ? (
+              <TableEmptyRow colSpan={9} message="Nincs megjeleníthető áru." />
             ) : (
               filtered.map((p) => (
                 <tr key={p.key} className="hover:bg-gray-50">
@@ -325,14 +321,14 @@ function Products() {
                       <button
                         type="button"
                         onClick={() => openEdit(p.productId)}
-                        className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 transition"
+                        className={BTN_NEUTRAL}
                       >
                         Szerk
                       </button>
                       <button
                         type="button"
                         onClick={() => deleteProduct(p.productId)}
-                        className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700 transition"
+                        className={BTN_DANGER}
                       >
                         Töröl
                       </button>
@@ -343,6 +339,7 @@ function Products() {
             )}
           </tbody>
         </table>
+        )}
       </div>
 
       {showForm && (
@@ -360,7 +357,7 @@ function Products() {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
+                className={BTN_GHOST}
               >
                 ✕
               </button>
@@ -456,14 +453,14 @@ function Products() {
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
+                  className={BTN_GHOST}
                 >
                   Mégse
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  className={BTN_PRIMARY}
                 >
                   {saving ? 'Mentés...' : 'Mentés'}
                 </button>

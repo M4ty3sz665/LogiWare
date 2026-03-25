@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { apiFetch, isAbortError } from '../../utils/api'
 import { useToast } from '../ToastProvider.jsx'
+import { EmptyState } from '../ui/StateBlocks.jsx'
+import { BTN_DARK_PILL, BTN_PRIMARY_PILL } from '../ui/buttonStyles.js'
 
 const HUF = new Intl.NumberFormat('hu-HU', {
   style: 'currency',
@@ -287,7 +289,7 @@ function CreateOrder() {
                         type="button"
                         onClick={() => addOne(item.id)}
                         disabled={item.available <= 0}
-                        className="rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 transition"
+                        className="rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 transition disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
                       >
                         hozzáad
                       </button>
@@ -296,9 +298,7 @@ function CreateOrder() {
                 ))}
 
                 {filteredStock.length === 0 && (
-                  <div className="rounded-lg bg-white px-3 py-3 text-sm text-gray-600">
-                    Nincs találat.
-                  </div>
+                  <EmptyState className="rounded-lg border-none bg-white px-3 py-3" message="Nincs találat." />
                 )}
               </div>
             </div>
@@ -348,9 +348,7 @@ function CreateOrder() {
                 ))}
 
                 {orderItems.length === 0 && (
-                  <div className="rounded-lg bg-white px-3 py-6 text-center text-sm text-gray-600">
-                    Még nincs tétel a kosárban.
-                  </div>
+                  <EmptyState className="rounded-lg border-none bg-white px-3 py-6" message="Még nincs tétel a kosárban." />
                 )}
               </div>
             </div>
@@ -370,7 +368,7 @@ function CreateOrder() {
               type="button"
               onClick={handleSaveDraftCsv}
               disabled={orderItems.length === 0 || loading}
-              className="inline-flex items-center justify-center rounded-full bg-gray-900 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              className={BTN_DARK_PILL}
             >
               CSV mentés (piszkozat)
             </button>
@@ -378,7 +376,7 @@ function CreateOrder() {
               type="button"
               onClick={handleFinalizeOrder}
               disabled={orderItems.length === 0 || isSubmitting || loading}
-              className="sm:ml-6 inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              className={`sm:ml-6 ${BTN_PRIMARY_PILL}`}
             >
               {isSubmitting ? 'Véglegesítés...' : 'Rendelés véglegesítése'}
             </button>

@@ -7,6 +7,7 @@ import Profile from './home/Profile.jsx'
 import Orders from './home/Orders.jsx'
 import { apiFetch } from '../utils/api'
 import BadgeIcon from './ui/BadgeIcon.jsx'
+import { BTN_DANGER } from './ui/buttonStyles.js'
 
 function HomePage({ onLogout }) {
   const [userInfo, setUserInfo] = useState(null)
@@ -125,8 +126,8 @@ function HomePage({ onLogout }) {
             onClick={() => selectMenu('dashboard')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'dashboard'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-300 hover:bg-slate-700'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white ring-1 ring-blue-300/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_20px_rgba(30,64,175,0.35)]'
+                : 'text-gray-300 hover:bg-slate-700 hover:text-white'
             }`}
           >
             <span className="inline-flex items-center gap-3">
@@ -138,8 +139,8 @@ function HomePage({ onLogout }) {
             onClick={() => selectMenu('create-order')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'create-order'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-300 hover:bg-slate-700'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white ring-1 ring-blue-300/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_20px_rgba(30,64,175,0.35)]'
+                : 'text-gray-300 hover:bg-slate-700 hover:text-white'
             }`}
           >
             <span className="inline-flex items-center gap-3">
@@ -151,8 +152,8 @@ function HomePage({ onLogout }) {
             onClick={() => selectMenu('orders')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'orders'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-300 hover:bg-slate-700'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white ring-1 ring-blue-300/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_20px_rgba(30,64,175,0.35)]'
+                : 'text-gray-300 hover:bg-slate-700 hover:text-white'
             }`}
           >
             <span className="inline-flex items-center gap-3">
@@ -164,8 +165,8 @@ function HomePage({ onLogout }) {
             onClick={() => selectMenu('stock')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'stock'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-300 hover:bg-slate-700'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white ring-1 ring-blue-300/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_20px_rgba(30,64,175,0.35)]'
+                : 'text-gray-300 hover:bg-slate-700 hover:text-white'
             }`}
           >
             <span className="inline-flex items-center gap-3">
@@ -177,8 +178,8 @@ function HomePage({ onLogout }) {
             onClick={() => selectMenu('cart')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'cart'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-300 hover:bg-slate-700'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white ring-1 ring-blue-300/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_20px_rgba(30,64,175,0.35)]'
+                : 'text-gray-300 hover:bg-slate-700 hover:text-white'
             }`}
           >
             <span className="inline-flex items-center gap-3">
@@ -190,8 +191,8 @@ function HomePage({ onLogout }) {
             onClick={() => selectMenu('profile')}
             className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
               activeMenu === 'profile'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-300 hover:bg-slate-700'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white ring-1 ring-blue-300/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_20px_rgba(30,64,175,0.35)]'
+                : 'text-gray-300 hover:bg-slate-700 hover:text-white'
             }`}
           >
             <span className="inline-flex items-center gap-3">
@@ -204,7 +205,7 @@ function HomePage({ onLogout }) {
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700 w-64">
           <button
             onClick={handleLogout}
-            className="w-full inline-flex items-center justify-center gap-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium"
+            className={`w-full ${BTN_DANGER}`}
           >
             <BadgeIcon icon="logout" tone="rose" size="sm" />
             <span>Kijelentkezés</span>

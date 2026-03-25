@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { apiFetch, isAbortError } from '../../utils/api'
+import { EmptyState, LoadingState } from '../ui/StateBlocks.jsx'
+import { BTN_OUTLINE_ICON } from '../ui/buttonStyles.js'
 
 const HUF = new Intl.NumberFormat('hu-HU', {
   style: 'currency',
@@ -94,13 +96,9 @@ function Cart() {
 
       <div className="mt-5 space-y-4">
         {loading ? (
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-600">
-            Betöltés...
-          </div>
+          <LoadingState message="Kosár betöltése..." />
         ) : orders.length === 0 ? (
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-600">
-            Még nincs rendelés a kosár összegzéshez.
-          </div>
+          <EmptyState message="Még nincs rendelés a kosár összegzéshez." />
         ) : (
           orders.map((order) => (
             <article key={order.order_number} className="rounded-xl border border-gray-200 bg-gray-50/40 p-4">
@@ -118,7 +116,7 @@ function Cart() {
                   <button
                     type="button"
                     onClick={() => toggleExpanded(order.order_number)}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition"
+                    className={BTN_OUTLINE_ICON}
                     aria-label={isExpanded(order.order_number) ? 'Termékek elrejtése' : 'Termékek megjelenítése'}
                     title={isExpanded(order.order_number) ? 'Termékek elrejtése' : 'Termékek megjelenítése'}
                   >

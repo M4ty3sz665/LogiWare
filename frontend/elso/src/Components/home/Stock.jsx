@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { apiFetch, isAbortError } from '../../utils/api'
+import { SkeletonTable } from '../ui/Skeleton.jsx'
+import { TableEmptyRow } from '../ui/StateBlocks.jsx'
+import { BTN_NEUTRAL } from '../ui/buttonStyles.js'
 
 function downloadCsv(filename, rows) {
   const esc = (v) => `"${String(v ?? '').replaceAll('"', '""')}"`
@@ -157,13 +160,16 @@ function Stock() {
                 ...summaryRows.map((r) => [r.id, r.name, r.code, r.amount, r.low]),
               ])
             }
-            className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 transition"
+            className={BTN_NEUTRAL}
           >
             CSV export
           </button>
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-gray-200">
+          {loading ? (
+            <SkeletonTable rows={6} cols={4} />
+          ) : (
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -182,18 +188,8 @@ function Stock() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 bg-white">
-              {loading ? (
-                <tr>
-                  <td className="px-4 py-4 text-sm text-gray-600" colSpan={4}>
-                    Betöltés...
-                  </td>
-                </tr>
-              ) : summaryRows.length === 0 ? (
-                <tr>
-                  <td className="px-4 py-6 text-sm text-gray-600" colSpan={4}>
-                    Nincs megjeleníthető sor.
-                  </td>
-                </tr>
+              {summaryRows.length === 0 ? (
+                <TableEmptyRow colSpan={4} message="Nincs megjeleníthető sor." />
               ) : (
                 summaryRows.map((r) => (
                   <tr key={r.id} className="hover:bg-gray-50">
@@ -217,6 +213,7 @@ function Stock() {
               )}
             </tbody>
           </table>
+          )}
         </div>
       </div>
     </div>
