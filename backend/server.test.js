@@ -195,6 +195,37 @@ describe('LogiWare Backend Tests', () => {
             expect(res.statusCode).toBe(401);
             expect(res.body).toHaveProperty('message');
         });
+
+        test('GET /profiles - should return 401 without token', async () => {
+            const res = await request(server).get('/profiles');
+
+            expect(res.statusCode).toBe(401);
+            expect(res.body).toHaveProperty('message');
+            expect(String(res.body.message)).toContain('jwt must be provided');
+        });
+
+        test('GET /profiles - should return 200 and an array for authenticated request', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .get('/profiles')
+                .set('Authorization', token);
+
+            expect(res.statusCode).toBe(200);
+            expect(Array.isArray(res.body)).toBe(true);
+        });
+
+        test('GET /oneuser - should return current user object for authenticated request', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .get('/oneuser')
+                .set('Authorization', token);
+
+            expect(res.statusCode).toBe(200);
+            expect(res.body).toHaveProperty('id');
+            expect(res.body).toHaveProperty('email');
+        });
     });
 
     describe('Authentication - Register', () => {
