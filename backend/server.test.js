@@ -678,6 +678,50 @@ describe('LogiWare Backend Tests', () => {
         });
     });
 
+    describe('Input Validation - User Password', () => {
+        test('PUT /oneuser/password - should require currentPassword and newPassword fields', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .put('/oneuser/password')
+                .set('Authorization', token)
+                .send({});
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Missing currentPassword or newPassword');
+        });
+
+        test('PUT /oneuser/password - should reject short new password', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .put('/oneuser/password')
+                .set('Authorization', token)
+                .send({
+                    currentPassword: 'password123',
+                    newPassword: '123'
+                });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Password must be at least 6 characters');
+        });
+
+        test('PUT /oneuser/password - should reject incorrect current password', async () => {
+            const token = await createAuthToken();
+
+            const res = await request(server)
+                .put('/oneuser/password')
+                .set('Authorization', token)
+                .send({
+                    currentPassword: 'wrong-current-password',
+                    newPassword: 'newpass123'
+                });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Wrong current password');
+        });
+    });
+
     describe('Edge Cases - Large Data', () => {
         test('POST /product - should handle very long product name', async () => {
             const longName = 'A'.repeat(1000);
