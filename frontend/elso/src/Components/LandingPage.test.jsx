@@ -1,13 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import LandingPage from './LandingPage'
 
-// LandingPage uses plain <a> links, no router dependency needed
-
-// --- render tests ---
-
 test('renders LogiWare brand name', () => {
   render(<LandingPage />)
-  // brand name appears both in header and hero
   expect(screen.getAllByText('LogiWare').length).toBeGreaterThanOrEqual(1)
 })
 

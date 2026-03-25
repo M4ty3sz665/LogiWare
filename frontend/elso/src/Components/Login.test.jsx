@@ -21,8 +21,6 @@ beforeEach(() => {
   localStorage.clear()
 })
 
-// --- render tests ---
-
 test('renders LogiWare heading', () => {
   renderLogin()
   expect(screen.getByText('LogiWare')).toBeInTheDocument()
@@ -53,16 +51,12 @@ test('renders Regisztráció navigation button', () => {
   expect(screen.getByRole('button', { name: /regisztráció/i })).toBeInTheDocument()
 })
 
-// --- validation tests ---
-
 test('shows empty-field error when form submitted with empty fields', async () => {
   renderLogin()
   fireEvent.click(screen.getByRole('button', { name: /belépés/i }))
   expect(await screen.findByText('Kérlek tölts ki minden mezőt.')).toBeInTheDocument()
 })
 
-// 'user@localhost' passes HTML5 type=email constraint (single-label domain allowed by spec)
-// but fails the custom validateEmail regex (requires a dot in domain)
 test('shows invalid email error when email format is wrong', async () => {
   const { container } = renderLogin()
   fireEvent.change(screen.getByLabelText(/e-mail/i), { target: { value: 'user@localhost' } })
@@ -80,8 +74,6 @@ test('error disappears when user starts typing after error', async () => {
     expect(screen.queryByText('Kérlek tölts ki minden mezőt.')).not.toBeInTheDocument()
   )
 })
-
-// --- submit / API interaction tests ---
 
 test('calls apiLogin with email and password on valid submit', async () => {
   const mockLogin = vi.spyOn(auth, 'login').mockResolvedValue({ token: 'tok123' })
@@ -121,7 +113,7 @@ test('shows API error message on failed login', async () => {
 })
 
 test('button shows Bejelentkezés... while submitting', async () => {
-  vi.spyOn(auth, 'login').mockImplementation(() => new Promise(() => {})) // never resolves
+  vi.spyOn(auth, 'login').mockImplementation(() => new Promise(() => {}))
   renderLogin()
   fireEvent.change(screen.getByLabelText(/e-mail/i), { target: { value: 'user@test.com' } })
   fireEvent.change(screen.getByLabelText(/jelszó/i), { target: { value: 'pass123' } })

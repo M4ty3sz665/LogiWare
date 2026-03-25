@@ -4,8 +4,7 @@ const dbHandler = require('./dbHandler');
 
 describe('LogiWare Backend Tests', () => {
     beforeAll(async () => {
-        // Database should already be synced by server startup
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for server startup
+        await new Promise(resolve => setTimeout(resolve, 2000));
     });
 
     async function createAuthToken() {
@@ -38,7 +37,6 @@ describe('LogiWare Backend Tests', () => {
     }
 
     afterAll(async () => {
-        // Keep connection alive for graceful shutdown
     });
 
     describe('Server Configuration', () => {
@@ -278,7 +276,6 @@ describe('LogiWare Backend Tests', () => {
         });
 
         test('POST /register - should handle duplicate username', async () => {
-            // First registration
             await request(server)
                 .post('/register')
                 .send({
@@ -287,7 +284,6 @@ describe('LogiWare Backend Tests', () => {
                     password: 'password123'
                 });
 
-            // Second registration with same name - should fail
             const res = await request(server)
                 .post('/register')
                 .send({
@@ -296,7 +292,6 @@ describe('LogiWare Backend Tests', () => {
                     password: 'password123'
                 });
 
-            // Should return error status code
             expect([400, 500]).toContain(res.statusCode);
         });
     });
@@ -627,7 +622,6 @@ describe('LogiWare Backend Tests', () => {
                 const row = res.body[0];
                 expect(row).toHaveProperty('id');
                 expect(row).toHaveProperty('amount');
-                // normalized fields always present
                 expect(Object.prototype.hasOwnProperty.call(row, 'product_name')).toBe(true);
                 expect(Object.prototype.hasOwnProperty.call(row, 'missing_product')).toBe(true);
             }
@@ -917,10 +911,8 @@ describe('LogiWare Backend Tests', () => {
 
     describe('Order Status Transitions', () => {
         test('PUT /order/:id/status - COMPLETED->any should be rejected as final', async () => {
-            // This tests that once an order is final, further transitions return 400
             const token = await createAuthToken();
 
-            // Attempt transition on a very high-id order (won't exist) to get clean 404
             const res = await request(server)
                 .put('/order/999998/status')
                 .set('Authorization', token)
@@ -937,7 +929,6 @@ describe('LogiWare Backend Tests', () => {
                 .set('Authorization', token)
                 .send({ status: 'COMPLETED' });
 
-            // either 404 (no order) or 400 (invalid transition)
             expect([400, 404]).toContain(res.statusCode);
         });
 

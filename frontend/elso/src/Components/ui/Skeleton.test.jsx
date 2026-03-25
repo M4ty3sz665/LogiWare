@@ -18,14 +18,12 @@ test('SkeletonLine applies custom className', () => {
 test('SkeletonTable renders default rows and cols', () => {
   const { container } = render(<SkeletonTable />)
   const lines = container.querySelectorAll('div[aria-hidden="true"]')
-  // default: 5 header lines + (6 rows * 5 cols) body lines = 35
   expect(lines.length).toBe(35)
 })
 
 test('SkeletonTable renders custom rows and cols', () => {
   const { container } = render(<SkeletonTable rows={2} cols={3} />)
   const lines = container.querySelectorAll('div[aria-hidden="true"]')
-  // custom: 3 header lines + (2 rows * 3 cols) body lines = 9
   expect(lines.length).toBe(9)
 })
 

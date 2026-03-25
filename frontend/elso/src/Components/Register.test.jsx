@@ -29,8 +29,6 @@ beforeEach(() => {
   localStorage.clear()
 })
 
-// --- render tests ---
-
 test('renders LogiWare heading', () => {
   renderRegister()
   expect(screen.getByText('LogiWare')).toBeInTheDocument()
@@ -59,8 +57,6 @@ test('renders Bejelentkezés navigation button', () => {
   renderRegister()
   expect(screen.getByRole('button', { name: /bejelentkezés/i })).toBeInTheDocument()
 })
-
-// --- validation tests ---
 
 test('shows empty-field error when form submitted empty', async () => {
   const { container } = renderRegister()
@@ -95,8 +91,6 @@ test('error disappears when user starts typing after error', async () => {
     expect(screen.queryByText('Kérlek tölts ki minden mezőt.')).not.toBeInTheDocument()
   )
 })
-
-// --- submit / API interaction tests ---
 
 test('calls apiRegister with all fields on valid submit', async () => {
   const mockRegister = vi.spyOn(auth, 'register').mockResolvedValue({ token: 'tok123' })

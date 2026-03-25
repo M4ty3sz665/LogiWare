@@ -1,6 +1,0 @@
-A következő fájlok törlendők, mert duplikáltak vagy nem használtak:
-- src/Login.jsx
-- src/Register.jsx
-- src/HomePage.jsx
-
-A fő komponensek a Components mappában vannak, ezekre nincs szükség a src gyökérben.
