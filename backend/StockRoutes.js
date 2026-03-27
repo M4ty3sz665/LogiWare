@@ -108,7 +108,6 @@ module.exports = function (server) {
     const created = await dbHandler.Stock.create({
       item_id: req.body.item_id,
       amount: req.body.amount,
-      created_at: req.body.created_at,
     })
     res.status(201).json({ message: 'stock successfully added', stock: created }).end()
   })

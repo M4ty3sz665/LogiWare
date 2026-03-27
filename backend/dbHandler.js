@@ -120,10 +120,6 @@ const order = sequelize.define('order', {
 		type: DataTypes.INTEGER,
 		allowNull: false
 	},
-	created_at: {
-		type: DataTypes.DATE,
-        defaultValue:DataTypes.NOW
-	},
     order_number:{
         type:DataTypes.INTEGER,
 		primaryKey:true,
@@ -196,10 +192,7 @@ const stock = sequelize.define('stock', {
 		type: DataTypes.INTEGER,
 		defaultValue: 1
 	},
-	created_at:{
-    type:DataTypes.DATEONLY,
-    defaultValue:DataTypes.NOW
-    }
+	
 	
 })
 
@@ -221,10 +214,6 @@ const receipt = sequelize.define('receipt', {
     status:{
         type:DataTypes.STRING,
         allowNull:false
-    },
-    created_at:{
-        type:DataTypes.DATEONLY,
-        defaultValue:DataTypes.NOW
     },
     total_net:{
         type:DataTypes.INTEGER
