@@ -75,11 +75,6 @@ const product = sequelize.define('product', {
     supplier_id:{
         type:DataTypes.INTEGER,
         allowNull:true
-		},
-		low_stock_threshold: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-			defaultValue: 0
     }
 })
 

@@ -820,11 +820,6 @@ describe('LogiWare Backend Tests', () => {
             expect([200, 400, 500]).toContain(res.statusCode);
         });
 
-        test('GET /stock?low_stock=true - should filter low stock items', async () => {
-            const res = await request(server).get('/stock?low_stock=true');
-            expect([200, 400, 500]).toContain(res.statusCode);
-        });
-
         test('GET /order?status=pending - should filter orders by status', async () => {
             const res = await request(server).get('/order?status=pending');
             expect([200, 400, 401, 500]).toContain(res.statusCode);

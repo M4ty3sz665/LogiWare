@@ -25,7 +25,6 @@ function Stock() {
 
   const [onlyNegative, setOnlyNegative] = useState(false)
   const [onlyZero, setOnlyZero] = useState(false)
-  const [onlyLow, setOnlyLow] = useState(false)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -67,14 +66,11 @@ function Stock() {
   const summaryRows = useMemo(() => {
     const list = (products || []).map((p) => {
       const amount = stockByItemId.get(p.id) || 0
-      const low = Number(p.low_stock_threshold || 0)
       return {
         id: p.id,
         name: p.name,
         code: p.product_code,
         amount,
-        low,
-        isLow: low > 0 && amount <= low,
       }
     })
 
@@ -82,7 +78,6 @@ function Stock() {
     const out = list.filter((r) => {
       if (onlyNegative && r.amount >= 0) return false
       if (onlyZero && r.amount !== 0) return false
-      if (onlyLow && !r.isLow) return false
       if (!q) return true
       return (
         String(r.id).includes(q) ||
@@ -92,7 +87,7 @@ function Stock() {
     })
     out.sort((a, b) => String(a.name).localeCompare(String(b.name), 'hu'))
     return out
-  }, [products, stockByItemId, query, onlyNegative, onlyZero, onlyLow])
+  }, [products, stockByItemId, query, onlyNegative, onlyZero])
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
@@ -142,22 +137,13 @@ function Stock() {
               />
               csak 0
             </label>
-            <label className="inline-flex items-center gap-2 text-sm text-gray-700">
-              <input
-                type="checkbox"
-                checked={onlyLow}
-                onChange={(e) => setOnlyLow(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              csak low
-            </label>
           </div>
           <button
             type="button"
             onClick={() =>
               downloadCsv('stock-summary.csv', [
-                ['product_id', 'name', 'code', 'amount', 'low_threshold'],
-                ...summaryRows.map((r) => [r.id, r.name, r.code, r.amount, r.low]),
+                ['product_id', 'name', 'code', 'amount'],
+                ...summaryRows.map((r) => [r.id, r.name, r.code, r.amount]),
               ])
             }
             className={BTN_NEUTRAL}
@@ -168,7 +154,7 @@ function Stock() {
 
         <div className="overflow-x-auto rounded-xl border border-gray-200">
           {loading ? (
-            <SkeletonTable rows={6} cols={4} />
+            <SkeletonTable rows={6} cols={3} />
           ) : (
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -182,31 +168,20 @@ function Stock() {
                 <th className="px-4 py-3 text-right text-xs font-semibold tracking-wider text-gray-600">
                   Készlet
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-semibold tracking-wider text-gray-600">
-                  Low
-                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 bg-white">
               {summaryRows.length === 0 ? (
-                <TableEmptyRow colSpan={4} message="Nincs megjeleníthető sor." />
+                <TableEmptyRow colSpan={3} message="Nincs megjeleníthető sor." />
               ) : (
                 summaryRows.map((r) => (
                   <tr key={r.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm font-medium text-gray-900">
                       {r.name}
-                      {r.isLow && (
-                        <span className="ml-2 inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700 ring-1 ring-red-200">
-                          alacsony
-                        </span>
-                      )}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">{r.code || '-'}</td>
-                    <td className={`px-4 py-3 text-sm font-semibold text-right tabular-nums ${r.isLow ? 'text-red-700' : 'text-gray-900'}`}>
+                    <td className="px-4 py-3 text-sm font-semibold text-right tabular-nums text-gray-900">
                       {r.amount}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-right tabular-nums text-gray-700">
-                      {r.low}
                     </td>
                   </tr>
                 ))

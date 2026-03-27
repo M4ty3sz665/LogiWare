@@ -34,7 +34,6 @@ function Products() {
     price_gross: '',
     vat_rate: '',
     supplier_id: '',
-    low_stock_threshold: '0',
   })
 
   useEffect(() => {
@@ -77,7 +76,6 @@ function Products() {
       name: p.name,
       code: p.product_code || '-',
       amount: 0, // nincs stockByItemId, default 0
-      low: Number(p.low_stock_threshold || 0),
       supplierName: supplierById.get(p.supplier_id)?.company_name || '-',
       price_net: p.price_net,
       price_gross: p.price_gross,
@@ -111,7 +109,6 @@ function Products() {
       price_gross: '',
       vat_rate: '',
       supplier_id: '',
-      low_stock_threshold: '0',
     })
     setShowForm(true)
   }
@@ -128,7 +125,6 @@ function Products() {
       price_gross: p.price_gross ?? '',
       vat_rate: p.vat_rate ?? '',
       supplier_id: p.supplier_id ?? '',
-      low_stock_threshold: String(p.low_stock_threshold ?? 0),
     })
     setShowForm(true)
   }
@@ -150,15 +146,10 @@ function Products() {
       price_gross: Number(form.price_gross),
       vat_rate: Number(form.vat_rate),
       supplier_id: form.supplier_id === '' ? null : Number(form.supplier_id),
-      low_stock_threshold: Number(form.low_stock_threshold || 0),
     }
 
     if (!Number.isFinite(payload.price_net) || !Number.isFinite(payload.price_gross) || !Number.isFinite(payload.vat_rate)) {
       setFormError('Árak és ÁFA csak szám lehet.')
-      return
-    }
-    if (!Number.isFinite(payload.low_stock_threshold) || payload.low_stock_threshold < 0) {
-      setFormError('Low-stock küszöb legyen 0 vagy nagyobb.')
       return
     }
 
@@ -244,7 +235,7 @@ function Products() {
 
       <div className="mt-5 overflow-x-auto rounded-xl border border-gray-200">
         {loading ? (
-          <SkeletonTable rows={6} cols={9} />
+          <SkeletonTable rows={6} cols={8} />
         ) : (
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -271,9 +262,6 @@ function Products() {
                 Készlet
               </th>
               <th className="px-4 py-3 text-right text-xs font-semibold tracking-wider text-gray-600">
-                Low
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold tracking-wider text-gray-600">
                 Művelet
               </th>
             </tr>
@@ -281,7 +269,7 @@ function Products() {
 
           <tbody className="divide-y divide-gray-100 bg-white">
             {filtered.length === 0 ? (
-              <TableEmptyRow colSpan={9} message="Nincs megjeleníthető áru." />
+              <TableEmptyRow colSpan={8} message="Nincs megjeleníthető áru." />
             ) : (
               filtered.map((p) => (
                 <tr key={p.key} className="hover:bg-gray-50">
@@ -301,20 +289,8 @@ function Products() {
                   <td className="px-4 py-3 text-sm text-gray-700 text-right tabular-nums">
                     {p.vat_rate ?? '-'}
                   </td>
-                  <td
-                    className={`px-4 py-3 text-sm font-semibold text-right tabular-nums ${
-                      p.low > 0 && p.amount <= p.low ? 'text-red-700' : 'text-gray-900'
-                    }`}
-                  >
+                  <td className="px-4 py-3 text-sm font-semibold text-right tabular-nums text-gray-900">
                     {p.amount}
-                    {p.low > 0 && p.amount <= p.low && (
-                      <span className="ml-2 inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700 ring-1 ring-red-200">
-                        alacsony
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 text-right tabular-nums">
-                    {p.low}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="inline-flex gap-2">
@@ -351,7 +327,7 @@ function Products() {
                   {editing ? 'Áru szerkesztése' : 'Új áru'}
                 </h4>
                 <p className="mt-1 text-sm text-gray-500">
-                  Név, kód, árak, ÁFA, beszállító, alacsony készlet küszöb.
+                  Név, kód, árak, ÁFA, beszállító.
                 </p>
               </div>
               <button
@@ -419,7 +395,7 @@ function Products() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Beszállító</label>
                   <select
@@ -434,18 +410,6 @@ function Products() {
                       </option>
                     ))}
                   </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Low-stock küszöb</label>
-                  <input
-                    inputMode="numeric"
-                    value={form.low_stock_threshold}
-                    onChange={(e) => setForm((f) => ({ ...f, low_stock_threshold: e.target.value }))}
-                    className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">
-                    Ha a készlet ≤ küszöb, pirossal jelöljük.
-                  </p>
                 </div>
               </div>
 
