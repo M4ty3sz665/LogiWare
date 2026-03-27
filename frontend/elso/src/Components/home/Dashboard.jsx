@@ -2,13 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { apiFetch, isAbortError } from '../../utils/api'
 import BadgeIcon from '../ui/BadgeIcon.jsx'
 
-function collectOrderItems(order) {
-  if (Array.isArray(order?.order_items)) return order.order_items
-  if (Array.isArray(order?.OrderItems)) return order.OrderItems
-  if (Array.isArray(order?.items)) return order.items
-  return []
-}
-
 const NUMBER = new Intl.NumberFormat('hu-HU')
 
 function Dashboard({ userInfo, onNavigate }) {
@@ -32,13 +25,14 @@ function Dashboard({ userInfo, onNavigate }) {
     return () => controller.abort()
   }, [])
 
-  const totalOrderedAmount = useMemo(() => {
-    return rows.reduce((orderSum, order) => {
-      const itemTotal = collectOrderItems(order).reduce((itemSum, item) => {
-        return itemSum + Number(item?.amount || 0)
-      }, 0)
-      return orderSum + itemTotal
-    }, 0)
+  const totalOrders = useMemo(() => {
+    const orderIds = new Set(
+      rows
+        .map((order) => order?.order_number ?? order?.id ?? null)
+        .filter((value) => value !== null && value !== undefined)
+    )
+
+    return orderIds.size
   }, [rows])
 
   if (!userInfo) return null
@@ -51,7 +45,7 @@ function Dashboard({ userInfo, onNavigate }) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm font-medium">Teljes Rendelések</p>
-              <p className="text-4xl font-bold text-gray-800 mt-2">{NUMBER.format(totalOrderedAmount)}</p>
+              <p className="text-4xl font-bold text-gray-800 mt-2">{NUMBER.format(totalOrders)}</p>
             </div>
             <BadgeIcon icon="orders" tone="amber" size="lg" />
           </div>

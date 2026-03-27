@@ -310,24 +310,57 @@ describe('LogiWare Backend Tests', () => {
             expect([200, 201, 400, 500]).toContain(res.statusCode);
         });
 
-        test('POST /register - should handle duplicate username', async () => {
-            await request(server)
+        test('POST /register - should allow duplicate username with different email', async () => {
+            const uniquePart = `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+            const firstRes = await request(server)
                 .post('/register')
                 .send({
                     name: 'duplicateuser',
-                    email: 'dup@test.com',
+                    email: `dup-${uniquePart}-1@test.com`,
+                    phone: '+36301111111',
                     password: 'password123'
                 });
+
+            expect(firstRes.statusCode).toBe(201);
 
             const res = await request(server)
                 .post('/register')
                 .send({
                     name: 'duplicateuser',
-                    email: 'dup2@test.com',
+                    email: `dup-${uniquePart}-2@test.com`,
+                    phone: '+36302222222',
                     password: 'password123'
                 });
 
-            expect([400, 500]).toContain(res.statusCode);
+            expect(res.statusCode).toBe(201);
+            expect(res.body).toHaveProperty('message', 'Successful registration');
+        });
+
+        test('POST /register - should handle duplicate email', async () => {
+            const uniqueEmail = `duplicate-email-${Date.now()}-${Math.floor(Math.random() * 100000)}@test.com`;
+
+            const firstRes = await request(server)
+                .post('/register')
+                .send({
+                    name: 'duplicateemailuser1',
+                    email: uniqueEmail,
+                    phone: '+36301234567',
+                    password: 'password123'
+                });
+
+            expect(firstRes.statusCode).toBe(201);
+
+            const res = await request(server)
+                .post('/register')
+                .send({
+                    name: 'duplicateemailuser2',
+                    email: uniqueEmail,
+                    phone: '+36307654321',
+                    password: 'password123'
+                });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'A user with this email already exists');
         });
     });
 

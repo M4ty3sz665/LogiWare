@@ -5,7 +5,7 @@ import Stock from './home/Stock.jsx'
 import Cart from './home/Cart.jsx'
 import Profile from './home/Profile.jsx'
 import Orders from './home/Orders.jsx'
-import { apiFetch } from '../utils/api'
+import { apiFetch, isAbortError } from '../utils/api'
 import BadgeIcon from './ui/BadgeIcon.jsx'
 import { BTN_DANGER } from './ui/buttonStyles.js'
 
@@ -16,29 +16,41 @@ function HomePage({ onLogout }) {
   const [activeMenu, setActiveMenu] = useState('dashboard')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const fetchUserInfo = useCallback(async () => {
-    try {
-      const data = await apiFetch('/oneuser')
-      setUserInfo(data)
-      setLoading(false)
-    } catch {
-      setError('Hiba az adatok betöltésénél')
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    queueMicrotask(() => {
-      fetchUserInfo()
-    })
-  }, [fetchUserInfo])
-
   const handleLogout = useCallback(() => {
     localStorage.removeItem('token')
     if (onLogout) {
       onLogout()
     }
   }, [onLogout])
+
+  const fetchUserInfo = useCallback(async (signal) => {
+    try {
+      setError('')
+      const data = await apiFetch('/oneuser', { signal })
+      setUserInfo(data)
+      setLoading(false)
+    } catch (err) {
+      if (isAbortError(err)) {
+        return
+      }
+      if (err?.status === 401 || err?.status === 403) {
+        handleLogout()
+        return
+      }
+      setError('Hiba az adatok betöltésénél')
+      setLoading(false)
+    }
+  }, [handleLogout])
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    queueMicrotask(() => {
+      fetchUserInfo(controller.signal)
+    })
+
+    return () => controller.abort()
+  }, [fetchUserInfo])
 
   useEffect(() => {
     const handler = () => handleLogout()
@@ -47,7 +59,7 @@ function HomePage({ onLogout }) {
   }, [handleLogout])
 
   const menuMeta = {
-    dashboard: { title: 'Dashboard', icon: 'dashboard', tone: 'indigo' },
+    dashboard: { title: 'Kezdő képernyő', icon: 'dashboard', tone: 'indigo' },
     'create-order': { title: 'Rendelés Létrehozása', icon: 'create', tone: 'cyan' },
     orders: { title: 'Rendelések', icon: 'orders', tone: 'amber' },
     stock: { title: 'Készletkezelés', icon: 'stock', tone: 'emerald' },
@@ -98,6 +110,16 @@ function HomePage({ onLogout }) {
     )
   }
 
+  if (error) {
+    return (
+      <div className="flex items-start justify-center min-h-screen bg-gray-50 p-4 pt-6 md:p-8">
+        <div className="w-full max-w-4xl rounded-2xl border border-red-300 bg-red-50 px-6 py-7 text-red-700 shadow-sm">
+          <p className="text-2xl font-medium">{error}</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
       {mobileMenuOpen && (
@@ -132,7 +154,7 @@ function HomePage({ onLogout }) {
           >
             <span className="inline-flex items-center gap-3">
               <BadgeIcon icon="dashboard" tone="indigo" size="sm" />
-              <span>Dashboard</span>
+              <span>Kezdő képernyő</span>
             </span>
           </button>
           <button

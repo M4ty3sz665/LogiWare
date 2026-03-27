@@ -20,13 +20,13 @@ module.exports = function(server) {
     })
 
     server.post("/register", async (req, res) => {
-    const user = await dbHandler.Users.findOne({
+    const userByEmail = await dbHandler.Users.findOne({
         where:{
-            name: req.body.name
+            email: req.body.email
         }
     })
-    if(user){
-        res.status(400).json({"message":"A user with this username already exists"}).end()
+    if(userByEmail){
+        res.status(400).json({"message":"A user with this email already exists"}).end()
     }
     else{
         const newUser = await dbHandler.Users.create({

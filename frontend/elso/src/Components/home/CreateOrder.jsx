@@ -15,6 +15,16 @@ function clampQty(n) {
   return Math.max(0, Math.min(999, n))
 }
 
+function getTomorrowIsoDate() {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  d.setDate(d.getDate() + 1)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 function downloadCsv(filename, rows) {
   const esc = (v) => `"${String(v ?? '').replaceAll('"', '""')}"`
   const csv = rows.map((r) => r.map(esc).join(',')).join('\n')
@@ -41,6 +51,8 @@ function CreateOrder() {
   const [paymentMethod, setPaymentMethod] = useState('cash')
   const [dueDate, setDueDate] = useState('')
   const [draftSavedAt, setDraftSavedAt] = useState('')
+
+  const minDueDate = useMemo(() => getTomorrowIsoDate(), [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -143,6 +155,10 @@ function CreateOrder() {
     }
     if (!dueDate) {
       toast.error('Adj meg teljesítési dátumot.')
+      return false
+    }
+    if (dueDate < minDueDate) {
+      toast.error('A teljesítési dátum minimum holnap lehet.')
       return false
     }
 
@@ -251,8 +267,10 @@ function CreateOrder() {
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
+                min={minDueDate}
                 className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              <p className="mt-1 text-xs text-gray-500">A múltbeli és mai dátum nem választható.</p>
             </div>
           </div>
         </div>
@@ -261,7 +279,7 @@ function CreateOrder() {
           <div className="mt-6 grid grid-cols-1 gap-6 lg:mt-0 lg:grid-cols-2">
             <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
               <div className="grid grid-cols-[1fr_auto] gap-3 border-b border-gray-200 pb-3">
-                <div className="text-xs font-bold tracking-wider text-gray-700">Kosár</div>
+                <div className="text-xs font-bold tracking-wider text-gray-700">Bolt</div>
                 <div className="text-xs font-bold tracking-wider text-gray-700">ÁR</div>
               </div>
 
