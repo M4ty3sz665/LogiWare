@@ -63,11 +63,18 @@ async function ensureSchema() {
     // keep current schema; we rely on defaultValue=0 in the model
   }
 
+  const orders = await qi.describeTable('orders')
+  if (!orders.user_id) {
+    await qi.addColumn('orders', 'user_id', {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    })
+  }
+
   // Legacy cleanup: remove old client-company schema artifacts.
   try {
     await dbHandler.sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
 
-    const orders = await qi.describeTable('orders')
     if (orders.company_id) {
       await qi.removeColumn('orders', 'company_id')
     }

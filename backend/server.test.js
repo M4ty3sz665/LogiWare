@@ -36,6 +36,41 @@ describe('LogiWare Backend Tests', () => {
         throw new Error(`Unable to create auth token. Register status: ${registerRes.statusCode}, login status: ${loginRes.statusCode}`);
     }
 
+    async function createOwnedOrder(token, overrides = {}) {
+        const productRes = await request(server).get('/product');
+        expect(productRes.statusCode).toBe(200);
+        expect(Array.isArray(productRes.body)).toBe(true);
+
+        let product = productRes.body[0];
+        if (!product) {
+            const uniquePart = `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+            product = await dbHandler.Products.create({
+                name: `order-test-product-${uniquePart}`,
+                price_net: 100,
+                price_gross: 127,
+                vat_rate: 27,
+                product_code: `OTP-${uniquePart}`,
+                supplier_id: null,
+            });
+        }
+
+        const payload = {
+            payment_method: 'card',
+            due_date: '2099-01-01',
+            items: [{ product_id: product.id, amount: 1 }],
+            ...overrides,
+        };
+
+        const createRes = await request(server)
+            .post('/order')
+            .set('Authorization', token)
+            .send(payload);
+
+        expect(createRes.statusCode).toBe(201);
+        expect(createRes.body).toHaveProperty('order_number');
+        return createRes.body.order_number;
+    }
+
     afterAll(async () => {
     });
 
@@ -534,6 +569,46 @@ describe('LogiWare Backend Tests', () => {
                     payment_status: 'processed',
                     payment_method: 'card'
                 });
+
+            expect(res.statusCode).toBe(404);
+            expect(res.body).toHaveProperty('message', 'No such order');
+        });
+
+        test('GET /order - should return only the authenticated user own orders', async () => {
+            const tokenA = await createAuthToken();
+            const tokenB = await createAuthToken();
+
+            const orderA = await createOwnedOrder(tokenA, { due_date: '2099-02-01' });
+            const orderB = await createOwnedOrder(tokenB, { due_date: '2099-02-02' });
+
+            const resA = await request(server)
+                .get('/order')
+                .set('Authorization', tokenA);
+
+            const resB = await request(server)
+                .get('/order')
+                .set('Authorization', tokenB);
+
+            expect(resA.statusCode).toBe(200);
+            expect(Array.isArray(resA.body)).toBe(true);
+            expect(resA.body.some((order) => order.order_number === orderA)).toBe(true);
+            expect(resA.body.some((order) => order.order_number === orderB)).toBe(false);
+
+            expect(resB.statusCode).toBe(200);
+            expect(Array.isArray(resB.body)).toBe(true);
+            expect(resB.body.some((order) => order.order_number === orderB)).toBe(true);
+            expect(resB.body.some((order) => order.order_number === orderA)).toBe(false);
+        });
+
+        test('PUT /order/:id/status - should return 404 for another user order', async () => {
+            const tokenA = await createAuthToken();
+            const tokenB = await createAuthToken();
+            const orderA = await createOwnedOrder(tokenA);
+
+            const res = await request(server)
+                .put(`/order/${orderA}/status`)
+                .set('Authorization', tokenB)
+                .send({ status: 'IN_PROGRESS' });
 
             expect(res.statusCode).toBe(404);
             expect(res.body).toHaveProperty('message', 'No such order');

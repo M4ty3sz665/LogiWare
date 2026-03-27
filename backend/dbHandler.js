@@ -75,11 +75,11 @@ const product = sequelize.define('product', {
     supplier_id:{
         type:DataTypes.INTEGER,
         allowNull:true
-    },
-    low_stock_threshold: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0
+		},
+		low_stock_threshold: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			defaultValue: 0
     }
 })
 
@@ -116,6 +116,10 @@ const orderItem = sequelize.define('order_item', {
 })
 
 const order = sequelize.define('order', {
+	user_id: {
+		type: DataTypes.INTEGER,
+		allowNull: true
+	},
 
 	item_id: {
 		type: DataTypes.INTEGER,
@@ -276,6 +280,9 @@ const supplier = sequelize.define('supplier', {
 })
 
 // Kapcsolatok definiálása
+user.hasMany(order, { foreignKey: 'user_id' })
+order.belongsTo(user, { foreignKey: 'user_id' })
+
 orderItem.belongsTo(product, { foreignKey: 'product_id' })
 product.hasMany(orderItem, { foreignKey: 'product_id' })
 
