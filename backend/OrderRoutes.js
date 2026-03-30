@@ -12,6 +12,24 @@ function normalizeStatus(value) {
   return v
 }
 
+function buildOrderWhere(req, orderNumber) {
+  const where = {}
+  if (typeof orderNumber === 'number' && Number.isFinite(orderNumber)) {
+    where.order_number = orderNumber
+  }
+  if (!req.admin) {
+    where.user_id = req.uid
+  }
+  return where
+}
+
+async function findAccessibleOrder(req, orderNumber, transaction) {
+  return dbHandler.Orders.findOne({
+    where: buildOrderWhere(req, orderNumber),
+    transaction,
+  })
+}
+
 async function applyStockDeltaForOrderItems(items, orderId, deltaSign, transaction) {
   // deltaSign: -1 to deduct, +1 to restore
   for (const it of items) {
@@ -46,7 +64,9 @@ async function applyStockDeltaForOrderItems(items, orderId, deltaSign, transacti
 module.exports = function (server) {
   server.get(['/order', '/order/'], middlewares.Auth(), async (req, res) => {
     try {
+      const where = buildOrderWhere(req)
       const rows = await dbHandler.Orders.findAll({
+        where,
         include: [
           {
             model: dbHandler.OrderItems,
@@ -83,6 +103,7 @@ module.exports = function (server) {
       const created = await dbHandler.sequelize.transaction(async (t) => {
         const order = await dbHandler.Orders.create(
           {
+            user_id: req.uid,
             item_id: Number(items[0]?.product_id || 0),
             payment_method: String(req.body.payment_method),
             due_date: req.body.due_date,
@@ -129,7 +150,7 @@ module.exports = function (server) {
 server.put(['/order/:id', '/order/:id/'], middlewares.Auth(), async (req, res) => {
     try {
       const id = Number(req.params.id)
-      const order = await dbHandler.Orders.findByPk(id)
+      const order = await findAccessibleOrder(req, id)
       if (!order) {
         res.status(404).json({ message: 'Order does not exist' }).end()
         return
@@ -152,7 +173,7 @@ server.put(['/order/:id', '/order/:id/'], middlewares.Auth(), async (req, res) =
         return
       }
 
-      const order = await dbHandler.Orders.findByPk(id)
+      const order = await findAccessibleOrder(req, id)
       if (!order) {
         res.status(404).json({ message: 'No such order' }).end()
         return
@@ -197,7 +218,7 @@ server.put(['/order/:id', '/order/:id/'], middlewares.Auth(), async (req, res) =
   server.put(['/order/:id/payment', '/order/:id/payment/'], middlewares.Auth(), async (req, res) => {
     try {
       const id = Number(req.params.id)
-      const order = await dbHandler.Orders.findByPk(id)
+      const order = await findAccessibleOrder(req, id)
       if (!order) {
         res.status(404).json({ message: 'No such order' }).end()
         return

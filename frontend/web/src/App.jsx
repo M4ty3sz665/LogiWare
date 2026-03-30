@@ -1,64 +1,21 @@
-import './App.css'
-import { useState, useEffect } from 'react'
-import Login from './Components/Login.jsx'
-import Register from './Components/Register.jsx'
+import { useCallback } from 'react'
+import { Navigate, useNavigate } from 'react-router-dom'
 import HomePage from './Components/HomePage.jsx'
 
 function App() {
-  const [view, setView] = useState('login') // 'login', 'register', or 'home'
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const navigate = useNavigate()
+  const token = localStorage.getItem('token')
 
-  // Check if user is already logged in on mount
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      setIsLoggedIn(true)
-      setView('home')
-    } 
-  }, [])
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('token')
+    navigate('/login', { replace: true })
+  }, [navigate])
 
-  const handleLogin = (user) => {
-    console.log('Sikeres bejelentkezés:', user)
-    setIsLoggedIn(true)
-    setView('home')
+  if (!token) {
+    return <Navigate to="/login" replace />
   }
 
-  const handleRegister = (user, token) => {
-    console.log('Sikeres regisztráció:', user)
-    if (token) {
-      setIsLoggedIn(true)
-      setView('home')
-    } else {
-      setView('login')
-    }
-  }
-
-  const handleLogout = () => {
-    setIsLoggedIn(false)
-    setView('login')
-  }
-
-  return (
-    <>
-      {isLoggedIn && view === 'home' && (
-        <HomePage
-          onLogout={handleLogout}
-        />
-      )}
-      {!isLoggedIn && view === 'login' && (
-        <Login
-          onLogin={handleLogin}
-          onShowRegister={() => setView('register')}
-        />
-      )}
-      {!isLoggedIn && view === 'register' && (
-        <Register
-          onRegister={handleRegister}
-          onShowLogin={() => setView('login')}
-        />
-      )}
-    </>
-  )
+  return <HomePage onLogout={handleLogout} />
 }
 
 export default App

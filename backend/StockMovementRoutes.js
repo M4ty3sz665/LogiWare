@@ -11,7 +11,7 @@ module.exports = function (server) {
             include: [
               {
                 model: dbHandler.Products,
-                attributes: ['id', 'name', 'product_code', 'low_stock_threshold'],
+                attributes: ['id', 'name', 'product_code'],
               },
             ],
           },
