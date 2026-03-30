@@ -13,11 +13,14 @@ using Avalonia;
 using LogiWareAvalonia.Services;
 using Avalonia.Controls.ApplicationLifetimes;
 using System.Data;
+using Avalonia.Platform;
 namespace LogiWareAvalonia.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
         private readonly ServerConnection _conn = new("http://localhost:3000");
+        [ObservableProperty]
+        private bool _isMobileView;
         [ObservableProperty]
         private bool _isadminview;
         [ObservableProperty]
@@ -55,6 +58,8 @@ namespace LogiWareAvalonia.ViewModels
             EditCommand = new AsyncRelayCommand<object>(OpenEditWindow);
             ViewCommand = new AsyncRelayCommand<Order>(ViewOrders);
             InitializeData();
+            if (OperatingSystem.IsWindows()) IsMobileView = true;
+            else IsMobileView = true;
         }
         private async Task InitializeData()
         {
