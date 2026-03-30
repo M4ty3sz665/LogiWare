@@ -28,7 +28,6 @@ module.exports = function (server) {
       price_net: req.body.price_net,
       price_gross: req.body.price_gross,
       vat_rate: req.body.vat_rate,
-      product_code: req.body.product_code,
       supplier_id: req.body.supplier_id ?? null,
       low_stock_threshold: req.body.low_stock_threshold ?? 0,
     })

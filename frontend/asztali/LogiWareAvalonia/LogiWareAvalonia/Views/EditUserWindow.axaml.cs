@@ -1,13 +1,16 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using LogiWareAvalonia.Classes;
 using LogiWareAvalonia.ViewModels;
+using System;
 
 namespace LogiWareAvalonia.Views
 {
     public partial class EditUserWindow : Window
     {
+        public Action OnSaveCallBack { get; set; }
         public EditUserWindow()
         {
             InitializeComponent();
@@ -18,6 +21,11 @@ namespace LogiWareAvalonia.Views
         {
             InitializeComponent();
             DataContext = new LogiWareAvalonia.ViewModels.EditUserWindowViewModel(itemToEdit);
+        }
+        private void Savebutton_Click(object s, RoutedEventArgs e)
+        {
+            OnSaveCallBack.Invoke();
+            this.Close();
         }
     }
 }

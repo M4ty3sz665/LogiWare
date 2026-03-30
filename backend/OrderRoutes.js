@@ -50,13 +50,14 @@ module.exports = function (server) {
         include: [
           {
             model: dbHandler.OrderItems,
-            include: [{ model: dbHandler.Products }],
+            include: [{ model: dbHandler.Products, as:'product' }],
           },
         ],
         order: [['order_number', 'DESC']],
       })
       res.json(rows).end()
     } catch (err) {
+      console.log(err)
       res.status(500).json({ message: err?.parent?.sqlMessage || err?.message || 'Server error' }).end()
     }
   })

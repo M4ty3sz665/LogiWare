@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 namespace LogiWareAvalonia.Classes
 {
-    class OrderItem
+    public class OrderItem
     {
-        public int Order_number { get; set; }
-        public int Product_id { get; set; }
+        public int id { get; set; }
+        public int product_id { get; set; }
+        public Product ?product { get; set; }
+        public int order_id { get; set; }
         public int amount { get; set; }
-
+        public int unit_price_net { get; set; }
+        public int unit_price_gross { get; set; }
+        public int vat_rate { get; set; }
     }
 }

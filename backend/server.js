@@ -27,8 +27,12 @@ orderItemRoutes(server)
 const { DataTypes } = require('sequelize')
 
 async function ensureSchema() {
+  dbHandler.Orders.sync({force:true})
   const qi = dbHandler.sequelize.getQueryInterface()
-
+/*  dbHandler.Stock.sync({force:true})
+  dbHandler.Orders.sync({force:true})
+  dbHandler.Suppliers.sync({force:true})
+  dbHandler.OrderItems.sync({force:true})*/
   // Keep this lightweight: only add missing columns we rely on.
   const products = await qi.describeTable('products')
   if (!products.supplier_id) {

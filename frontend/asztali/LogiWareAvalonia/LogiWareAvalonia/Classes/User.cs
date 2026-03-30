@@ -9,7 +9,7 @@ namespace LogiWareAvalonia.Classes
 {
     public class User
     {
-        private ServerConnection _conn = new ServerConnection("http://localhost:3000");
+        private readonly ServerConnection _conn = new("http://localhost:3000");
         public int id { get; set; }
         public string name { get; set; }
         public string email { get; set; }
@@ -17,6 +17,6 @@ namespace LogiWareAvalonia.Classes
         public string passsword { get; set; }
         public string role { get; set; }
         public string joined_at { get; set; }
-        public int admin { get; set; }
+        public bool admin { get; set; }
     }
 }

@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace LogiWareAvalonia.Classes
 {
-    class Product
+    public class Product
     {
+        public int id { get; set; }
        public string name { get; set; }
        public int price_net { get; set; }
        public int price_gross { get; set; }
        public int vat_rate { get; set; }
-       public int product_code { get; set; }
+        public int? supplier_id { get; set; }
+        public int low_stock_threshold { get; set; }
     }
 }

@@ -12,26 +12,29 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Avalonia;
 using LogiWareAvalonia.Services;
 using Avalonia.Controls.ApplicationLifetimes;
+using System.Data;
 namespace LogiWareAvalonia.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private ServerConnection _conn = new ServerConnection("http://localhost:3000");
+        private readonly ServerConnection _conn = new("http://localhost:3000");
         [ObservableProperty]
         private bool _isadminview;
         [ObservableProperty]
-        private ObservableCollection<object> _currentItems = new();
+        private ObservableCollection<object> _currentItems = [];
         [ObservableProperty]
         private string _titleLabel = "Dashboard";
         [ObservableProperty]
-        private ObservableCollection<User> _users = new(); 
+        private ObservableCollection<User> _users = []; 
         [ObservableProperty]
-        private ObservableCollection<Stock> _stock = new();
+        private ObservableCollection<Stock> _stocklist = [];
         [ObservableProperty]
-        private ObservableCollection<Order> _orders = new();
+        private ObservableCollection<Order> _orders = [];
         [ObservableProperty]
-        private ObservableCollection<Product> _products = new();
-        private string ActiveWindow = "none";
+        private ObservableCollection<OrderItem> _items = [];
+        [ObservableProperty]
+        private ObservableCollection<Product> _products = [];
+        public string ActiveWindow = "none";
         public AsyncRelayCommand UsersButtonClick { get; }
         public AsyncRelayCommand StockButtonClick { get; }
         public AsyncRelayCommand OrdersButtonClick { get; }
@@ -39,6 +42,7 @@ namespace LogiWareAvalonia.ViewModels
         public AsyncRelayCommand NewItemCommand { get; }
         public AsyncRelayCommand<Window> LogOutClick { get; }
         public AsyncRelayCommand<object> EditCommand { get; }
+        public AsyncRelayCommand<Order> ViewCommand { get; }
         public MainWindowViewModel()
         {
             Isadminview = Token.IsAdmin;
@@ -49,7 +53,37 @@ namespace LogiWareAvalonia.ViewModels
             NewItemCommand = new AsyncRelayCommand(NewItem);
             LogOutClick = new AsyncRelayCommand<Window>(LogOut);
             EditCommand = new AsyncRelayCommand<object>(OpenEditWindow);
-
+            ViewCommand = new AsyncRelayCommand<Order>(ViewOrders);
+            InitializeData();
+        }
+        private async Task InitializeData()
+        {
+            var sers = await _conn.Profiles();
+            Users = [.. sers];
+            var items = await _conn.GetStock();
+            Stocklist = [.. items];
+            var prods = await _conn.GetProducts();
+            Products = [.. prods];
+            var orders = await _conn.GetOrders();
+            Orders = [.. orders];
+            var orderitems = await _conn.GetOrderItems();
+            Items = [.. orderitems];
+            foreach (var item in Items)
+            {
+                Product oneproduct = Products.FirstOrDefault(u => u.id == item.product_id);
+                item.product = oneproduct;
+            }
+        }
+        private async Task ViewOrders(Order order) 
+        {
+            if(order != null)
+            {
+                if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+                {
+                    ViewOrderWindow win = new(order);
+                    win.ShowDialog(desktop.MainWindow);
+                }
+            }
         }
         private async Task OnUsersClick()
         {
@@ -69,7 +103,24 @@ namespace LogiWareAvalonia.ViewModels
             if (objectToEdit == null) return;
             // 1. Create the new window instance
             // 2. Pass the selected user data into its constructor
-            var editWin = new EditUserWindow(objectToEdit);
+            var editWin = new EditUserWindow(objectToEdit)
+            {
+                OnSaveCallBack = async () =>
+                {
+                    switch (ActiveWindow)
+                    {
+                        case "stock":
+                            await OnStockClick();
+                            break;
+                        case "users":
+                            await OnUsersClick();
+                            break;
+                        case "orders":
+                            await OnOrdersClick();
+                            break;
+                    }
+                }
+            };
             editWin.Show();
         }
         private async Task OnStockClick()
@@ -77,19 +128,25 @@ namespace LogiWareAvalonia.ViewModels
             ActiveWindow = "stock";
             TitleLabel = "Inventory & Stock";
             CurrentItems.Clear();
-
-            // Adding dummy data to CurrentItems so they appear on screen
-            CurrentItems.Add(new Stock { product_name = "Alma", item_id = 1, amount = 10, created_at = DateOnly.FromDateTime(DateTime.Today) });
+            var items = await _conn.GetStock();
+            Stocklist = [.. items];
+            foreach (var item in Stocklist) CurrentItems.Add(item);
         }
         private async Task OnOrdersClick()
         {
             ActiveWindow = "orders";
             TitleLabel = "Orders Tracking";
             CurrentItems.Clear();
+            var get = await _conn.GetOrders();
+            Orders = [.. get];
+            foreach (var item in Orders)
+            {
+                User oneuser  = Users.FirstOrDefault(u => u.id == item.company_id);
+                if (oneuser != null) item.company_name = oneuser.name;
+                else item.company_name = "company not found";
+                CurrentItems.Add(item);
+            }
 
-            // Add dummy orders to CurrentItems
-            CurrentItems.Add(new Order { order_number = 1001, status = "TBD", payment_method = "Bank Transfer" });
-            CurrentItems.Add(new Order { order_number = 1002, status = "Shipped", payment_method = "Credit Card" });
         }
         private async Task OnProductsClick()
         {
@@ -124,7 +181,7 @@ namespace LogiWareAvalonia.ViewModels
                     break;
                 }
             }
-                EditUserWindow editWin = new EditUserWindow(newItem);
+                EditUserWindow editWin = new(newItem);
                 editWin.Show();
             }
         }
@@ -138,7 +195,7 @@ namespace LogiWareAvalonia.ViewModels
             {
                 Window1 loginWin = new();
                 desktop.MainWindow = loginWin;
-                loginWin.ShowDialog(currentWindow);
+                await loginWin.ShowDialog(currentWindow);
                 currentWindow.Close();
             }
         }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -19,6 +20,7 @@ namespace LogiWareAvalonia.ViewModels
         private string _title;
 
         public AsyncRelayCommand<Window> SaveCommand { get; }
+        public Action<string> OnSaveCallBack { get; set; }
 
         public EditUserWindowViewModel(object item)
         {
@@ -48,6 +50,7 @@ namespace LogiWareAvalonia.ViewModels
                 if (result != "Error" || regresult != false)
                 {
                     window?.Close();
+                    OnSaveCallBack?.Invoke("user");
                 }
             }
             else if (EditingItem is Stock s)
@@ -57,6 +60,7 @@ namespace LogiWareAvalonia.ViewModels
                 if (result != "Error" || regresult != false)
                 {
                     window?.Close();
+                    OnSaveCallBack?.Invoke("stock");
                 }
             }
             else if(EditingItem is Order o)
@@ -66,6 +70,7 @@ namespace LogiWareAvalonia.ViewModels
                 if (result != "Error" || regresult != false)
                 {
                     window?.Close();
+                    OnSaveCallBack?.Invoke("order");
                 }
             }
         }

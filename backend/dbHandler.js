@@ -64,22 +64,9 @@ const product = sequelize.define('product', {
 		type: DataTypes.INTEGER,
 		allowNull: false
 	},
-    product_code:{
-        type:DataTypes.STRING,
-        allowNull:false
-    },
-    recieved_at:{
-        type:DataTypes.DATE,
-        defaultValue:DataTypes.NOW
-    },
     supplier_id:{
         type:DataTypes.INTEGER,
         allowNull:true
-    },
-    low_stock_threshold: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0
     }
 })
 
@@ -116,14 +103,14 @@ const orderItem = sequelize.define('order_item', {
 })
 
 const order = sequelize.define('order', {
+	user_id: {
+		type: DataTypes.INTEGER,
+		allowNull: true
+	},
 
 	item_id: {
 		type: DataTypes.INTEGER,
 		allowNull: false
-	},
-	created_at: {
-		type: DataTypes.DATE,
-        defaultValue:DataTypes.NOW
 	},
     order_number:{
         type:DataTypes.INTEGER,
@@ -174,10 +161,6 @@ const stock_movement = sequelize.define('stock_movement', {
         type:DataTypes.STRING,
         allowNull:false
     },
-    time_of_movement: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
-    },
     note: {
         type: DataTypes.STRING
     }
@@ -197,10 +180,7 @@ const stock = sequelize.define('stock', {
 		type: DataTypes.INTEGER,
 		defaultValue: 1
 	},
-	created_at:{
-    type:DataTypes.DATEONLY,
-    defaultValue:DataTypes.NOW
-    }
+	
 	
 })
 
@@ -222,10 +202,6 @@ const receipt = sequelize.define('receipt', {
     status:{
         type:DataTypes.STRING,
         allowNull:false
-    },
-    created_at:{
-        type:DataTypes.DATEONLY,
-        defaultValue:DataTypes.NOW
     },
     total_net:{
         type:DataTypes.INTEGER
@@ -276,6 +252,9 @@ const supplier = sequelize.define('supplier', {
 })
 
 // Kapcsolatok definiálása
+user.hasMany(order, { foreignKey: 'user_id' })
+order.belongsTo(user, { foreignKey: 'user_id' })
+
 orderItem.belongsTo(product, { foreignKey: 'product_id' })
 product.hasMany(orderItem, { foreignKey: 'product_id' })
 

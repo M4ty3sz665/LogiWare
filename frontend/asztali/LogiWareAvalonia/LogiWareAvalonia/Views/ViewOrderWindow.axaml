@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:LogiWareAvalonia.ViewModels"
+        xmlns:models="clr-namespace:LogiWareAvalonia.Classes;assembly=LogiWareAvalonia"
+        x:Class="LogiWareAvalonia.Views.ViewOrderWindow"
+        x:DataType="vm:EditUserWindowViewModel"
+        Title="{Binding Title}"
+        Width="350" SizeToContent="Height"
+        Background="#1E1E22">
+    <Border Background="#2B2B30" Margin="0,0,0,10" Padding="15" CornerRadius="8">
+        <StackPanel>
+            <TextBlock FontSize="16">
+                <Run Text="Order #" FontWeight="Bold"/>
+                <Run Text="{Binding }" FontWeight="Bold"/>
+                <Run Text=" - "/>
+                <Run Text="{Binding company_name}" FontStyle="Italic" Foreground="Gray"/>
+            </TextBlock>
+            <TextBlock  FontSize="12">
+				<Run Text="{Binding status}"></Run>
+				<Run Text="   Net "/>
+				<Run Text="{Binding price_net}"/>
+				<Run Text="   Gross "/>
+				<Run Text="{Binding price_gross}"/>
+				<Button Padding="3"
+						HorizontalAlignment="Right"
+						Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ViewCommand}">View</Button>
+				<Button Padding="3"
+						Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditCommand}"
+						CommandParameter="{Binding}">Edit</Button>
+			</TextBlock>
+        </StackPanel>
+    </Border>
+</Window>

@@ -15,12 +15,10 @@ namespace LogiWareAvalonia.Services
     class ServerConnection
     {
         public User ActiveUser;
-        HttpClient client = new HttpClient();
-        string serverUrl = "";
-        public ServerConnection(string serverUrl)
-        {
-            this.serverUrl = serverUrl;
-        }
+        readonly HttpClient client = new();
+        readonly string serverUrl = "";
+        public ServerConnection(string serverUrl) => this.serverUrl = serverUrl;
+
         private void AddAuth()
         {
             client.DefaultRequestHeaders.Remove("Authorization");
@@ -34,7 +32,7 @@ namespace LogiWareAvalonia.Services
                 var jsonInfo = new
                 {
                     email = username,
-                    password = password
+                    password
                 };
                 string jsonStringified = JsonSerializer.Serialize(jsonInfo);
                 HttpContent sendThis = new StringContent(jsonStringified, Encoding.UTF8, "Application/json");
@@ -63,12 +61,12 @@ namespace LogiWareAvalonia.Services
             {
                 var jsonInfo = new
                 {
-                    name = newUser.name,
+                    newUser.name,
                     password = newUser.passsword,
-                    phone = newUser.phone,
-                    role = newUser.role,
-                    email = newUser.email,
-                    admin = newUser.role.ToLower() == "admin"
+                    newUser.phone,
+                    newUser.role,
+                    newUser.email,
+                    admin = newUser.role.Equals("admin", StringComparison.CurrentCultureIgnoreCase)
                 };
                 string jsonStringified = JsonSerializer.Serialize(jsonInfo);
                 HttpContent sendThis = new StringContent(jsonStringified, Encoding.UTF8, "Application/json");
@@ -87,7 +85,7 @@ namespace LogiWareAvalonia.Services
         }
         public async Task<List<User>> Profiles()
         {
-            List<User> all = new List<User>();
+            List<User> all;
             string url = serverUrl + "/profiles";
             try
             {
@@ -95,48 +93,48 @@ namespace LogiWareAvalonia.Services
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 string result = await response.Content.ReadAsStringAsync();
-                all = JsonSerializer.Deserialize<List<User>>(result).ToList();
+                all = [.. JsonSerializer.Deserialize<List<User>>(result)];
             }
             catch (Exception e)
             {
                 new MessageWindow(e.Message, "Error").Show();
-                return new List<User>();
+                return [];
             }
             return all;
         }
         public async Task<List<Stock>> GetStock()
         {
-            List<Stock> all = new List<Stock>();
+            List<Stock> all;
             string url = serverUrl + "/stock";
             try
             {
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 string result = await response.Content.ReadAsStringAsync();
-                all = JsonSerializer.Deserialize<List<Stock>>(result).ToList();
+                all = [.. JsonSerializer.Deserialize<List<Stock>>(result)];
             }
             catch (Exception e)
             {
                 new MessageWindow(e.Message, "Error").Show();
-                return new List<Stock>();
+                return [];
             }
             return all;
         }
         public async Task<List<Product>> GetProducts()
         {
-            List<Product> all = new List<Product>();
+            List<Product> all;
             string url = serverUrl + "/product";
             try
             {
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 string result = await response.Content.ReadAsStringAsync();
-                all = JsonSerializer.Deserialize<List<Product>>(result).ToList();
+                all = [.. JsonSerializer.Deserialize<List<Product>>(result)];
             }
             catch (Exception e)
             {
                 new MessageWindow(e.Message, "Error").Show();
-                return new List<Product>();
+                return [];
             }
             return all;
         }
@@ -148,12 +146,12 @@ namespace LogiWareAvalonia.Services
                 AddAuth();
                 var jsonInfo = new
                 {
-                    id = oneuser.id,
-                    name = oneuser.name,
-                    email = oneuser.email,
-                    phone = oneuser.phone,
+                    oneuser.id,
+                    oneuser.name,
+                    oneuser.email,
+                    oneuser.phone,
                     password = oneuser.passsword,
-                    role = oneuser.role
+                    oneuser.role
                 };
                 string jsonStringified = JsonSerializer.Serialize(jsonInfo);
                 HttpContent sendThis = new StringContent(jsonStringified, Encoding.UTF8, "Application/json");
@@ -169,17 +167,14 @@ namespace LogiWareAvalonia.Services
         }
         public async Task<string> EditStock(Stock onestock)
         {
-            string url = serverUrl + "/onestock";
+            string url = serverUrl + "/stock/" + onestock.id;
             try
             {
                 AddAuth();
                 var jsonInfo = new
                 {
-                    id = onestock.id,
-                    product_name = onestock.product_name,
-                    item_id = onestock.item_id,
-                    amount = onestock.amount,
-                    created_at = onestock.created_at
+                    product_id = onestock.product_code,
+                    onestock.amount,
                 };
 
                 string jsonStringified = JsonSerializer.Serialize(jsonInfo);
@@ -204,9 +199,11 @@ namespace LogiWareAvalonia.Services
                 AddAuth();
                 var jsonInfo = new
                 {
-                    item_id=oneStock.item_id,
-                    amount=oneStock.amount,
-                    created_at=DateOnly.FromDateTime(DateTime.Now)
+                    product_id = oneStock.product_code,
+                    type = "ADJUST",
+                    oneStock.amount,
+                    note = "",
+                    time_of_movement = DateOnly.FromDateTime(DateTime.Now)
                 };
                 string jsonStringified = JsonSerializer.Serialize(jsonInfo);
                 HttpContent sendThis = new StringContent(jsonStringified, Encoding.UTF8, "Application/json");
@@ -223,19 +220,37 @@ namespace LogiWareAvalonia.Services
         }
         public async Task<List<Order>> GetOrders()
         {
-            List<Order> all = new List<Order>();
+            List<Order> all;
             string url = serverUrl + "/order";
             try
             {
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 string result = await response.Content.ReadAsStringAsync();
-                all = JsonSerializer.Deserialize<List<Order>>(result).ToList();
+                all = [.. JsonSerializer.Deserialize<List<Order>>(result)];
             }
             catch (Exception e)
             {
                 new MessageWindow(e.Message, "Error").Show();
-                return new List<Order>();
+                return [];
+            }
+            return all;
+        }
+        public async Task<List<OrderItem>> GetOrderItems()
+        {
+            List<OrderItem> all;
+            string url = serverUrl + "/orderitem";
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                string result = await response.Content.ReadAsStringAsync();
+                all = [.. JsonSerializer.Deserialize<List<OrderItem>>(result)];
+            }
+            catch (Exception e)
+            {
+                new MessageWindow(e.Message, "Error").Show();
+                return [];
             }
             return all;
         }
@@ -247,13 +262,13 @@ namespace LogiWareAvalonia.Services
                 AddAuth();
                 var jsonInfo = new
                 {
-                    order_number = oneorder.order_number,
-                    company_id = oneorder.company_id,
-                    status = oneorder.status,
-                    payment_status = oneorder.payment_status,
-                    payment_method = oneorder.payment_method,
-                    due_date = oneorder.due_date,
-                    due_time = oneorder.due_time
+                    oneorder.order_number,
+                    oneorder.company_id,
+                    oneorder.status,
+                    oneorder.payment_status,
+                    oneorder.payment_method,
+                    oneorder.due_date,
+                    oneorder.due_time
                 };
 
                 string jsonStringified = JsonSerializer.Serialize(jsonInfo);
@@ -272,18 +287,20 @@ namespace LogiWareAvalonia.Services
         }
         public async Task<bool> CreateOrder(Order oneOrder)
         {
-            string url = serverUrl + "/stock";
+            string url = serverUrl + "/order";
             try
             {
                 AddAuth();
                 var jsonInfo = new
                 {
-                    item_id = oneOrder.company_id,
-                    amount = oneOrder.due_date,
-                    payment_method = oneOrder.payment_method,
+                    oneOrder.payment_method,
+                    oneOrder.due_date,
+                    oneOrder.due_time,
+                    oneOrder.payment_status,
+                    oneOrder.company_id
                 };
                 string jsonStringified = JsonSerializer.Serialize(jsonInfo);
-                HttpContent sendThis = new StringContent(jsonStringified, Encoding.UTF8, "Application/json");
+                HttpContent sendThis = new StringContent(jsonStringified, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await client.PostAsync(url, sendThis);
                 response.EnsureSuccessStatusCode();
                 string result = await response.Content.ReadAsStringAsync();
@@ -295,7 +312,84 @@ namespace LogiWareAvalonia.Services
                 return (false);
             }
         }
+                // Create a new product
+                public async Task<bool> CreateProduct(Product newProduct)
+                {
+                    string url = serverUrl + "/product";
+                    try
+                    {
+                        AddAuth();
+                        var jsonInfo = new
+                        {
+                            newProduct.name,
+                            newProduct.price_net,
+                            newProduct.price_gross,
+                            newProduct.vat_rate,
+                            newProduct.supplier_id,
+                            newProduct.low_stock_threshold
+                        };
+                        string jsonStringified = JsonSerializer.Serialize(jsonInfo);
+                        HttpContent sendThis = new StringContent(jsonStringified, Encoding.UTF8, "application/json");
+                        HttpResponseMessage response = await client.PostAsync(url, sendThis);
+                        response.EnsureSuccessStatusCode();
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        new MessageWindow(e.Message, "Product Create Error").Show();
+                        return false;
+                    }
+                }
+
+                // Edit an existing product
+                public async Task<bool> EditProduct(Product product)
+                {
+                    string url = serverUrl + "/product/" + product.id;
+                    try
+                    {
+                        AddAuth();
+                        var jsonInfo = new
+                        {
+                            product.name,
+                            product.price_net,
+                            product.price_gross,
+                            product.vat_rate,
+                            product.supplier_id,
+                            product.low_stock_threshold
+                        };
+                        string jsonStringified = JsonSerializer.Serialize(jsonInfo);
+                        HttpContent sendThis = new StringContent(jsonStringified, Encoding.UTF8, "application/json");
+                        HttpResponseMessage response = await client.PutAsync(url, sendThis);
+                        response.EnsureSuccessStatusCode();
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        new MessageWindow(e.Message, "Product Edit Error").Show();
+                        return false;
+                    }
+                }
+
+                // Get current user profile
+                public async Task<User> GetCurrentUser()
+                {
+                    string url = serverUrl + "/oneuser";
+                    try
+                    {
+                        AddAuth();
+                        HttpResponseMessage response = await client.GetAsync(url);
+                        response.EnsureSuccessStatusCode();
+                        string result = await response.Content.ReadAsStringAsync();
+                        return JsonSerializer.Deserialize<User>(result);
+                    }
+                    catch (Exception e)
+                    {
+                        new MessageWindow(e.Message, "Get User Error").Show();
+                        return null;
+                    }
+                }
+        }
     }
-}
+
 
 

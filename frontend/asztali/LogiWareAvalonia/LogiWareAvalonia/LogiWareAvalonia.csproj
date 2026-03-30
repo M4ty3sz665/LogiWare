@@ -9,6 +9,14 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AvaloniaXaml Remove="Views\Window1.axaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Views\Window1.axaml.cs" />
+  </ItemGroup>
+
 <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.0.6" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.6" />

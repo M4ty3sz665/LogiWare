@@ -14,7 +14,6 @@ module.exports = function (server) {
         ],
         order: [['id', 'DESC']],
       })
-
       // Normalize output so the frontend always has easy fields,
       // even if the JOIN is missing (no matching product).
       const normalized = rows.map((r) => {
