@@ -4,7 +4,6 @@ import CreateOrder from './home/CreateOrder.jsx'
 import Stock from './home/Stock.jsx'
 import Cart from './home/Cart.jsx'
 import Profile from './home/Profile.jsx'
-import Orders from './home/Orders.jsx'
 import { apiFetch, isAbortError } from '../utils/api'
 import BadgeIcon from './ui/BadgeIcon.jsx'
 import { BTN_DANGER } from './ui/buttonStyles.js'
@@ -61,7 +60,6 @@ function HomePage({ onLogout }) {
   const menuMeta = {
     dashboard: { title: 'Kezdő képernyő', icon: 'dashboard', tone: 'indigo' },
     'create-order': { title: 'Rendelés Létrehozása', icon: 'create', tone: 'cyan' },
-    orders: { title: 'Rendelések', icon: 'orders', tone: 'amber' },
     stock: { title: 'Készletkezelés', icon: 'stock', tone: 'emerald' },
     cart: { title: 'Kosár', icon: 'cart', tone: 'rose' },
     profile: { title: 'Profil', icon: 'profile', tone: 'slate' },
@@ -80,8 +78,6 @@ function HomePage({ onLogout }) {
         return <Dashboard userInfo={userInfo} onNavigate={setActiveMenu} />
       case 'create-order':
         return <CreateOrder />
-      case 'orders':
-        return <Orders />
       case 'stock':
         return <Stock />
       case 'cart':
@@ -168,19 +164,6 @@ function HomePage({ onLogout }) {
             <span className="inline-flex items-center gap-3">
               <BadgeIcon icon="create" tone="cyan" size="sm" />
               <span>Rendelés létrehozása</span>
-            </span>
-          </button>
-          <button
-            onClick={() => selectMenu('orders')}
-            className={`w-full text-left px-6 py-3 rounded-lg transition font-medium ${
-              activeMenu === 'orders'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white ring-1 ring-blue-300/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_20px_rgba(30,64,175,0.35)]'
-                : 'text-gray-300 hover:bg-slate-700 hover:text-white'
-            }`}
-          >
-            <span className="inline-flex items-center gap-3">
-              <BadgeIcon icon="orders" tone="amber" size="sm" />
-              <span>Rendelések</span>
             </span>
           </button>
           <button

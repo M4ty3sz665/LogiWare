@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { apiFetch, isAbortError } from '../../utils/api'
 import { EmptyState, LoadingState } from '../ui/StateBlocks.jsx'
-import { BTN_OUTLINE_ICON } from '../ui/buttonStyles.js'
+import { useToast } from '../ToastProvider.jsx'
+import { BTN_DANGER, BTN_OUTLINE_ICON } from '../ui/buttonStyles.js'
 
 const HUF = new Intl.NumberFormat('hu-HU', {
   style: 'currency',
@@ -9,12 +10,36 @@ const HUF = new Intl.NumberFormat('hu-HU', {
   maximumFractionDigits: 0,
 })
 
+function formatWeightKg(value) {
+  return `${Number(value || 0).toFixed(1)} kg`
+}
+
+function getPricePerTenthKg(pricePerKg) {
+  return Math.floor(Number(pricePerKg || 0) / 10)
+}
+
 function statusBadgeClass(status) {
   const s = String(status || '').toUpperCase()
   if (s === 'COMPLETED') return 'bg-emerald-50 text-emerald-700 ring-emerald-200'
   if (s === 'IN_PROGRESS') return 'bg-blue-50 text-blue-700 ring-blue-200'
   if (s === 'CANCELLED') return 'bg-red-50 text-red-700 ring-red-200'
   return 'bg-slate-50 text-slate-700 ring-slate-200'
+}
+
+function statusLabelHu(status) {
+  const s = String(status || '').toUpperCase()
+  if (s === 'COMPLETED') return 'Teljesítve'
+  if (s === 'IN_PROGRESS') return 'Folyamatban'
+  if (s === 'CANCELLED') return 'Lemondva'
+  return 'Függőben'
+}
+
+function paymentStatusHu(value) {
+  const s = String(value || '').trim().toLowerCase()
+  if (!s) return 'Nincs feldolgozva'
+  if (s === 'not processed') return 'Nincs feldolgozva'
+  if (s === 'processed') return 'Feldolgozva'
+  return value
 }
 
 function collectOrderItems(order) {
@@ -25,19 +50,19 @@ function collectOrderItems(order) {
 }
 
 function Cart() {
+  const toast = useToast()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [expandedByOrder, setExpandedByOrder] = useState({})
+  const [savingId, setSavingId] = useState(null)
 
-  useEffect(() => {
-    const controller = new AbortController()
-
-    async function load() {
+  const load = useCallback(
+    async (signal) => {
       setLoading(true)
       setError('')
       try {
-        const data = await apiFetch('/order', { signal: controller.signal })
+        const data = await apiFetch('/order', { signal })
         setRows(Array.isArray(data) ? data : [])
       } catch (e) {
         if (!isAbortError(e)) {
@@ -46,19 +71,23 @@ function Cart() {
       } finally {
         setLoading(false)
       }
-    }
+    },
+    [],
+  )
 
-    load()
+  useEffect(() => {
+    const controller = new AbortController()
+    load(controller.signal)
     return () => controller.abort()
-  }, [])
+  }, [load])
 
   const orders = useMemo(() => {
     return rows.map((order) => {
       const items = collectOrderItems(order)
       const total = items.reduce((sum, item) => {
         const qty = Number(item?.amount || 0)
-        const unit = Number(item?.unit_price_gross || 0)
-        return sum + qty * unit
+        const unitPerTenthKg = getPricePerTenthKg(item?.unit_price_gross || 0)
+        return sum + unitPerTenthKg * Math.round(qty * 10)
       }, 0)
       return {
         ...order,
@@ -77,13 +106,31 @@ function Cart() {
     }))
   }
 
+  const cancelOrder = async (orderNumber, status) => {
+    const s = String(status || '').toUpperCase()
+    if (s === 'CANCELLED' || s === 'COMPLETED') return
+    if (savingId) return
+    const ok = window.confirm('Biztos lemondod? (készlet vissza lesz töltve)')
+    if (!ok) return
+    setSavingId(orderNumber)
+    try {
+      await apiFetch(`/order/${orderNumber}/status`, { method: 'PUT', body: { status: 'CANCELLED' } })
+      toast.success('Rendelés lemondva.')
+      await load()
+    } catch (e) {
+      toast.error(e?.message || 'Nem sikerült lemondani a rendelést.')
+    } finally {
+      setSavingId(null)
+    }
+  }
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h3 className="text-lg font-bold text-gray-800">Kosár</h3>
           <p className="mt-1 text-sm text-gray-500">
-            Itt látod a rendelés összegzéseket: melyik rendelés mit és mennyit tartalmaz.
+            Itt látod a rendeléseket kg alapú mennyiségekkel, 0.1 kg-os egységárral.
           </p>
         </div>
       </div>
@@ -108,10 +155,10 @@ function Cart() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${statusBadgeClass(order.status)}`}>
-                    {String(order.status || 'TBD').toUpperCase()}
+                    {statusLabelHu(order.status)}
                   </span>
                   <span className="inline-flex items-center rounded-full bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
-                    {order.payment_status || 'not processed'}
+                    {paymentStatusHu(order.payment_status)}
                   </span>
                   <button
                     type="button"
@@ -134,8 +181,8 @@ function Cart() {
                   ) : (
                     order._items.map((item) => {
                       const qty = Number(item?.amount || 0)
-                      const unit = Number(item?.unit_price_gross || 0)
-                      const lineTotal = qty * unit
+                      const unitPerTenthKg = getPricePerTenthKg(item?.unit_price_gross || 0)
+                      const lineTotal = unitPerTenthKg * Math.round(qty * 10)
                       return (
                         <div
                           key={item.id}
@@ -150,10 +197,10 @@ function Cart() {
                             </div>
                           </div>
                           <div className="text-xs font-semibold text-gray-700">
-                            {qty} db
+                            {formatWeightKg(qty)}
                           </div>
                           <div className="text-xs font-semibold text-gray-700">
-                            {HUF.format(lineTotal)}
+                            {HUF.format(unitPerTenthKg)} / 0.1 kg, {HUF.format(lineTotal)}
                           </div>
                         </div>
                       )
@@ -162,8 +209,23 @@ function Cart() {
                 </div>
               )}
 
-              <div className="mt-3 border-t border-gray-200 pt-3 text-right text-sm font-semibold text-gray-800">
-                Összesen: <span className="text-base font-bold text-gray-900">{HUF.format(order._totalGross)}</span>
+              <div className="mt-3 flex items-center justify-between gap-3 border-t border-gray-200 pt-3">
+                <button
+                  type="button"
+                  onClick={() => cancelOrder(order.order_number, order.status)}
+                  disabled={
+                    savingId === order.order_number ||
+                    String(order.status || '').toUpperCase() === 'CANCELLED' ||
+                    String(order.status || '').toUpperCase() === 'COMPLETED'
+                  }
+                  className={BTN_DANGER}
+                >
+                  {savingId === order.order_number ? 'Lemondás...' : 'Lemondás'}
+                </button>
+                <div className="text-right text-sm font-semibold text-gray-800">
+                  Összesen:{' '}
+                  <span className="text-base font-bold text-gray-900">{HUF.format(order._totalGross)}</span>
+                </div>
               </div>
             </article>
           ))
