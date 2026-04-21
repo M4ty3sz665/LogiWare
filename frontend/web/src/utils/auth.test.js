@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { validateEmail, login, register } from './auth'
+import { validateEmail, validatePhone, login, register } from './auth'
 
 describe('validateEmail', () => {
   test('should return true for a valid email address', () => {
@@ -73,6 +73,28 @@ describe('login', () => {
     await expect(login({ email: 'x@x.com', password: 'wrong' })).rejects.toThrow(
       'Wrong username or password',
     )
+  })
+})
+
+describe('validatePhone', () => {
+  test('should return true for valid international format', () => {
+    expect(validatePhone('+36301234567')).toBe(true)
+  })
+
+  test('should return true for spaced phone number', () => {
+    expect(validatePhone('+36 30 123 4567')).toBe(true)
+  })
+
+  test('should return false for letters in phone number', () => {
+    expect(validatePhone('+36ABC12345')).toBe(false)
+  })
+
+  test('should return false for unsupported special characters', () => {
+    expect(validatePhone('+522452562525!%"!%"!%2')).toBe(false)
+  })
+
+  test('should return false for too short phone number', () => {
+    expect(validatePhone('12345')).toBe(false)
   })
 })
 

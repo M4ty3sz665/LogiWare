@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { register as apiRegister, validateEmail } from '../utils/auth'
+import { register as apiRegister, validateEmail, validatePhone } from '../utils/auth'
 import { useToast } from './ToastProvider.jsx'
 import { useNavigate } from 'react-router-dom'
 
@@ -29,6 +29,11 @@ function Register({ onRegister, onShowLogin }) {
 
     if (!validateEmail(email)) {
       setError('Kérlek valós e‑mail címet adj meg.')
+      return
+    }
+
+    if (!validatePhone(phone)) {
+      setError('Kérlek valós telefonszámot adj meg (csak számok, 8-15 hossz).')
       return
     }
 
@@ -143,6 +148,9 @@ function Register({ onRegister, onShowLogin }) {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 autoComplete="tel"
+                inputMode="tel"
+                pattern="^\+?[0-9\s()-]{8,20}$"
+                title="Adj meg valós telefonszámot (pl. +36301234567)"
                 disabled={isSubmitting}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition disabled:bg-gray-100 text-sm"
               />

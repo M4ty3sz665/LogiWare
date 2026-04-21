@@ -70,6 +70,12 @@ test('shows invalid email error for no-dot domain email', async () => {
   expect(await screen.findByText(/valós e.mail/i)).toBeInTheDocument()
 })
 
+test('shows invalid phone error for malformed phone input', async () => {
+  const { container } = renderRegister()
+  fillForm({ container, phone: '+522452562525!%"!%"!%2' })
+  expect(await screen.findByText(/valós telefonszámot adj meg/i)).toBeInTheDocument()
+})
+
 test('shows password mismatch error', async () => {
   const { container } = renderRegister()
   fillForm({ container, password: 'pass123', confirmPassword: 'different' })

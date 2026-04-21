@@ -1,6 +1,33 @@
 const middlewares = require("./middlewares")
 const dbHandler = require('./dbHandler')
 
+function isValidEmail(email) {
+    if (typeof email !== 'string') return false
+    return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,10}$/.test(email.trim())
+}
+
+function isValidPhone(phone) {
+    if (typeof phone !== 'string') return false
+
+    const trimmed = phone.trim()
+    const allowedCharacters = /^\+?[0-9\s()-]+$/
+
+    if (!trimmed || !allowedCharacters.test(trimmed)) {
+        return false
+    }
+
+    if ((trimmed.match(/\+/g) || []).length > 1) {
+        return false
+    }
+
+    if (trimmed.includes('+') && !trimmed.startsWith('+')) {
+        return false
+    }
+
+    const digitsOnly = trimmed.replace(/\D/g, '')
+    return digitsOnly.length >= 8 && digitsOnly.length <= 15
+}
+
 module.exports = function(server) {
     server.post("/login", async (req, res) => {
         const user = await dbHandler.Users.findOne({
@@ -20,9 +47,34 @@ module.exports = function(server) {
     })
 
     server.post("/register", async (req, res) => {
+    const name = typeof req.body.name === 'string' ? req.body.name.trim() : ''
+    const email = typeof req.body.email === 'string' ? req.body.email.trim() : ''
+    const phone = typeof req.body.phone === 'string' ? req.body.phone.trim() : ''
+    const password = typeof req.body.password === 'string' ? req.body.password : ''
+
+    if (!name || !email || !phone || !password) {
+        res.status(400).json({"message":"Missing required fields"}).end()
+        return
+    }
+
+    if (!isValidEmail(email)) {
+        res.status(400).json({"message":"Invalid email format"}).end()
+        return
+    }
+
+    if (!isValidPhone(phone)) {
+        res.status(400).json({"message":"Invalid phone number format"}).end()
+        return
+    }
+
+    if (password.length < 6) {
+        res.status(400).json({"message":"Password must be at least 6 characters"}).end()
+        return
+    }
+
     const userByEmail = await dbHandler.Users.findOne({
         where:{
-            email: req.body.email
+            email
         }
     })
     if(userByEmail){
@@ -30,11 +82,11 @@ module.exports = function(server) {
     }
     else{
         const newUser = await dbHandler.Users.create({
-            name: req.body.name,
-            password: req.body.password,
-            phone:req.body.phone,
+            name,
+            password,
+            phone,
             role:'user',
-            email:req.body.email,
+            email,
             admin:false
         })
         const token = middlewares.JWT.sign({"uid":newUser.id , "admin":newUser.admin}, process.env.SECRETKEY, {expiresIn: "6h"})

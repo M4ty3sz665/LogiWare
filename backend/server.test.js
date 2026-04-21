@@ -362,6 +362,36 @@ describe('LogiWare Backend Tests', () => {
             expect(res.statusCode).toBe(400);
             expect(res.body).toHaveProperty('message', 'A user with this email already exists');
         });
+
+        test('POST /register - should reject invalid email format', async () => {
+            const uniquePart = `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+            const res = await request(server)
+                .post('/register')
+                .send({
+                    name: `invalid-email-${uniquePart}`,
+                    email: 'ASD@gmail.comrigjdrrghdruhvuvhuhr',
+                    phone: '+36301234567',
+                    password: 'password123'
+                });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Invalid email format');
+        });
+
+        test('POST /register - should reject invalid phone format', async () => {
+            const uniquePart = `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+            const res = await request(server)
+                .post('/register')
+                .send({
+                    name: `invalid-phone-${uniquePart}`,
+                    email: `valid-${uniquePart}@test.com`,
+                    phone: '+522452562525!%"!%"!%2',
+                    password: 'password123'
+                });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Invalid phone number format');
+        });
     });
 
     describe('Products - CRUD Operations', () => {
