@@ -13,6 +13,22 @@ function badge(status) {
   return 'bg-slate-50 text-slate-700 ring-slate-200'
 }
 
+function statusLabelHu(status) {
+  const s = String(status || '').toUpperCase()
+  if (s === 'COMPLETED') return 'Teljesítve'
+  if (s === 'IN_PROGRESS') return 'Folyamatban'
+  if (s === 'CANCELLED') return 'Lemondva'
+  return 'Függőben'
+}
+
+function paymentStatusHu(value) {
+  const s = String(value || '').trim().toLowerCase()
+  if (!s) return 'Nincs feldolgozva'
+  if (s === 'not processed') return 'Nincs feldolgozva'
+  if (s === 'processed') return 'Feldolgozva'
+  return value
+}
+
 function Orders() {
   const toast = useToast()
   const [rows, setRows] = useState([])
@@ -80,7 +96,7 @@ function Orders() {
         <div>
           <h3 className="text-lg font-bold text-gray-800">Rendelések</h3>
           <p className="mt-1 text-sm text-gray-500">
-            Státusz flow: TBD → IN_PROGRESS → COMPLETED. Lemondás: CANCELLED.
+            Státusz folyamat: Függőben → Folyamatban → Teljesítve. Lemondás: Lemondva.
           </p>
         </div>
         <div className="w-full sm:w-80">
@@ -135,12 +151,12 @@ function Orders() {
                         o.status,
                       )}`}
                     >
-                      {String(o.status || 'TBD').toUpperCase()}
+                      {statusLabelHu(o.status)}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-800">
                     <div className="inline-flex items-center rounded-full bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
-                      {o.payment_status || 'not processed'}
+                      {paymentStatusHu(o.payment_status)}
                     </div>
                   </td>
                   <td className="px-4 py-3 text-right">

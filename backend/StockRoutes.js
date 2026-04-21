@@ -1,6 +1,12 @@
 const middlewares = require("./middlewares")
 const dbHandler = require('./dbHandler')
 
+function normalizeWeightKg(value) {
+  const num = Number(value)
+  if (!Number.isFinite(num)) return NaN
+  return Math.round(num * 10) / 10
+}
+
 module.exports = function (server) {
   server.get('/stock', async (req, res) => {
     try {
@@ -42,7 +48,7 @@ module.exports = function (server) {
     try {
       const productId = Number(req.body.product_id)
       const type = String(req.body.type || '').toUpperCase()
-      const amount = Number(req.body.amount)
+      const amount = normalizeWeightKg(req.body.amount)
       const note = req.body.note
       const time = req.body.time_of_movement
 
@@ -68,7 +74,7 @@ module.exports = function (server) {
       // Ensure a stock row exists for this product.
       let stockRow = await dbHandler.Stock.findOne({ where: { item_id: productId } })
       if (!stockRow) {
-        stockRow = await dbHandler.Stock.create({ item_id: productId, amount: 0 })
+        stockRow = await dbHandler.Stock.create({ item_id: productId, amount: 0.0 })
       }
 
       const current = Number(stockRow.amount || 0)
@@ -86,7 +92,7 @@ module.exports = function (server) {
         movementAmount = amount - current
       }
 
-      await stockRow.update({ amount: newAmount })
+      await stockRow.update({ amount: Math.round(newAmount * 10) / 10 })
 
       const movement = await dbHandler.stockMovements.create({
         stock_id: stockRow.id,
@@ -106,7 +112,7 @@ module.exports = function (server) {
   server.post('/stock', middlewares.Auth(), async (req, res) => {
     const created = await dbHandler.Stock.create({
       item_id: req.body.item_id,
-      amount: req.body.amount,
+      amount: normalizeWeightKg(req.body.amount),
     })
     res.status(201).json({ message: 'stock successfully added', stock: created }).end()
   })
@@ -120,7 +126,7 @@ module.exports = function (server) {
 
     await onestock.update({
       item_id: req.body.item_id ?? onestock.item_id,
-      amount: req.body.amount ?? onestock.amount,
+      amount: req.body.amount == null ? onestock.amount : normalizeWeightKg(req.body.amount),
       created_at: req.body.created_at ?? onestock.created_at,
     })
     res.status(200).json({ message: 'stock successfully updated' }).end()

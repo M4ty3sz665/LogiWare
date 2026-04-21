@@ -47,7 +47,6 @@ function Products() {
           apiFetch('/product', { auth: false, signal: controller.signal }),
           apiFetch('/supplier', { signal: controller.signal }),
         ])
-        console.log('DEBUG: productsData', productsData)
         setProducts(Array.isArray(productsData) ? productsData : [])
         setSuppliers(Array.isArray(suppliersData) ? suppliersData : [])
       } catch (e) {
@@ -250,10 +249,10 @@ function Products() {
                 Beszállító
               </th>
               <th className="px-4 py-3 text-right text-xs font-semibold tracking-wider text-gray-600">
-                Nettó
+                Nettó / 0.1 kg
               </th>
               <th className="px-4 py-3 text-right text-xs font-semibold tracking-wider text-gray-600">
-                Bruttó
+                Bruttó / 0.1 kg
               </th>
               <th className="px-4 py-3 text-right text-xs font-semibold tracking-wider text-gray-600">
                 ÁFA%
@@ -327,7 +326,7 @@ function Products() {
                   {editing ? 'Áru szerkesztése' : 'Új áru'}
                 </h4>
                 <p className="mt-1 text-sm text-gray-500">
-                  Név, kód, árak, ÁFA, beszállító.
+                  Név, kód, 0.1 kg-os árak, ÁFA, beszállító.
                 </p>
               </div>
               <button
@@ -367,7 +366,7 @@ function Products() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Nettó</label>
+                  <label className="block text-sm font-medium text-gray-700">Nettó / 0.1 kg</label>
                   <input
                     inputMode="numeric"
                     value={form.price_net}
@@ -376,7 +375,7 @@ function Products() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Bruttó</label>
+                  <label className="block text-sm font-medium text-gray-700">Bruttó / 0.1 kg</label>
                   <input
                     inputMode="numeric"
                     value={form.price_gross}

@@ -3,6 +3,12 @@ const dbHandler = require('./dbHandler')
 
 const ALLOWED_STATUSES = new Set(['TBD', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'])
 
+function normalizeWeightKg(value) {
+  const num = Number(value)
+  if (!Number.isFinite(num)) return NaN
+  return Math.round(num * 10) / 10
+}
+
 function normalizeStatus(value) {
   if (!value) return null
   const v = String(value).trim().toUpperCase()
@@ -34,18 +40,18 @@ async function applyStockDeltaForOrderItems(items, orderId, deltaSign, transacti
   // deltaSign: -1 to deduct, +1 to restore
   for (const it of items) {
     const productId = Number(it.product_id)
-    const qty = Number(it.amount)
+    const qty = normalizeWeightKg(it.amount)
     if (!productId || !Number.isFinite(qty) || qty <= 0) {
       throw new Error('Invalid order items')
     }
 
     let stockRow = await dbHandler.Stock.findOne({ where: { item_id: productId }, transaction })
     if (!stockRow) {
-      stockRow = await dbHandler.Stock.create({ item_id: productId, amount: 0 }, { transaction })
+      stockRow = await dbHandler.Stock.create({ item_id: productId, amount: 0.0 }, { transaction })
     }
 
     const current = Number(stockRow.amount || 0)
-    const next = current + deltaSign * qty
+    const next = Math.round((current + deltaSign * qty) * 10) / 10
     await stockRow.update({ amount: next }, { transaction })
 
     await dbHandler.stockMovements.create(
@@ -117,7 +123,7 @@ module.exports = function (server) {
         // Create order items with prices copied from product.
         for (const it of items) {
           const productId = Number(it.product_id)
-          const qty = Number(it.amount)
+          const qty = normalizeWeightKg(it.amount)
           if (!productId || !Number.isFinite(qty) || qty <= 0) {
             throw new Error('Invalid items')
           }
