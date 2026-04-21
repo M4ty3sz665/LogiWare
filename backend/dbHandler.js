@@ -52,6 +52,11 @@ const product = sequelize.define('product', {
 		type: DataTypes.STRING,
 		allowNull: false
 	},
+	category: {
+		type: DataTypes.STRING,
+		allowNull: false,
+		defaultValue: 'zoldseg'
+	},
 	price_net: {
 		type: DataTypes.INTEGER,
 		allowNull: false
@@ -85,8 +90,8 @@ const orderItem = sequelize.define('order_item', {
 		allowNull: false
 	},
 	amount: {
-		type: DataTypes.INTEGER,
-        default:1
+		type: DataTypes.DECIMAL(10, 1),
+        defaultValue: 0.1
 	},
     unit_price_net:{
         type:DataTypes.INTEGER,
@@ -149,8 +154,8 @@ const stock_movement = sequelize.define('stock_movement', {
 		allowNull: false
 	},
 	amount: {
-		type: DataTypes.INTEGER,
-		defaultValue: 1
+		type: DataTypes.DECIMAL(10, 1),
+		defaultValue: 0.0
 	},
 	order_id: {
 		type: DataTypes.INTEGER,
@@ -177,8 +182,8 @@ const stock = sequelize.define('stock', {
 		allowNull: false
 	},
 	amount: {
-		type: DataTypes.INTEGER,
-		defaultValue: 1
+		type: DataTypes.DECIMAL(10, 1),
+		defaultValue: 0.0
 	},
 	
 	

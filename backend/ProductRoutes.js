@@ -1,6 +1,13 @@
 const middlewares = require("./middlewares")
 const dbHandler = require('./dbHandler')
 
+function normalizeCategory(value) {
+  const v = String(value || '').trim().toLowerCase()
+  if (v === 'zoldseg' || v === 'zöldség' || v === 'vegetable') return 'zoldseg'
+  if (v === 'gyumolcs' || v === 'gyümölcs' || v === 'fruit') return 'gyumolcs'
+  return null
+}
+
 module.exports = function (server) {
   server.get('/product', async (req, res) => {
     try {
@@ -25,6 +32,7 @@ module.exports = function (server) {
 
     await dbHandler.Products.create({
       name: req.body.name,
+      category: normalizeCategory(req.body.category) || 'zoldseg',
       price_net: req.body.price_net,
       price_gross: req.body.price_gross,
       vat_rate: req.body.vat_rate,
@@ -43,6 +51,7 @@ module.exports = function (server) {
 
     await oneProduct.update({
       name: req.body.name,
+      category: normalizeCategory(req.body.category) || oneProduct.category || 'zoldseg',
       price_net: req.body.price_net,
       price_gross: req.body.price_gross,
       vat_rate: req.body.vat_rate,

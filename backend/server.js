@@ -41,6 +41,26 @@ async function ensureSchema() {
       allowNull: true,
     })
   }
+  if (!products.category) {
+    await qi.addColumn('products', 'category', {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'zoldseg',
+    })
+  }
+  // Backfill category for existing products (idempotent).
+  // We use product_code prefixes where available (FR-* fruit, VG-* vegetable),
+  // and fall back to a small name-based list.
+  try {
+    await dbHandler.sequelize.query(
+      "UPDATE products SET category='gyumolcs' WHERE (category IS NULL OR category='' OR category='zoldseg') AND (product_code LIKE 'FR-%' OR LOWER(name) IN ('alma','banán','banan','narancs','eper','szőlő','szolo'))",
+    )
+    await dbHandler.sequelize.query(
+      "UPDATE products SET category='zoldseg' WHERE (category IS NULL OR category='') AND (product_code LIKE 'VG-%' OR LOWER(name) IN ('krumpli','vörös hagyma','voros hagyma','répa','repa','paradicsom','uborka'))",
+    )
+  } catch (e) {
+    console.log('Category backfill skipped:', e?.parent?.sqlMessage || e?.message || e)
+  }
 
   const stockMovements = await qi.describeTable('stock_movements')
   if (!stockMovements.time_of_movement) {
@@ -59,6 +79,11 @@ async function ensureSchema() {
   if (stockMovements.order_id && stockMovements.order_id.allowNull) {
     // keep current schema; we rely on defaultValue=0 in the model
   }
+  await qi.changeColumn('stock_movements', 'amount', {
+    type: DataTypes.DECIMAL(10, 1),
+    allowNull: false,
+    defaultValue: 0.0,
+  })
 
   const orders = await qi.describeTable('orders')
   if (!orders.user_id) {
@@ -67,6 +92,17 @@ async function ensureSchema() {
       allowNull: true,
     })
   }
+
+  await qi.changeColumn('stocks', 'amount', {
+    type: DataTypes.DECIMAL(10, 1),
+    allowNull: false,
+    defaultValue: 0.0,
+  })
+  await qi.changeColumn('order_items', 'amount', {
+    type: DataTypes.DECIMAL(10, 1),
+    allowNull: false,
+    defaultValue: 0.1,
+  })
 
   // Legacy cleanup: remove old client-company schema artifacts.
   try {

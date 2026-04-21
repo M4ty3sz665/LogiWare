@@ -12,7 +12,15 @@ const HUF = new Intl.NumberFormat('hu-HU', {
 
 function clampQty(n) {
   if (Number.isNaN(n)) return 0
-  return Math.max(0, Math.min(999, n))
+  return Math.max(0, Math.min(999, Math.round(n * 10) / 10))
+}
+
+function formatWeightKg(value) {
+  return `${Number(value || 0).toFixed(1)} kg`
+}
+
+function getPricePerTenthKg(pricePerKg) {
+  return Math.floor(Number(pricePerKg || 0) / 10)
 }
 
 function getTomorrowIsoDate() {
@@ -40,6 +48,7 @@ function downloadCsv(filename, rows) {
 function CreateOrder() {
   const toast = useToast()
   const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('all')
   const [orderQtyById, setOrderQtyById] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -94,7 +103,8 @@ function CreateOrder() {
         id: p.id,
         name: p.name,
         code: p.product_code,
-        price: Number(p.price_gross || 0),
+        category: p.category || 'zoldseg',
+        pricePerTenthKg: getPricePerTenthKg(p.price_gross),
         available: stockByItemId.get(p.id) || 0,
       }))
       .sort((a, b) => String(a.name).localeCompare(String(b.name), 'hu'))
@@ -106,6 +116,11 @@ function CreateOrder() {
     return stockItems.filter((i) => i.name.toLowerCase().includes(q) || String(i.code || '').toLowerCase().includes(q))
   }, [query, stockItems])
 
+  const filteredStockByCategory = useMemo(() => {
+    if (category === 'all') return filteredStock
+    return filteredStock.filter((i) => String(i.category || '').toLowerCase() === category)
+  }, [filteredStock, category])
+
   const orderItems = useMemo(() => {
     const items = []
     for (const item of stockItems) {
@@ -116,13 +131,13 @@ function CreateOrder() {
   }, [orderQtyById, stockItems])
 
   const total = useMemo(() => {
-    return orderItems.reduce((sum, i) => sum + i.price * i.qty, 0)
+    return orderItems.reduce((sum, i) => sum + i.pricePerTenthKg * Math.round(i.qty * 10), 0)
   }, [orderItems])
 
   const addOne = (id) => {
     setOrderQtyById((prev) => {
       const next = { ...prev }
-      next[id] = clampQty((next[id] || 0) + 1)
+      next[id] = clampQty((next[id] || 0) + 0.1)
       return next
     })
   }
@@ -131,7 +146,7 @@ function CreateOrder() {
     setOrderQtyById((prev) => {
       const next = { ...prev }
       const current = next[id] || 0
-      const updated = clampQty(current - 1)
+      const updated = clampQty(current - 0.1)
       if (updated <= 0) delete next[id]
       else next[id] = updated
       return next
@@ -164,7 +179,7 @@ function CreateOrder() {
 
     for (const it of orderItems) {
       if (it.qty > it.available) {
-        toast.error(`Nincs elég készlet: ${it.name} (max ${it.available})`)
+        toast.error(`Nincs elég készlet: ${it.name} (max ${formatWeightKg(it.available)})`)
         return false
       }
     }
@@ -180,10 +195,10 @@ function CreateOrder() {
 
     downloadCsv(`order-draft-${stamp}.csv`, [
       ['type', 'payment_method', 'due_date', 'total_huf', 'saved_at'],
-      ['draft', paymentMethod, dueDate, total, now.toISOString()],
+      ['piszkozat', paymentMethod, dueDate, total, now.toISOString()],
       [],
-      ['product_id', 'product_name', 'product_code', 'qty', 'unit_price_huf', 'line_total_huf'],
-      ...orderItems.map((i) => [i.id, i.name, i.code, i.qty, i.price, i.price * i.qty]),
+      ['product_id', 'product_name', 'product_code', 'qty_kg', 'unit_price_per_0_1kg_huf', 'line_total_huf'],
+      ...orderItems.map((i) => [i.id, i.name, i.code, i.qty, i.pricePerTenthKg, i.pricePerTenthKg * Math.round(i.qty * 10)]),
     ])
 
     setDraftSavedAt(now.toLocaleString('hu-HU'))
@@ -221,20 +236,32 @@ function CreateOrder() {
         <div>
           <h3 className="text-lg font-bold text-gray-800">Rendelés létrehozása</h3>
           <p className="mt-1 text-sm text-gray-500">
-            Válassz zöldséget vagy gyümölcsöt az áruk közül, jobb oldalt áll össze a kosár.
+            Válassz zöldséget vagy gyümölcsöt, a mennyiséget kg-ban add meg, az ár pedig 0.1 kg-ra van számolva.
           </p>
         </div>
 
-        <div className="w-full sm:w-72">
-          <label className="block text-xs font-semibold tracking-wide text-gray-600">
-            Keresés
-          </label>
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="pl. alma, paradicsom..."
-            className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        <div className="w-full sm:w-[28rem] grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <label className="block text-xs font-semibold tracking-wide text-gray-600">Kategória</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">Összes</option>
+              <option value="zoldseg">Zöldség</option>
+              <option value="gyumolcs">Gyümölcs</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold tracking-wide text-gray-600">Keresés</label>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="pl. alma, paradicsom..."
+              className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
         </div>
       </div>
 
@@ -284,7 +311,7 @@ function CreateOrder() {
               </div>
 
               <div className="mt-3 space-y-2">
-                {filteredStock.map((item) => (
+                {filteredStockByCategory.map((item) => (
                   <div
                     key={item.id}
                     className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg bg-white px-3 py-2 shadow-sm"
@@ -295,13 +322,13 @@ function CreateOrder() {
                         <span className="text-xs text-gray-500">({item.code})</span>
                       </div>
                       <div className="mt-1 text-xs text-gray-500">
-                        Készlet: <span className="font-semibold">{item.available}</span>
+                        Készlet: <span className="font-semibold">{formatWeightKg(item.available)}</span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
                       <div className="whitespace-nowrap text-sm font-semibold text-gray-700">
-                        {HUF.format(item.price)}
+                        {HUF.format(item.pricePerTenthKg)} / 0.1 kg
                       </div>
                       <button
                         type="button"
@@ -309,13 +336,13 @@ function CreateOrder() {
                         disabled={item.available <= 0}
                         className="rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 transition disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
                       >
-                        hozzáad
+                        +0.1 kg
                       </button>
                     </div>
                   </div>
                 ))}
 
-                {filteredStock.length === 0 && (
+                {filteredStockByCategory.length === 0 && (
                   <EmptyState className="rounded-lg border-none bg-white px-3 py-3" message="Nincs találat." />
                 )}
               </div>
@@ -331,35 +358,42 @@ function CreateOrder() {
                 {orderItems.map((item) => (
                   <div
                     key={item.id}
-                    className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg bg-white px-3 py-2 shadow-sm"
+                    className="rounded-lg bg-white px-4 py-3 shadow-sm"
                   >
                     <div className="min-w-0">
                       <div className="truncate text-sm font-medium text-gray-800">{item.name}</div>
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className="text-xs text-gray-500">Menny.</span>
-                        <input
-                          type="number"
-                          inputMode="numeric"
-                          min={0}
-                          max={999}
-                          value={item.qty}
-                          onChange={(e) => setQty(item.id, e.target.value)}
-                          className="w-20 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
+
+                      <div className="mt-3 grid grid-cols-1 gap-2">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-xs text-gray-500">Menny. (kg)</span>
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            min={0}
+                            max={999}
+                            step="0.1"
+                            value={item.qty}
+                            onChange={(e) => setQty(item.id, e.target.value)}
+                            className="w-32 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+
                         <button
                           type="button"
                           onClick={() => removeOne(item.id)}
-                          className="rounded-full bg-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-900 hover:bg-gray-300 transition"
+                          className="w-full rounded-lg bg-gray-200 px-3 py-2 text-xs font-semibold text-gray-900 hover:bg-gray-300 transition"
                         >
-                          töröl
+                          töröl (-0.1 kg)
                         </button>
-                      </div>
-                    </div>
 
-                    <div className="text-right">
-                      <div className="whitespace-nowrap text-sm font-semibold text-gray-700">{HUF.format(item.price)}</div>
-                      <div className="mt-1 whitespace-nowrap text-xs text-gray-500">
-                        {HUF.format(item.price * item.qty)}
+                        <div className="rounded-md bg-gray-50 px-3 py-2">
+                          <div className="text-right text-sm font-semibold text-gray-700">
+                            {HUF.format(item.pricePerTenthKg)} / 0.1 kg
+                          </div>
+                          <div className="mt-1 text-right text-xs text-gray-500">
+                            {formatWeightKg(item.qty)} = {HUF.format(item.pricePerTenthKg * Math.round(item.qty * 10))}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

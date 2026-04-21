@@ -16,12 +16,17 @@ function downloadCsv(filename, rows) {
   URL.revokeObjectURL(url)
 }
 
+function formatWeightKg(value) {
+  return `${Number(value || 0).toFixed(1)} kg`
+}
+
 function Stock() {
   const [rows, setRows] = useState([])
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('all')
 
   const [onlyNegative, setOnlyNegative] = useState(false)
   const [onlyZero, setOnlyZero] = useState(false)
@@ -70,12 +75,14 @@ function Stock() {
         id: p.id,
         name: p.name,
         code: p.product_code,
+        category: p.category || 'zoldseg',
         amount,
       }
     })
 
     const q = query.trim().toLowerCase()
     const out = list.filter((r) => {
+      if (category !== 'all' && String(r.category || '').toLowerCase() !== category) return false
       if (onlyNegative && r.amount >= 0) return false
       if (onlyZero && r.amount !== 0) return false
       if (!q) return true
@@ -87,7 +94,7 @@ function Stock() {
     })
     out.sort((a, b) => String(a.name).localeCompare(String(b.name), 'hu'))
     return out
-  }, [products, stockByItemId, query, onlyNegative, onlyZero])
+  }, [products, stockByItemId, query, onlyNegative, onlyZero, category])
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
@@ -95,18 +102,32 @@ function Stock() {
         <div>
           <h3 className="text-lg font-bold text-gray-800">Raktár</h3>
           <p className="mt-1 text-sm text-gray-500">
-            Összesített készlet nézet.
+            Összesített készlet nézet kg alapú mennyiségekkel.
           </p>
         </div>
 
-        <div className="w-full sm:w-96">
-          <label className="block text-xs font-semibold tracking-wide text-gray-600">Keresés</label>
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="név, kód, id, típus..."
-            className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        <div className="w-full sm:w-[28rem] grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <label className="block text-xs font-semibold tracking-wide text-gray-600">Kategória</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">Összes</option>
+              <option value="zoldseg">Zöldség</option>
+              <option value="gyumolcs">Gyümölcs</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold tracking-wide text-gray-600">Keresés</label>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="név, kód, id..."
+              className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
         </div>
       </div>
 
@@ -142,8 +163,8 @@ function Stock() {
             type="button"
             onClick={() =>
               downloadCsv('stock-summary.csv', [
-                ['product_id', 'name', 'code', 'amount'],
-                ...summaryRows.map((r) => [r.id, r.name, r.code, r.amount]),
+                ['product_id', 'name', 'code', 'category', 'amount_kg'],
+                ...summaryRows.map((r) => [r.id, r.name, r.code, r.category, r.amount]),
               ])
             }
             className={BTN_NEUTRAL}
@@ -165,14 +186,17 @@ function Stock() {
                 <th className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-600">
                   Kód
                 </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-600">
+                  Kategória
+                </th>
                 <th className="px-4 py-3 text-right text-xs font-semibold tracking-wider text-gray-600">
-                  Készlet
+                  Készlet (kg)
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 bg-white">
               {summaryRows.length === 0 ? (
-                <TableEmptyRow colSpan={3} message="Nincs megjeleníthető sor." />
+                <TableEmptyRow colSpan={4} message="Nincs megjeleníthető sor." />
               ) : (
                 summaryRows.map((r) => (
                   <tr key={r.id} className="hover:bg-gray-50">
@@ -180,8 +204,11 @@ function Stock() {
                       {r.name}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">{r.code || '-'}</td>
+                    <td className="px-4 py-3 text-xs font-semibold text-gray-700">
+                      {String(r.category || '').toLowerCase() === 'gyumolcs' ? 'Gyümölcs' : 'Zöldség'}
+                    </td>
                     <td className="px-4 py-3 text-sm font-semibold text-right tabular-nums text-gray-900">
-                      {r.amount}
+                      {formatWeightKg(r.amount)}
                     </td>
                   </tr>
                 ))
