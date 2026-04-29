@@ -3,7 +3,6 @@ const server = express()
 server.use(express.static("public"))
 const dbHandler = require("./dbHandler")
 server.use(express.json())
-require("dotenv").config()
 const PORT = process.env.PORT
 const userRoutes = require('./UserRoutes')
 userRoutes(server)
@@ -27,7 +26,7 @@ orderItemRoutes(server)
 const { DataTypes } = require('sequelize')
 
 async function ensureSchema() {
-  dbHandler.Orders.sync({force:true})
+  // dbHandler.Orders.sync({force:true})
   const qi = dbHandler.sequelize.getQueryInterface()
 /*  dbHandler.Stock.sync({force:true})
   dbHandler.Orders.sync({force:true})
