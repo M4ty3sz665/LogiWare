@@ -56,7 +56,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="mt-6 text-lg leading-relaxed text-blue-100/95 sm:text-2xl">
-              A LogiWare egy modern rendszer készletkezelésre, rendeléskövetésre és csapatmunkára.
+              A LogiWare egy modern rendszer készletkezelésre és rendeléskövetésre.
               Minden rendelést gyorsan átlátsz, a kosár összegzésig.
             </p>
 
