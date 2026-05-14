@@ -47,7 +47,7 @@ describe('login', () => {
     await login({ email: 'a@b.com', password: 'secret' })
 
     const [url, options] = mockFetch.mock.calls[0]
-    expect(url).toBe('/api/login')
+    expect(url).toBe('https://api.logiware.hu/api/login')
     expect(options.method).toBe('POST')
     expect(JSON.parse(options.body)).toEqual({ email: 'a@b.com', password: 'secret' })
   })
@@ -114,7 +114,7 @@ describe('register', () => {
     await register({ name: 'Bob', email: 'b@b.com', phone: '123', password: 'pass' })
 
     const [url, options] = mockFetch.mock.calls[0]
-    expect(url).toBe('/api/register')
+    expect(url).toBe('https://api.logiware.hu/api/register')
     expect(options.method).toBe('POST')
     expect(JSON.parse(options.body)).toEqual({
       name: 'Bob',

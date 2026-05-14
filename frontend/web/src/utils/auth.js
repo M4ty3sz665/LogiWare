@@ -1,4 +1,3 @@
-// shared helpers for authentication forms
 
 export function validateEmail(email) {
   const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,10}$/
@@ -28,20 +27,21 @@ export function validatePhone(phone) {
 }
 
 async function request(path, body) {
-  const res = await fetch(`/api/${path}`, {
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+  const res = await fetch(`${API_URL}/api/${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
 
-  // some responses (e.g. 204 No Content) or server errors may return an empty body
+  
   let data
   const text = await res.text()
   if (text) {
     try {
       data = JSON.parse(text)
     } catch (parseErr) {
-      // fall back to raw text if it's not JSON
+      
       data = { message: text }
     }
   } else {

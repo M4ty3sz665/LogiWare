@@ -69,7 +69,7 @@ describe('apiFetch', () => {
 
     await apiFetch('/product')
     expect(mockFetch).toHaveBeenCalledWith(
-      '/api/product',
+      'https://api.logiware.hu/api/product',
       expect.objectContaining({ method: 'GET' }),
     )
   })

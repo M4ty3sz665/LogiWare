@@ -10,7 +10,7 @@ function normalizeWeightKg(value) {
 module.exports = function (server) {
   server.get('/stock', async (req, res) => {
     try {
-      // Include product so frontend can show names/codes without extra call
+      
       const rows = await dbHandler.Stock.findAll({
         include: [
           {
@@ -20,8 +20,8 @@ module.exports = function (server) {
         ],
         order: [['id', 'DESC']],
       })
-      // Normalize output so the frontend always has easy fields,
-      // even if the JOIN is missing (no matching product).
+      
+      
       const normalized = rows.map((r) => {
         const plain = r.toJSON ? r.toJSON() : r
         const product = plain.product || null
@@ -42,8 +42,8 @@ module.exports = function (server) {
     }
   })
 
-  // Inventory operation: IN/OUT/ADJUST for a product.
-  // Body: { product_id, type: 'IN'|'OUT'|'ADJUST', amount, note?, time_of_movement? }
+  
+  
   server.post('/inventory/move', middlewares.Auth(), async (req, res) => {
     try {
       const productId = Number(req.body.product_id)
@@ -71,7 +71,7 @@ module.exports = function (server) {
         return
       }
 
-      // Ensure a stock row exists for this product.
+      
       let stockRow = await dbHandler.Stock.findOne({ where: { item_id: productId } })
       if (!stockRow) {
         stockRow = await dbHandler.Stock.create({ item_id: productId, amount: 0.0 })
@@ -99,7 +99,7 @@ module.exports = function (server) {
         amount: movementAmount,
         order_id: 0,
         movement_type: type,
-        time_of_movement: time,
+        time_of_movement: time || new Date(),
         note,
       })
 

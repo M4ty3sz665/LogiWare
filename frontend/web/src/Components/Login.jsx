@@ -38,7 +38,7 @@ function Login({ onLogin, onShowRegister }) {
       if (onLogin) {
         onLogin({ email })
       }
-      navigate('/app') // route váltás
+      navigate('/app') 
     } catch (err) {
       setError(err.message || 'Hiba történt a bejelentkezés során.')
     } finally {
@@ -65,7 +65,7 @@ function Login({ onLogin, onShowRegister }) {
       <div className="relative mx-auto flex min-h-screen w-full max-w-[1240px] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-md">
           <div className="bg-white/95 rounded-2xl shadow-xl border border-slate-100 px-8 py-10 text-slate-900">
-          {/* Header */}
+          {}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
               LogiWare
@@ -78,16 +78,16 @@ function Login({ onLogin, onShowRegister }) {
             </p>
           </div>
 
-          {/* Error Message */}
+          {}
           {error && (
             <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm font-medium">
               {error}
             </div>
           )}
 
-          {/* Form */}
+          {}
           <form className="space-y-4" onSubmit={handleSubmit}>
-            {/* Email */}
+            {}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
                 E-mail cím
@@ -104,7 +104,7 @@ function Login({ onLogin, onShowRegister }) {
               />
             </div>
 
-            {/* Password */}
+            {}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
                 Jelszó
@@ -121,7 +121,7 @@ function Login({ onLogin, onShowRegister }) {
               />
             </div>
 
-            {/* Submit Button */}
+            {}
             <button
               type="submit"
               disabled={isSubmitting}
@@ -131,7 +131,7 @@ function Login({ onLogin, onShowRegister }) {
             </button>
           </form>
 
-          {/* Register Link */}
+          {}
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-500">
               Nincs még fiókod?{' '}
@@ -146,7 +146,7 @@ function Login({ onLogin, onShowRegister }) {
           </div>
         </div>
 
-        {/* Footer Info */}
+        {}
         <div className="mt-8 text-center text-xs text-slate-400">
           <p>© 2026 LogiWare. Minden jog fenntartva.</p>
         </div>

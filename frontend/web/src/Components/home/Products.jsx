@@ -24,7 +24,7 @@ function Products() {
   const [showOutOfStock, setShowOutOfStock] = useState(false)
 
   const [showForm, setShowForm] = useState(false)
-  const [editing, setEditing] = useState(null) // product or null
+  const [editing, setEditing] = useState(null) 
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
   const [form, setForm] = useState({
@@ -74,7 +74,7 @@ function Products() {
       productId: p.id,
       name: p.name,
       code: p.product_code || '-',
-      amount: 0, // nincs stockByItemId, default 0
+      amount: 0, 
       supplierName: supplierById.get(p.supplier_id)?.company_name || '-',
       price_net: p.price_net,
       price_gross: p.price_gross,
@@ -87,7 +87,7 @@ function Products() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     return viewRows.filter((p) => {
-      // Minden áru látszódjon, ne szűrje ki a 0 készletet
+      
       if (!q) return true
       return (
         String(p.productId ?? '').toLowerCase().includes(q) ||
@@ -158,7 +158,7 @@ function Products() {
       const method = editing ? 'PUT' : 'POST'
       await apiFetch(url, { method, body: payload })
 
-      // refresh product list
+      
       const refreshedData = await apiFetch('/product', { auth: false })
       setProducts(Array.isArray(refreshedData) ? refreshedData : [])
       setShowForm(false)

@@ -26,13 +26,10 @@ orderItemRoutes(server)
 const { DataTypes } = require('sequelize')
 
 async function ensureSchema() {
-  // dbHandler.Orders.sync({force:true})
+  
   const qi = dbHandler.sequelize.getQueryInterface()
-/*  dbHandler.Stock.sync({force:true})
-  dbHandler.Orders.sync({force:true})
-  dbHandler.Suppliers.sync({force:true})
-  dbHandler.OrderItems.sync({force:true})*/
-  // Keep this lightweight: only add missing columns we rely on.
+
+  
   const products = await qi.describeTable('products')
   if (!products.supplier_id) {
     await qi.addColumn('products', 'supplier_id', {
@@ -47,9 +44,9 @@ async function ensureSchema() {
       defaultValue: 'zoldseg',
     })
   }
-  // Backfill category for existing products (idempotent).
-  // We use product_code prefixes where available (FR-* fruit, VG-* vegetable),
-  // and fall back to a small name-based list.
+  
+  
+  
   try {
     await dbHandler.sequelize.query(
       "UPDATE products SET category='gyumolcs' WHERE (category IS NULL OR category='' OR category='zoldseg') AND (product_code LIKE 'FR-%' OR LOWER(name) IN ('alma','banán','banan','narancs','eper','szőlő','szolo'))",
@@ -68,6 +65,12 @@ async function ensureSchema() {
       allowNull: false,
       defaultValue: DataTypes.NOW,
     })
+  } else {
+    await qi.changeColumn('stock_movements', 'time_of_movement', {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    })
   }
   if (!stockMovements.note) {
     await qi.addColumn('stock_movements', 'note', {
@@ -76,7 +79,7 @@ async function ensureSchema() {
     })
   }
   if (stockMovements.order_id && stockMovements.order_id.allowNull) {
-    // keep current schema; we rely on defaultValue=0 in the model
+    
   }
   await qi.changeColumn('stock_movements', 'amount', {
     type: DataTypes.DECIMAL(10, 1),
@@ -103,7 +106,7 @@ async function ensureSchema() {
     defaultValue: 0.1,
   })
 
-  // Legacy cleanup: remove old client-company schema artifacts.
+  
   try {
     await dbHandler.sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
 

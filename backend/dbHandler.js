@@ -173,6 +173,11 @@ const stock_movement = sequelize.define('stock_movement', {
         type:DataTypes.STRING,
         allowNull:false
     },
+    time_of_movement: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
     note: {
         type: DataTypes.STRING
     }
@@ -263,7 +268,7 @@ const supplier = sequelize.define('supplier', {
     }
 })
 
-// Kapcsolatok definiálása
+
 user.hasMany(order, { foreignKey: 'user_id' })
 order.belongsTo(user, { foreignKey: 'user_id' })
 

@@ -101,7 +101,7 @@ module.exports = function(server) {
     server.get('/profiles', middlewares.Auth(), async (req,res)=>{
     res.status(200).json(await dbHandler.Users.findAll()).end()
 })
-    // Delete own account
+    
     server.delete('/oneuser',middlewares.Auth(), async (req,res)=> {
         try{
             const deleted = await dbHandler.Users.destroy({where:{id:req.uid}})
@@ -117,7 +117,7 @@ module.exports = function(server) {
         }
  })
 
-    // Update own profile (admin can update role/admin too if sent)
+    
     server.put('/oneuser', middlewares.Auth(), async (req, res) => {
         try {
             const payload = {}
@@ -125,7 +125,7 @@ module.exports = function(server) {
             if(typeof req.body.email === 'string') payload.email = req.body.email
             if(typeof req.body.phone === 'string') payload.phone = req.body.phone
 
-            // role/admin only if admin
+            
             if(req.admin){
                 if(typeof req.body.role === 'string') payload.role = req.body.role
                 if(typeof req.body.admin === 'boolean') payload.admin = req.body.admin
@@ -143,7 +143,7 @@ module.exports = function(server) {
         }
     })
 
-    // Change password for own user
+    
     server.put('/oneuser/password', middlewares.Auth(), async (req, res) => {
         try{
             const currentPassword = req.body.currentPassword

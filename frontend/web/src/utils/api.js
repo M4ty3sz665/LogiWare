@@ -30,7 +30,8 @@ export async function apiFetch(path, { method = 'GET', body, auth = true, signal
     if (token) headers.Authorization = token
   }
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+  const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+  const API_URL = rawUrl.match(/^https?:\/\
   const res = await fetch(`${API_URL}/api${path}`, {
     method,
     headers: Object.keys(headers).length ? headers : undefined,

@@ -37,7 +37,7 @@ async function findAccessibleOrder(req, orderNumber, transaction) {
 }
 
 async function applyStockDeltaForOrderItems(items, orderId, deltaSign, transaction) {
-  // deltaSign: -1 to deduct, +1 to restore
+  
   for (const it of items) {
     const productId = Number(it.product_id)
     const qty = normalizeWeightKg(it.amount)
@@ -60,6 +60,7 @@ async function applyStockDeltaForOrderItems(items, orderId, deltaSign, transacti
         amount: deltaSign * qty,
         order_id: orderId,
         movement_type: deltaSign === -1 ? 'OUT' : 'IN',
+        time_of_movement: new Date(),
         note: deltaSign === -1 ? 'order created' : 'order cancelled/deleted',
       },
       { transaction },
@@ -88,8 +89,8 @@ module.exports = function (server) {
     }
   })
 
-  // Create order with items and automatic stock deduction.
-  // Body: { payment_method, due_date, due_time?, items:[{product_id, amount}] }
+  
+  
   server.post(['/order', '/order/'], middlewares.Auth(), async (req, res) => {
     const items = Array.isArray(req.body.items) ? req.body.items : []
     try {
@@ -120,7 +121,7 @@ module.exports = function (server) {
           { transaction: t },
         )
 
-        // Create order items with prices copied from product.
+        
         for (const it of items) {
           const productId = Number(it.product_id)
           const qty = normalizeWeightKg(it.amount)
@@ -143,7 +144,7 @@ module.exports = function (server) {
           )
         }
 
-        // Deduct stock for each item.
+        
         await applyStockDeltaForOrderItems(items, order.order_number, -1, t)
         return order
       })
@@ -169,7 +170,7 @@ server.put(['/order/:id', '/order/:id/'], middlewares.Auth(), async (req, res) =
       }).end()
     }
   })
-  // Update order status with flow enforcement
+  
   server.put(['/order/:id/status', '/order/:id/status/'], middlewares.Auth(), async (req, res) => {
     try {
       const id = Number(req.params.id)
@@ -191,7 +192,7 @@ server.put(['/order/:id', '/order/:id/'], middlewares.Auth(), async (req, res) =
         return
       }
 
-      // Simple flow: TBD -> IN_PROGRESS -> COMPLETED, cancellation allowed from TBD/IN_PROGRESS
+      
       if (next === 'IN_PROGRESS' && current !== 'TBD') {
         res.status(400).json({ message: 'Invalid transition' }).end()
         return
@@ -202,7 +203,7 @@ server.put(['/order/:id', '/order/:id/'], middlewares.Auth(), async (req, res) =
       }
 
       if (next === 'CANCELLED') {
-        // restore stock only once on cancel
+        
         await dbHandler.sequelize.transaction(async (t) => {
           const items = await dbHandler.OrderItems.findAll({ where: { order_id: id }, transaction: t })
           const plainItems = items.map((i) => ({ product_id: i.product_id, amount: i.amount }))
@@ -239,7 +240,7 @@ server.put(['/order/:id', '/order/:id/'], middlewares.Auth(), async (req, res) =
     }
   })
 
-  // Delete order (admin): restores stock if not yet cancelled.
+  
   server.delete(['/order/:id', '/order/:id/'], middlewares.Auth(), async (req, res) => {
     if (!req.admin) {
       res.status(403).json({ message: 'Forbidden' }).end()
